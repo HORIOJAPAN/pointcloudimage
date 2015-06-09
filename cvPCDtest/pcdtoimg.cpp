@@ -22,8 +22,6 @@ int save_pcdtoimg(string fileName, string imgName ,int resolution )
 	const int coefficient = 100 / resolution;	//データを解像度に合わせる係数
 	const int imgval_increment = 80;			//画素値の増加量
 
-	char	z;
-
 	//点群座標から画像の座標に変換した値
 	int	x_val, y_val;
 
@@ -39,7 +37,6 @@ int save_pcdtoimg(string fileName, string imgName ,int resolution )
 	if (ifs.fail())
 	{
 		cerr << "False" << endl;
-		z = getchar();
 		return EXIT_FAILURE;
 	}
 
