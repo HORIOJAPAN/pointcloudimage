@@ -167,6 +167,16 @@ int PCIclasstest(){
 
 }
 
+/*
+*　コンストラクタ
+*引数:
+*	string name 保存時のファイル名
+*	int width 　縦
+*	int height　横
+*	int resolution　解像度(cm)
+*返り値:
+*	なし
+*/
 PCImage::PCImage(string name, int width, int height, int resolution)
 {
 	img_name = name;
@@ -182,6 +192,14 @@ PCImage::~PCImage()
 {
 }
 
+/*
+*　指定座標に点を書き込む
+*引数:
+*	float x_val x座標
+*	float y_val y座標
+*返り値:
+*	なし
+*/
 void PCImage::writePoint(float x_val, float y_val)
 {
 	x_val *= coefficient;
@@ -190,12 +208,19 @@ void PCImage::writePoint(float x_val, float y_val)
 	//取得した[x,y]の画素値を増加させる
 	pcimage.data[(pcimage.rows / 2 + (int)y_val) * pcimage.cols + (int)x_val + pcimage.cols / 5] += imgval_increment;
 }
+
 int PCImage::readPoint(int x_val, int y_val)
 {
 	return pcimage.data[y_val * pcimage.cols + x_val];
 }
 
-
+/*
+*　画像を保存
+*引数:
+*	なし
+*返り値:
+*	0
+*/
 int PCImage::savePCImage()
 {
 	imwrite(img_name, pcimage);
