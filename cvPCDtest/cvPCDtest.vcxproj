@@ -67,10 +67,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="pcdtoimg.cpp" />
+    <ClCompile Include="pcimage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pcdtoimg.h" />
+    <ClInclude Include="pcimage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
