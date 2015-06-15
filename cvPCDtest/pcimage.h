@@ -25,7 +25,6 @@ private:
 	class PCI : public cv::Mat
 	{
 
-
 	};
 
 	cv::Mat pcimage[imageNum];				//‰æ‘œ—Ìˆæ‚Ì”z—ñ
