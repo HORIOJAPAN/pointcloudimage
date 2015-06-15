@@ -21,6 +21,12 @@ int PCIclasstest();
 class PCImage
 {
 private:
+
+	class PCI : public cv::Mat
+	{
+
+	};
+
 	cv::Mat pcimage[imageNum];				//画像領域の配列
 	cv::Mat* pcimage_ptr;					//現在参照している画像へのポインタ
 
