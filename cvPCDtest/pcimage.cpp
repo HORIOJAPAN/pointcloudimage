@@ -9,12 +9,12 @@ using namespace cv;
 using namespace std;
 
 /*
-*pcdファイル名を指定すると画像に変換して保存
-*引数:
+*　概要:pcdファイル名を指定すると画像に変換して保存
+*　引数:
 *	string fileName ファイル名
 *	string imgName 保存する画像名
 *	int resolution 1pix何cm四方にするか
-*返り値:
+*　返り値:
 *	成功 0  失敗　1
 */
 int save_pcdtoimg(string fileName, string imgName ,int resolution )
@@ -175,14 +175,18 @@ int PCIclasstest(){
 	}
 
 	cout << "complete" << endl;
-	pcimage.savePCImage();
+	pcimage.savePCImage(0);
 
 	return 0;
 }
 
+/*------------------------------
+*--↓--PCImageクラスの定義--↓--
+*-------------------------------*/
+
 /*
-*　コンストラクタ(引数有) 
-*引数:
+*　概要:コンストラクタ(引数有) 
+*　引数:
 *	string name 保存時のファイル名
 *	int width 　縦
 *	int height　横
@@ -225,8 +229,8 @@ PCImage::PCImage(int width, int height, int resolution)
 
 
 	cout << "Image name : " << *img_name_ptr << endl;
-	cout << "Width:" << pcimage_ptr->cols
-		<< "\nHeight:" << pcimage_ptr->rows << endl;
+	cout << "Width:" << pcimage[nowimage].cols
+		<< "\nHeight:" << pcimage[nowimage].rows << endl;
 
 }
 
@@ -261,14 +265,15 @@ void PCImage::writePoint(float x_val, float y_val)
 	y_val *= -coefficient;
 
 	//取得した[x,y]の画素値を増加させる
-	if (pcimage_ptr->data[(pcimage_ptr->rows / 2 + (int)y_val) * pcimage_ptr->cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
-		pcimage_ptr->data[(pcimage_ptr->rows / 2 + (int)y_val) * pcimage_ptr->cols + (int)x_val + limitpix] += imgval_increment;
+	if (pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
+		pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] += imgval_increment;
 	}
-	else pcimage_ptr->data[(pcimage_ptr->rows / 2 + (int)y_val) * pcimage_ptr->cols + (int)x_val + limitpix] = 255;
+	else pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] = 255;
 	
 
 	//imshow("pci", pcimage);
 }
+
 /*
 *　概要：指定座標(絶対座標)に点を書き込む
 *　引数:
@@ -281,13 +286,16 @@ void PCImage::writePoint(float x_val, float y_val)
 */
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
+
+	////画像位置に合わせて書き込む座標を補正する必要あり
+
 	this->writePoint(x_val, y_val);
 	this->checkPosition(pos_x, pos_y);
 
 }
 
 /*
-*　概要：画像内で端に近付いていないかチェック
+*　概要：画像内の自己位置をチェックして必要な処理を行う
 *　引数:
 *	float pos_x	自己位置のx座標(m)
 *	float pos_y	自己位置のy座標(m)
@@ -299,45 +307,111 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	int xi = int(pos_x * coefficient);
 	int yi = int(pos_y * -coefficient);
 
+	//上下左右のリミットチェック
+	//画像の端に近付いたら次の画像を用意し，離れたら保存する
 	//上方向のリミットチェック
-	if (isPrepareTOP && yi < limitpix)
+	if (!isPrepareTOP && yi < limitpix)
 	{
 		prepareImage(TOP);
+		isPrepareTOP = true;		//フラグをtrueにする
+	}
+	else if (isPrepareTOP && yi > limitpix)
+	{
+		savePCImage(TOP);
+		isPrepareTOP = false;		//フラグをfalseにする
 	}
 	//右方向のリミットチェック
-	if (isPrepareRIGHT && xi > pcimage_ptr->cols - limitpix)
+	if (!isPrepareRIGHT && xi > pcimage[nowimage].cols - limitpix)
 	{
 		prepareImage(RIGHT);
+		isPrepareRIGHT = true;
+	}
+	else if (isPrepareRIGHT && xi < pcimage[nowimage].cols - limitpix)
+	{
+		savePCImage(RIGHT);
+		isPrepareRIGHT = false;
 	}
 	//下方向のリミットチェック
-	if (isPrepareBOTTOM && yi >  pcimage_ptr->rows - limitpix)
+	if (!isPrepareBOTTOM && yi >  pcimage[nowimage].rows - limitpix)
 	{
 		prepareImage(BOTTOM);
+		isPrepareBOTTOM = true;
+
+	}
+	else if (isPrepareBOTTOM && yi <  pcimage[nowimage].rows - limitpix)
+	{
+		savePCImage(BOTTOM);
+		isPrepareBOTTOM = false;
 	}
 	//左方向のリミットチェック
-	if (isPrepareLEFT && xi < limitpix)
+	if (!isPrepareLEFT && xi < limitpix)
 	{
 		prepareImage(LEFT);
+		isPrepareLEFT = true;
 	}
+	else if (isPrepareLEFT && xi > limitpix)
+	{
+		savePCImage(LEFT);
+		isPrepareLEFT = false;
+	}
+
+	
 	return 0;
 }
 
 int PCImage::readPoint(int x_val, int y_val)
 {
 	//指定した[x,y]の画素値を返す
-	return pcimage_ptr->data[y_val * pcimage_ptr->cols + x_val];
+	return pcimage[nowimage].data[y_val * pcimage[nowimage].cols + x_val];
 }
 
 /*
 *　概要：画像を保存
 *　引数:
-*　	なし
+*　	int imgNum　画像番号
 *　返り値:
 *	0
 */
-int PCImage::savePCImage()
+int PCImage::savePCImage( int imgNum )
 {
-	imwrite(dirname + "/" + *img_name_ptr + ".jpg", *pcimage_ptr);
+	imwrite(dirname + "/" + *img_name_ptr + ".jpg", pcimage[imgNum]);
+	pcimage[imgNum].release();
+	img_name[imgNum] = "";
+	imageCondition[imgNum] = NONE;
+
+	return 0;
+}
+/*
+*　概要：画像を保存
+*　引数:
+*　	int imgNum　画像番号
+*　返り値:
+*	0
+*/
+void PCImage::savePCImage(Direction direction)
+{
+	for (int i = 0; i < imageNum ; i++)
+	{
+		if (imageCondition[i] == direction) this->savePCImage(i);
+	}
+
+}
+
+/*
+*　概要：画像を読み込む
+*　引数:
+*　	int emptyImageNum 画像番号
+*　返り値:
+*	0
+*/
+int PCImage::loadPCImage(int emptyImageNum)
+{
+	pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+	if (pcimage[emptyImageNum].empty())
+	{
+		pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
+	}
+
 	return 0;
 }
 
@@ -358,35 +432,31 @@ int PCImage::prepareImage(Direction direction)
 	switch (direction)
 	{
 	case TOP:
-		isPrepareTOP = true;														//フラグをtrueにする
 		emptyImageNum = getEmptyImage();											//空いている画像の番号を取得
 		img_name[emptyImageNum] = to_string(xy[0]) + "_" + to_string(xy[1] + 1);	//用意する画像名を作成
 		imageCondition[emptyImageNum] = TOP;										//画像の状態を変更
-		pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);					//既に作成されている場合を読み込む
+		loadPCImage(emptyImageNum);													//既に作成されている場合を読み込む
 		return 0;
 
 	case RIGHT:
-		isPrepareRIGHT = true;
 		emptyImageNum = getEmptyImage();
 		img_name[emptyImageNum] = to_string(xy[0] + 1) + "_" + to_string(xy[1]);
 		imageCondition[emptyImageNum] = RIGHT;
-		pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+		loadPCImage(emptyImageNum);
 		return 0;
 
 	case BOTTOM:
-		isPrepareBOTTOM = true;
 		emptyImageNum = getEmptyImage();
 		img_name[emptyImageNum] = to_string(xy[0]) + "_" + to_string(xy[1] - 1);
 		imageCondition[emptyImageNum] = BOTTOM;
-		pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+		loadPCImage(emptyImageNum);
 		return 0;
 
 	case LEFT:
-		isPrepareLEFT = true;
 		emptyImageNum = getEmptyImage();
 		img_name[emptyImageNum] = to_string(xy[0] - 1) + "_" + to_string(xy[1]);
 		imageCondition[emptyImageNum] = LEFT;
-		pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+		loadPCImage(emptyImageNum);
 		return 0;
 
 	default:
@@ -426,4 +496,17 @@ void PCImage::getImageNumber( int xy[] )
 		xy[0] = stoi(img_name[nowimage].substr(0, x_pos));
 		xy[1] = stoi(img_name[nowimage].substr(x_pos + 1));
 	}
+}
+
+/*
+*　概要：中心画像を指定方向にシフトする
+*　引数:
+*	Direction direction シフトする方向
+*　返り値:
+*	なし
+*/
+int PCImage::shiftCenterImage(Direction direction)
+{
+
+	return 0;
 }
