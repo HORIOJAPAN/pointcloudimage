@@ -308,6 +308,8 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	int yi = int(pos_y * -coefficient);
 
 
+
+
 	//上下左右のリミットチェック
 	//画像の端に近付いたら次の画像を用意し，離れたら保存する
 	//上方向のリミットチェック
