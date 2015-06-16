@@ -17,18 +17,38 @@ int save_floorimg(std::string src_imgName, std::string dst_imgName);
 //PCImageクラスのテストをする関数
 int PCIclasstest();
 
+
+
 //点群画像を作成するクラス
 class PCImage
 {
-private:
+public:
+	enum Direction { NONE, TOP, RIGHT, BOTTOM, LEFT, CENTER };		//方向を表す列挙型
+	enum NowNumber { ZERO, ONE, TWO, THREE };
 
+	//Matクラスを継承した点群画像クラス
+	//画像番号を考慮した処理を行う
 	class PCI : public cv::Mat
 	{
+	private:
+		PCImage& pciOut;
 
+		Direction			imageCondition;
+		std::string			name;
+		int					imageNumXY[2];
+
+	public:
+		PCI(PCImage& pcimage_outer) ;
+		PCI& operator=(cv::Mat& mat);
+
+		//画像に点を書き込む
+		void writePoint(float x_val, float y_val);
 	};
 
-	cv::Mat pcimage[imageNum];				//画像領域の配列
-	cv::Mat* pcimage_ptr;					//現在参照している画像へのポインタ
+private:
+
+	PCI pcimage[imageNum];					//画像領域の配列
+	PCI* pcimage_ptr;						//現在参照している画像へのポインタ
 
 	std::string dirname;					//作成するディレクトリ名
 	std::string img_name[imageNum];			//保存時の画像名の配列
@@ -40,15 +60,13 @@ private:
 	int imgval_increment;					//画素値の増加量
 	int limit , limitpix;					//次の画像を読み込むボーダーライン(m)(pix)
 
-	enum Direction { NONE , TOP , RIGHT, BOTTOM, LEFT , CENTER  };		//方向を表す列挙型
-	enum NowNumber { ZERO , ONE, TWO, THREE };
-
 	bool isPrepareTOP = false, isPrepareRIGHT = false, isPrepareBOTTOM = false, isPrepareLEFT = false;		//上下左右について次の画像が用意されているかどうかのフラグ
 
 	Direction imageCondition[imageNum];		//画像領域の状態
 	NowNumber nowimage;						//現在参照している画像の番号
 
 public:
+
 	//コンストラクタ
 	PCImage();
 	PCImage( int resolution );
@@ -86,6 +104,7 @@ public:
 	int shiftCenterImage(Direction direction);
 
 };
+
 
 
 #endif

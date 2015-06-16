@@ -131,7 +131,7 @@ int PCIclasstest(){
 	int	img_height = 1000;
 	float x_val, y_val;
 
-	PCImage pcimage(3);
+	PCImage pcimage(5);
 
 	string str, x_str, y_str;
 	string searchLine("nan");
@@ -187,7 +187,6 @@ int PCIclasstest(){
 /*
 *　概要:コンストラクタ(引数有) 
 *　引数:
-*	string name 保存時のファイル名
 *	int width 　縦
 *	int height　横
 *	int resolution　1pix何cm四方にするか
@@ -406,10 +405,10 @@ void PCImage::savePCImage(Direction direction)
 */
 int PCImage::loadPCImage(int emptyImageNum)
 {
-	pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+	(Mat)pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
 	if (pcimage[emptyImageNum].empty())
 	{
-		pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
+		(Mat)pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
 	}
 
 	return 0;
@@ -509,4 +508,32 @@ int PCImage::shiftCenterImage(Direction direction)
 {
 
 	return 0;
+}
+
+/*------------------------------
+*----↓--PCIクラスの定義--↓----
+*-------------------------------*/
+PCImage::PCI::PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer)
+{
+	cv::Mat::Mat();
+}
+PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
+{
+	Mat::operator=(mat);
+	return *this;
+}
+void PCImage::PCI::writePoint(float x_val, float y_val)
+{
+	//x,yの値を指定した解像度に合わせる
+	x_val *= pciOut.coefficient;
+	y_val *= -pciOut.coefficient;
+
+	//取得した[x,y]の画素値を増加させる
+	if (data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
+		data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] += pciOut.imgval_increment;
+	}
+	else data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] = 255;
+
+
+	//imshow("pci", pcimage);
 }
