@@ -2,6 +2,7 @@
 #define _INC_PCIMAGE
 
 #include <string>
+#include <vector>
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
@@ -38,7 +39,7 @@ public:
 		int					imageNumXY[2];
 
 	public:
-		PCI(PCImage& pcimage_outer) ;
+		PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer){};
 		PCI& operator=(cv::Mat& mat);
 
 		//画像に点を書き込む
@@ -47,7 +48,7 @@ public:
 
 private:
 
-	PCI pcimage[imageNum];					//画像領域の配列
+	std::vector<PCI> pcimage;					//画像領域の配列
 	PCI* pcimage_ptr;						//現在参照している画像へのポインタ
 
 	std::string dirname;					//作成するディレクトリ名
@@ -71,6 +72,7 @@ public:
 	PCImage();
 	PCImage( int resolution );
 	PCImage( int width, int height, int resolution);
+	PCImage(PCImage& pcimage_ptr);
 	//デストラクタ
 	~PCImage();
 

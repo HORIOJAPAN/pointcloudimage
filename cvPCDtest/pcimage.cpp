@@ -191,7 +191,7 @@ int PCIclasstest(){
 *	int height　横
 *	int resolution　1pix何cm四方にするか
 */
-PCImage::PCImage(int width, int height, int resolution)
+PCImage::PCImage(int width, int height, int resolution) :pcimage(4 , *this)
 {
 	//-----メンバの初期化-----
 	img_name[0] = "0_0";
@@ -244,6 +244,7 @@ PCImage::PCImage(int resolution )
 	this->PCImage::PCImage( 1000, 1000, resolution);
 
 }
+
 
 PCImage::~PCImage()
 {
@@ -513,10 +514,6 @@ int PCImage::shiftCenterImage(Direction direction)
 /*------------------------------
 *----↓--PCIクラスの定義--↓----
 *-------------------------------*/
-PCImage::PCI::PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer)
-{
-	cv::Mat::Mat();
-}
 PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 {
 	Mat::operator=(mat);
