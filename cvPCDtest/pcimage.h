@@ -2,12 +2,12 @@
 #define _INC_PCIMAGE
 
 #include <string>
+#include <vector>
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
 
 const int imageNum = 4;		//事前に用意する画像領域の数
-
 
 //pcdファイル名を指定すると画像に変換して保存
 int save_pcdtoimg(std::string fileName, std::string imgName, int resolution = 1);
@@ -26,30 +26,29 @@ class PCImage
 public:
 	enum Direction { NONE, TOP, RIGHT, BOTTOM, LEFT, CENTER };		//方向を表す列挙型
 	enum NowNumber { ZERO, ONE, TWO, THREE };
-	int coefficient;						//データを解像度に合わせる係数
 
 	//Matクラスを継承した点群画像クラス
 	//画像番号を考慮した処理を行う
 	class PCI : public cv::Mat
 	{
 	private:
+		PCImage& pciOut;
+
 		Direction			imageCondition;
 		std::string			name;
 		int					imageNumXY[2];
-		PCImage&			pciOut;
 
 	public:
-		PCI();
+		PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer){};
 		PCI& operator=(cv::Mat& mat);
-		//PCI& operator=(PCImage& pciOut);
-		void setOuter(PCImage& pciOut);
 
 		//画像に点を書き込む
 		void writePoint(float x_val, float y_val);
 	};
 
 private:
-	PCI pcimage[imageNum];					//画像領域の配列
+
+	std::vector<PCI> pcimage;					//画像領域の配列
 	PCI* pcimage_ptr;						//現在参照している画像へのポインタ
 
 	std::string dirname;					//作成するディレクトリ名
@@ -58,7 +57,7 @@ private:
 
 	int img_width;							//用意する画像の幅
 	int img_height;							//用意する画像の高さ
-
+	int coefficient;						//データを解像度に合わせる係数
 	int imgval_increment;					//画素値の増加量
 	int limit , limitpix;					//次の画像を読み込むボーダーライン(m)(pix)
 
@@ -68,13 +67,14 @@ private:
 	NowNumber nowimage;						//現在参照している画像の番号
 
 public:
+
 	//コンストラクタ
 	PCImage();
 	PCImage( int resolution );
 	PCImage( int width, int height, int resolution);
+	PCImage(PCImage& pcimage_ptr);
 	//デストラクタ
 	~PCImage();
-	PCImage& operator=(PCImage& pc);
 
 	//画像に点を書き込む
 	void writePoint(float x_val, float y_val);

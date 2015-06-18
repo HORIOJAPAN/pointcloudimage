@@ -191,7 +191,7 @@ int PCIclasstest(){
 *	int height　横
 *	int resolution　1pix何cm四方にするか
 */
-PCImage::PCImage(int width, int height, int resolution)
+PCImage::PCImage(int width, int height, int resolution) :pcimage(4 , *this)
 {
 	//-----メンバの初期化-----
 	img_name[0] = "0_0";
@@ -204,7 +204,6 @@ PCImage::PCImage(int width, int height, int resolution)
 
 	for (auto& image : pcimage)
 	{
-		image.setOuter(*this);
 		image = Mat(Size(width, height), CV_8U, Scalar::all(0));
 	}
 	for (auto& icondition : imageCondition)
@@ -245,6 +244,7 @@ PCImage::PCImage(int resolution )
 	this->PCImage::PCImage( 1000, 1000, resolution);
 
 }
+
 
 PCImage::~PCImage()
 {
@@ -511,30 +511,13 @@ int PCImage::shiftCenterImage(Direction direction)
 	return 0;
 }
 
-PCImage& PCImage::operator=(PCImage& pc)
-{
-	return *this;
-}
-
 /*------------------------------
 *----↓--PCIクラスの定義--↓----
 *-------------------------------*/
-PCImage::PCI::PCI()
-{
-	pciOut = NULL;
-}
 PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 {
 	Mat::operator=(mat);
 	return *this;
-}
-/*PCImage::PCI& PCImage::PCI::operator=(PCImage& pciOut)
-{
-	return pciOut;
-}*/
-void PCImage::PCI::setOuter(PCImage& pciOut)
-{
-	this->pciOut = pciOut;
 }
 void PCImage::PCI::writePoint(float x_val, float y_val)
 {
