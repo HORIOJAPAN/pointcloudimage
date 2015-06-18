@@ -204,6 +204,7 @@ PCImage::PCImage(int width, int height, int resolution)
 
 	for (auto& image : pcimage)
 	{
+		image.setOuter(*this);
 		image = Mat(Size(width, height), CV_8U, Scalar::all(0));
 	}
 	for (auto& icondition : imageCondition)
@@ -510,17 +511,30 @@ int PCImage::shiftCenterImage(Direction direction)
 	return 0;
 }
 
+PCImage& PCImage::operator=(PCImage& pc)
+{
+	return *this;
+}
+
 /*------------------------------
 *----«--PCIƒNƒ‰ƒX‚Ì’è‹`--«----
 *-------------------------------*/
-PCImage::PCI::PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer)
+PCImage::PCI::PCI()
 {
-	cv::Mat::Mat();
+	pciOut = NULL;
 }
 PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 {
 	Mat::operator=(mat);
 	return *this;
+}
+/*PCImage::PCI& PCImage::PCI::operator=(PCImage& pciOut)
+{
+	return pciOut;
+}*/
+void PCImage::PCI::setOuter(PCImage& pciOut)
+{
+	this->pciOut = pciOut;
 }
 void PCImage::PCI::writePoint(float x_val, float y_val)
 {
