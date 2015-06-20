@@ -19,7 +19,6 @@ int save_floorimg(std::string src_imgName, std::string dst_imgName);
 int PCIclasstest();
 
 
-
 //点群画像を作成するクラス
 class PCImage
 {
@@ -81,6 +80,9 @@ public:
 	//中心画像を指定方向にシフトする
 	int shiftCenterImage(Direction direction);
 
+	//現在の時刻を文字列で取得する
+	static void getNowTime(std::string& nowstr);
+
 };
 
 //Matクラスを継承した点群画像クラス
@@ -109,7 +111,7 @@ public:
 	void getImageNumber(int xy[]);
 
 	//画像名を返す
-	// directoryname / filename .jpg 
+	// [./(directoryname)/(filename).jpg]
 	std::string getName();
 
 	//画像に点を書き込む

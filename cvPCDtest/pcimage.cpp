@@ -112,19 +112,6 @@ int save_floorimg(string src_imgName, string dst_imgName)
 	return 0;
 }
 
-
-//現在の時刻を文字列で取得する
-void getNowTime(string& nowstr){
-	SYSTEMTIME st;
-	GetSystemTime(&st);
-	char szTime[25] = { 0 };
-	// wHourを９時間足して、日本時間にする
-	wsprintf(szTime, "%04d%02d%02d%02d%02d%02d",
-		st.wYear, st.wMonth, st.wDay,
-		st.wHour + 9, st.wMinute, st.wSecond);
-	nowstr = szTime;
-}
-
 int PCIclasstest(){
 	
 	int img_width = 1000;
@@ -170,7 +157,7 @@ int PCIclasstest(){
 			y_str = str.substr(x_pos + 1, y_pos);
 			y_val = stof(y_str);
 		}
-		pcimage.writePoint(x_val, y_val);
+		pcimage.writePoint( x_val, y_val );
 
 	}
 
@@ -202,7 +189,7 @@ PCImage::PCImage(int width, int height, int resolution) :pcimage(imageNum , *thi
 	limitpix = limit * coefficient;
 
 	//年月日時分秒で命名したディレクトリを作成
-	getNowTime(dirname);
+	this->getNowTime(dirname);
 	if (_mkdir(dirname.c_str()) == 0){
 		cout << "Made a directory named:" << dirname << endl << endl;
 	}
@@ -263,6 +250,11 @@ void PCImage::writePoint(float x_val, float y_val)
 */
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//端に近付いて点が次の画像に入った時に処理を分岐せねば
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
 	pcimage[nowimage].writePoint(x_val, y_val);
 	this->checkPosition(pos_x, pos_y);
 
@@ -330,7 +322,11 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		isPrepareLEFT = false;
 	}
 
-	
+
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//次の画像にシフトする処理 
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 	return 0;
 }
 
@@ -343,9 +339,9 @@ int PCImage::readPoint(int x_val, int y_val)
 /*
 *　概要：画像を保存
 *　引数:
-*　	int imgNum　画像番号
+*　	Direction direction　保存したい画像の状態
 *　返り値:
-*	0
+*	なし
 */
 void PCImage::savePCImage(Direction direction)
 {
@@ -378,7 +374,8 @@ int PCImage::loadPCImage(int emptyImageNum)
 *　引数:
 *	Direction direction　用意する方向
 *　返り値:
-*	なし
+*	成功　0
+*	失敗　-1
 */
 int PCImage::prepareImage(Direction direction)
 {
@@ -443,17 +440,50 @@ int PCImage::getEmptyImage()
 int PCImage::shiftCenterImage(Direction direction)
 {
 
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 	return 0;
+}
+
+//現在の時刻を文字列で取得する
+void PCImage::getNowTime(string& nowstr){
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	char szTime[25] = { 0 };
+	// wHourを９時間足して、日本時間にする
+	wsprintf(szTime, "%04d%02d%02d%02d%02d%02d",
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour + 9, st.wMinute, st.wSecond);
+	nowstr = szTime;
 }
 
 /*------------------------------
 *----↓--PCIクラスの定義--↓----
 *-------------------------------*/
+/*
+*　概要：=演算子のオーバーロード
+*		 Matクラスのものを再定義
+*　引数:
+*	cv::Mat& mat　Matクラスの参照
+*　返り値:
+*	*this　自身の参照
+*/
 PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 {
 	Mat::operator=(mat);
 	return *this;
 }
+
+/*
+*　概要：メンバの初期化
+*　引数:
+*	int x	画像位置のx座標
+*	int y	画像位置のy座標
+*	PCImage::Direction dir	画像の状態(CENTERからみてどの方向か)
+*　返り値:
+*	なし
+*/
 void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
 {
 	imageNumXY[0] = x;
@@ -461,12 +491,21 @@ void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
 	imageCondition = dir;
 	name = "./" + pciOut.dirname + "/" +  to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
 }
+
+/*
+*　概要：画像の状態の取得
+*　引数:
+*	なし
+*　返り値:
+*	Direction　imageCondition　画像の状態(中心から見てどの方向か，もしくは空か)
+*/
 PCImage::Direction PCImage::PCI::getCondition()
 {
 	return imageCondition;
 }
+
 /*
-*　概要：現在の中心画像の位置(x,y)を返す
+*　概要：画像の位置(x,y)を返す
 *　引数:
 *	int xy[]　x,y座標を格納する配列
 *　返り値:
@@ -478,10 +517,26 @@ void PCImage::PCI::getImageNumber(int xy[])
 	xy[1] = imageNumXY[1];
 }
 
+/*
+*　概要：画像名を返す[./(directoryname)/(filename).jpg]
+*　引数:
+*	なし
+*　返り値:
+*	string　name　画像名
+*/
 string PCImage::PCI::getName()
 {
 	return name;
 }
+
+/*
+*　概要：指定座標に点を書き込む
+*　引数:
+*	float x_val x座標(m)
+*	float y_val y座標(m)
+*　返り値:
+*	なし
+*/
 void PCImage::PCI::writePoint(float x_val, float y_val)
 {
 	//x,yの値を指定した解像度に合わせる
@@ -490,7 +545,7 @@ void PCImage::PCI::writePoint(float x_val, float y_val)
 
 	//x,yの値を画像の位置に合わせる
 	x_val -= imageNumXY[0] * pciOut.img_width - pciOut.limitpix;
-	y_val -= imageNumXY[1] * pciOut.img_height - rows / 2;
+	y_val -= -imageNumXY[1] * pciOut.img_height - rows / 2;
 
 	//取得した[x,y]の画素値を増加させる
 	if (data[(int)y_val * cols + (int)x_val] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
@@ -498,6 +553,14 @@ void PCImage::PCI::writePoint(float x_val, float y_val)
 	}
 	else data[(int)y_val * cols + (int)x_val] = 255;
 }
+
+/*
+*　概要：画像を保存して画像領域を解放
+*　引数:
+*	なし
+*　返り値:
+*	なし
+*/
 void PCImage::PCI::savePCImage()
 {
 	imwrite( name, *this );
