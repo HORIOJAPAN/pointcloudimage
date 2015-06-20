@@ -175,7 +175,7 @@ int PCIclasstest(){
 	}
 
 	cout << "complete" << endl;
-	pcimage.savePCImage(0);
+	pcimage.savePCImage(PCImage::CENTER);
 
 	return 0;
 }
@@ -191,31 +191,15 @@ int PCIclasstest(){
 *	int height　横
 *	int resolution　1pix何cm四方にするか
 */
-PCImage::PCImage(int width, int height, int resolution) :pcimage(4 , *this)
+PCImage::PCImage(int width, int height, int resolution) :pcimage(imageNum , *this)
 {
 	//-----メンバの初期化-----
-	img_name[0] = "0_0";
 	img_width = width;
 	img_height = height;
 	coefficient = 100 / resolution;
 	imgval_increment = 80;
 	limit = 10;
 	limitpix = limit * coefficient;
-
-	for (auto& image : pcimage)
-	{
-		image = Mat(Size(width, height), CV_8U, Scalar::all(0));
-	}
-	for (auto& icondition : imageCondition)
-	{
-		icondition = NONE;
-	}
-
-	//まずpci0を参照する
-	pcimage_ptr = &pcimage[0];
-	img_name_ptr = &img_name[0];
-	nowimage = ZERO;
-	imageCondition[0] = CENTER;
 
 	//年月日時分秒で命名したディレクトリを作成
 	getNowTime(dirname);
@@ -226,8 +210,12 @@ PCImage::PCImage(int width, int height, int resolution) :pcimage(4 , *this)
 		cout << "Failed to make the directory" << endl;
 	}
 
+	//pcimage[0]を準備する
+	nowimage = ZERO;
+	pcimage[nowimage].setPCI(0, 0, CENTER);
+	pcimage[nowimage] = Mat(Size(width, height), CV_8U, Scalar::all(0));
 
-	cout << "Image name : " << *img_name_ptr << endl;
+
 	cout << "Width:" << pcimage[nowimage].cols
 		<< "\nHeight:" << pcimage[nowimage].rows << endl;
 
@@ -260,18 +248,7 @@ PCImage::~PCImage()
 */
 void PCImage::writePoint(float x_val, float y_val)
 {
-	//x,yの値を指定した解像度に合わせる
-	x_val *= coefficient;
-	y_val *= -coefficient;
-
-	//取得した[x,y]の画素値を増加させる
-	if (pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
-		pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] += imgval_increment;
-	}
-	else pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] = 255;
-	
-
-	//imshow("pci", pcimage);
+	pcimage[nowimage].writePoint(x_val, y_val);
 }
 
 /*
@@ -286,16 +263,14 @@ void PCImage::writePoint(float x_val, float y_val)
 */
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
-
-	////画像位置に合わせて書き込む座標を補正する必要あり
-
-	this->writePoint(x_val, y_val);
+	pcimage[nowimage].writePoint(x_val, y_val);
 	this->checkPosition(pos_x, pos_y);
 
 }
 
 /*
 *　概要：画像内の自己位置をチェックして必要な処理を行う
+*		　画像の用意と保存，中心画像の移行
 *　引数:
 *	float pos_x	自己位置のx座標(m)
 *	float pos_y	自己位置のy座標(m)
@@ -372,27 +347,11 @@ int PCImage::readPoint(int x_val, int y_val)
 *　返り値:
 *	0
 */
-int PCImage::savePCImage( int imgNum )
-{
-	imwrite(dirname + "/" + *img_name_ptr + ".jpg", pcimage[imgNum]);
-	pcimage[imgNum].release();
-	img_name[imgNum] = "";
-	imageCondition[imgNum] = NONE;
-
-	return 0;
-}
-/*
-*　概要：画像を保存
-*　引数:
-*　	int imgNum　画像番号
-*　返り値:
-*	0
-*/
 void PCImage::savePCImage(Direction direction)
 {
 	for (int i = 0; i < imageNum ; i++)
 	{
-		if (imageCondition[i] == direction) this->savePCImage(i);
+		if (pcimage[i].getCondition() == direction) pcimage[i].savePCImage();
 	}
 
 }
@@ -406,19 +365,18 @@ void PCImage::savePCImage(Direction direction)
 */
 int PCImage::loadPCImage(int emptyImageNum)
 {
-	(Mat)pcimage[emptyImageNum] = imread(img_name[emptyImageNum]);
+	pcimage[emptyImageNum] = imread(pcimage[emptyImageNum].getName());
 	if (pcimage[emptyImageNum].empty())
 	{
-		(Mat)pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
+		pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
 	}
-
 	return 0;
 }
 
 /*
 *　概要：次の画像を用意する
 *　引数:
-*	Direction direction　近付いている方向
+*	Direction direction　用意する方向
 *　返り値:
 *	なし
 */
@@ -427,35 +385,31 @@ int PCImage::prepareImage(Direction direction)
 	int emptyImageNum;
 	int xy[2];
 
-	getImageNumber(xy);		//中心画像のx,y番号を取得
+	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
 
 	switch (direction)
 	{
 	case TOP:
-		emptyImageNum = getEmptyImage();											//空いている画像の番号を取得
-		img_name[emptyImageNum] = to_string(xy[0]) + "_" + to_string(xy[1] + 1);	//用意する画像名を作成
-		imageCondition[emptyImageNum] = TOP;										//画像の状態を変更
-		loadPCImage(emptyImageNum);													//既に作成されている場合を読み込む
+		emptyImageNum = getEmptyImage();						//空いている画像の番号を取得
+		pcimage[emptyImageNum].setPCI(xy[0], xy[1] + 1, TOP);	//画像を用意
+		loadPCImage(emptyImageNum);								//既に作成されている場合は読み込む
 		return 0;
 
 	case RIGHT:
 		emptyImageNum = getEmptyImage();
-		img_name[emptyImageNum] = to_string(xy[0] + 1) + "_" + to_string(xy[1]);
-		imageCondition[emptyImageNum] = RIGHT;
+		pcimage[emptyImageNum].setPCI(xy[0] + 1, xy[1] , RIGHT);
 		loadPCImage(emptyImageNum);
 		return 0;
 
 	case BOTTOM:
 		emptyImageNum = getEmptyImage();
-		img_name[emptyImageNum] = to_string(xy[0]) + "_" + to_string(xy[1] - 1);
-		imageCondition[emptyImageNum] = BOTTOM;
+		pcimage[emptyImageNum].setPCI(xy[0], xy[1] - 1, BOTTOM);
 		loadPCImage(emptyImageNum);
 		return 0;
 
 	case LEFT:
 		emptyImageNum = getEmptyImage();
-		img_name[emptyImageNum] = to_string(xy[0] - 1) + "_" + to_string(xy[1]);
-		imageCondition[emptyImageNum] = LEFT;
+		pcimage[emptyImageNum].setPCI(xy[0] - 1 , xy[1] , LEFT);
 		loadPCImage(emptyImageNum);
 		return 0;
 
@@ -475,27 +429,8 @@ int PCImage::prepareImage(Direction direction)
 int PCImage::getEmptyImage()
 {
 	for (int i = 0; i < 4; i++)
-		if (imageCondition[i] == NONE) return i;
+		if (pcimage[i].getCondition() == NONE) return i;
 	return -1;
-}
-
-
-/*
-*　概要：現在の中心画像の番号(x,y)を返す
-*　引数:
-*	int xy[]　x,y座標を格納する配列
-*　返り値:
-*	なし
-*/
-void PCImage::getImageNumber( int xy[] )
-{
-	string::size_type x_pos;
-	
-	x_pos = img_name[nowimage].find("_");
-	if (x_pos != string::npos){
-		xy[0] = stoi(img_name[nowimage].substr(0, x_pos));
-		xy[1] = stoi(img_name[nowimage].substr(x_pos + 1));
-	}
 }
 
 /*
@@ -519,18 +454,55 @@ PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 	Mat::operator=(mat);
 	return *this;
 }
+void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
+{
+	imageNumXY[0] = x;
+	imageNumXY[1] = y;
+	imageCondition = dir;
+	name = "./" + pciOut.dirname + "/" +  to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
+}
+PCImage::Direction PCImage::PCI::getCondition()
+{
+	return imageCondition;
+}
+/*
+*　概要：現在の中心画像の位置(x,y)を返す
+*　引数:
+*	int xy[]　x,y座標を格納する配列
+*　返り値:
+*	なし
+*/
+void PCImage::PCI::getImageNumber(int xy[])
+{
+	xy[0] = imageNumXY[0];
+	xy[1] = imageNumXY[1];
+}
+
+string PCImage::PCI::getName()
+{
+	return name;
+}
 void PCImage::PCI::writePoint(float x_val, float y_val)
 {
 	//x,yの値を指定した解像度に合わせる
 	x_val *= pciOut.coefficient;
 	y_val *= -pciOut.coefficient;
 
+	//x,yの値を画像の位置に合わせる
+	x_val -= imageNumXY[0] * pciOut.img_width - pciOut.limitpix;
+	y_val -= imageNumXY[1] * pciOut.img_height - rows / 2;
+
 	//取得した[x,y]の画素値を増加させる
-	if (data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
-		data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] += pciOut.imgval_increment;
+	if (data[(int)y_val * cols + (int)x_val] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
+		data[(int)y_val * cols + (int)x_val] += pciOut.imgval_increment;
 	}
-	else data[(rows / 2 + (int)y_val) * cols + (int)x_val + pciOut.limitpix] = 255;
-
-
-	//imshow("pci", pcimage);
+	else data[(int)y_val * cols + (int)x_val] = 255;
 }
+void PCImage::PCI::savePCImage()
+{
+	imwrite( name, *this );
+	this->release();
+	name = "";
+	imageCondition = NONE;
+}
+

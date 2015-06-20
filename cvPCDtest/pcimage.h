@@ -25,49 +25,29 @@ class PCImage
 {
 public:
 	enum Direction { NONE, TOP, RIGHT, BOTTOM, LEFT, CENTER };		//方向を表す列挙型
-	enum NowNumber { ZERO, ONE, TWO, THREE };
+	enum Number { ZERO, ONE, TWO, THREE };							//画像番号
 
 	//Matクラスを継承した点群画像クラス
-	//画像番号を考慮した処理を行う
-	class PCI : public cv::Mat
-	{
-	private:
-		PCImage& pciOut;
-
-		Direction			imageCondition;
-		std::string			name;
-		int					imageNumXY[2];
-
-	public:
-		PCI(PCImage& pcimage_outer) :pciOut(pcimage_outer){};
-		PCI& operator=(cv::Mat& mat);
-
-		//画像に点を書き込む
-		void writePoint(float x_val, float y_val);
-	};
+	//画像位置を考慮した処理を行う
+	class PCI;
+	std::string dirname;					//作成するディレクトリ名
 
 private:
+	std::vector<PCI> pcimage;				//画像領域の配列
 
-	std::vector<PCI> pcimage;					//画像領域の配列
-	PCI* pcimage_ptr;						//現在参照している画像へのポインタ
-
-	std::string dirname;					//作成するディレクトリ名
-	std::string img_name[imageNum];			//保存時の画像名の配列
-	std::string* img_name_ptr;
 
 	int img_width;							//用意する画像の幅
 	int img_height;							//用意する画像の高さ
 	int coefficient;						//データを解像度に合わせる係数
 	int imgval_increment;					//画素値の増加量
-	int limit , limitpix;					//次の画像を読み込むボーダーライン(m)(pix)
+	int limit , limitpix;					//次の画像を読み込むボーダーライン(m),(pix)
 
-	bool isPrepareTOP = false, isPrepareRIGHT = false, isPrepareBOTTOM = false, isPrepareLEFT = false;		//上下左右について次の画像が用意されているかどうかのフラグ
+	//上下左右について次の画像が用意されているかどうかのフラグ
+	bool isPrepareTOP = false, isPrepareRIGHT = false, isPrepareBOTTOM = false, isPrepareLEFT = false;
 
-	Direction imageCondition[imageNum];		//画像領域の状態
-	NowNumber nowimage;						//現在参照している画像の番号
+	Number nowimage;						//現在走行している画像の番号
 
 public:
-
 	//コンストラクタ
 	PCImage();
 	PCImage( int resolution );
@@ -92,11 +72,7 @@ public:
 	//使われていない画像の番号を返す
 	int getEmptyImage();
 
-	//画像の位置を返す
-	void getImageNumber(int xy[] );
-
 	//画像を保存して領域を解放する
-	int savePCImage( int imgNum);
 	void savePCImage(Direction direction);
 
 	//画像を読み込む
@@ -107,6 +83,40 @@ public:
 
 };
 
+//Matクラスを継承した点群画像クラス
+//画像位置を考慮した処理を行う
+class PCImage::PCI : public cv::Mat
+{
+private:
+	PCImage& pciOut;	//PCImageクラスへの参照
 
+	PCImage::Direction	imageCondition;			//現在の状態
+	std::string			name;					//保存時の名前
+	int					imageNumXY[2];			//画像の位置
+
+public:
+	PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer){};
+	PCI& operator=(cv::Mat& mat);
+
+
+	//画像情報をセットする
+	void setPCI(int x, int y, PCImage::Direction dir);
+
+	//画像の状態を返す
+	PCImage::Direction getCondition();
+
+	//画像の位置を返す
+	void getImageNumber(int xy[]);
+
+	//画像名を返す
+	// directoryname / filename .jpg 
+	std::string getName();
+
+	//画像に点を書き込む
+	void writePoint(float x_val, float y_val);
+
+	//画像を保存して領域を解放する
+	void savePCImage();
+};
 
 #endif
