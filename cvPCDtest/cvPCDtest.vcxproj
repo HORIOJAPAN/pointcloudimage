@@ -66,10 +66,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Timer\Timer\Timer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pcimage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Timer\Timer\Timer.h" />
     <ClInclude Include="pcimage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
