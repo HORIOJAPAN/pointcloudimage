@@ -23,7 +23,7 @@ int PCIclasstest();
 class PCImage
 {
 public:
-	enum Direction { NONE, TOP, RIGHT, BOTTOM, LEFT, CENTER };		//方向を表す列挙型
+	enum Direction { NONE, TOP, RIGHT, LEFT, BOTTOM, CENTER, UPPERRIGHT, LOWERRIGHT, UPPERLEFT, LOWERLEFT };		//方向を表す列挙型
 	enum Number { ZERO, ONE, TWO, THREE };							//画像番号
 
 	//Matクラスを継承した点群画像クラス
@@ -80,6 +80,9 @@ public:
 	//中心画像を指定方向にシフトする
 	int shiftCenterImage(Direction direction);
 
+	//画像の領域番号を問い合わせると真偽を返す
+	bool isPrepare(int x, int y);
+
 	//現在の時刻を文字列で取得する
 	static void getNowTime(std::string& nowstr);
 
@@ -106,6 +109,8 @@ public:
 
 	//画像の状態を返す
 	PCImage::Direction getCondition();
+	//画像の状態を変更する
+	void setCondition(PCImage::Direction dir);
 
 	//画像の位置を返す
 	void getImageNumber(int xy[]);
@@ -113,6 +118,10 @@ public:
 	//画像名を返す
 	// [./(directoryname)/(filename).jpg]
 	std::string getName();
+
+	//画像の領域番号を問い合わせると真偽を返す
+	bool isCoordinates( int x , int y);
+	bool isCoordinates(int xy[]);
 
 	//画像に点を書き込む
 	void writePoint(float x_val, float y_val);

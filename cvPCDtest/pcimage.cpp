@@ -118,7 +118,7 @@ int PCIclasstest(){
 	int	img_height = 1000;
 	float x_val, y_val;
 
-	PCImage pcimage(5);
+	PCImage pcimage(img_width , img_height ,3);
 
 	string str, x_str, y_str;
 	string searchLine("nan");
@@ -261,6 +261,9 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 }
 
 /*
+*
+*  ⊂二二二（ ＾ω＾）二⊃     処理の中枢     ⊂二二二（ ＾ω＾）二⊃
+*
 *　概要：画像内の自己位置をチェックして必要な処理を行う
 *		　画像の用意と保存，中心画像の移行
 *　引数:
@@ -274,10 +277,14 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	int xi = int(pos_x * coefficient);
 	int yi = int(pos_y * -coefficient);
 
+	int xy[2];
+
+	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
+
 	//上下左右のリミットチェック
 	//画像の端に近付いたら次の画像を用意し，離れたら保存する
 	//上方向のリミットチェック
-	if (!isPrepareTOP && yi < limitpix)
+	if (!isPrepare(xy[0]+1,xy[1]) && yi < limitpix)
 	{
 		prepareImage(TOP);
 		isPrepareTOP = true;		//フラグをtrueにする
@@ -425,7 +432,7 @@ int PCImage::prepareImage(Direction direction)
 */
 int PCImage::getEmptyImage()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < imageNum; i++)
 		if (pcimage[i].getCondition() == NONE) return i;
 	return -1;
 }
@@ -440,12 +447,32 @@ int PCImage::getEmptyImage()
 int PCImage::shiftCenterImage(Direction direction)
 {
 
-	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	for (int i = 0; i < imageNum; i++)
+	{
+		if (pcimage[i].getCondition() == CENTER) pcimage[i].setCondition(direction);
+		if (pcimage[i].getCondition() == direction)
+		{
+			pcimage[i].setCondition(CENTER);
+			nowimage = (Number)i;
+		}
+	}
 
 	return 0;
 }
 
+
+//画像の領域番号を問い合わせると真偽を返す
+bool PCImage::isPrepare(int x, int y)
+{
+	for (int i = 0; i < imageNum; i++)
+	{
+		if (pcimage[i].isCoordinates(x, y)) return true;
+	}
+	return false;
+}
+
+
+//⊂二二二（ ＾ω＾）二⊃ ﾌﾞｰﾝ
 //現在の時刻を文字列で取得する
 void PCImage::getNowTime(string& nowstr){
 	SYSTEMTIME st;
@@ -569,3 +596,18 @@ void PCImage::PCI::savePCImage()
 	imageCondition = NONE;
 }
 
+void PCImage::PCI::setCondition(PCImage::Direction dir)
+{
+	imageCondition = dir;
+}
+
+bool PCImage::PCI::isCoordinates(int x, int y)
+{
+	if (imageNumXY[0] == x && imageNumXY[1] == y) return true;
+	return false;
+}
+bool PCImage::PCI::isCoordinates(int xy[])
+{
+	if (imageNumXY[0] == xy[0] && imageNumXY[1] == xy[1]) return true;
+	return false;
+}
