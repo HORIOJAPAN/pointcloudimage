@@ -65,23 +65,26 @@ public:
 	//自己位置に応じて画像の用意などの処理をする
 	int checkPosition(float pos_x, float pos_y);
 
+	//画像の領域番号を問い合わせると真偽を返す
+	bool checkPrepare(int x, int y);
+
 	//次の画像を用意する
 	int prepareImage(Direction direction);
+	int prepareImage(int x , int y);
 
 	//使われていない画像の番号を返す
 	int getEmptyImage();
 
 	//画像を保存して領域を解放する
 	void savePCImage(Direction direction);
+	void savePCImage(int x , int y);
 
 	//画像を読み込む
 	int loadPCImage(int emptyImageNum);
 
 	//中心画像を指定方向にシフトする
 	int shiftCenterImage(Direction direction);
-
-	//画像の領域番号を問い合わせると真偽を返す
-	bool isPrepare(int x, int y);
+	int shiftCenterImage(int x, int y);
 
 	//現在の時刻を文字列で取得する
 	static void getNowTime(std::string& nowstr);
@@ -106,6 +109,7 @@ public:
 
 	//画像情報をセットする
 	void setPCI(int x, int y, PCImage::Direction dir);
+	void setPCI(int x, int y);
 
 	//画像の状態を返す
 	PCImage::Direction getCondition();
@@ -123,8 +127,12 @@ public:
 	bool isCoordinates( int x , int y);
 	bool isCoordinates(int xy[]);
 
+	//画像の領域番号セットする
+	void setCoordinates(int x, int y);
+	void setCoordinates(int xy[]);
+
 	//画像に点を書き込む
-	void writePoint(float x_val, float y_val);
+	int writePoint(float x_val, float y_val);
 
 	//画像を保存して領域を解放する
 	void savePCImage();
