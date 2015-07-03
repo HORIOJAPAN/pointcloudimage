@@ -67,12 +67,13 @@ void FeatureMatching(
 
 
 
-int main()
+int unkomain()
 {
 	string fileName = "./pointcloud.pcd";
 	string imgName = "pcd.jpg";
 	string floorimgName = "pcd_floor.jpg";
-	
+
+
 	Timer t;
 	t.Start(0);
 	/*

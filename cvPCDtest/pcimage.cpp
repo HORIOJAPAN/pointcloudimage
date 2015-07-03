@@ -118,7 +118,7 @@ int PCIclasstest(){
 	int	img_height = 1000;
 	float x_val, y_val;
 
-	PCImage pcimage(img_width , img_height ,3);
+	PCImage pcimage;
 
 	string str, x_str, y_str;
 	string searchLine("nan");
@@ -223,6 +223,11 @@ PCImage::PCImage(int resolution )
 
 PCImage::~PCImage()
 {
+	for (int i = 0; i < imageNum; i++)
+		if (pcimage[i].getCondition() != NONE)
+		{
+			pcimage[i].savePCImage();
+		}
 }
 
 /*
@@ -631,6 +636,7 @@ void PCImage::PCI::setPCI(int x, int y)
 {
 	imageNumXY[0] = x;
 	imageNumXY[1] = y;
+	imageCondition = RIGHT;
 	name = "./" + pciOut.dirname + "/" + to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
 }
 
