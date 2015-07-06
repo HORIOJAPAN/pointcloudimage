@@ -135,6 +135,8 @@ public:
 	int writePoint(float x_val, float y_val);
 
 	//‰æ‘œ‚ð•Û‘¶‚µ‚Ä—Ìˆæ‚ð‰ð•ú‚·‚é
+	void release();
+	//‰æ‘œ‚ð•Û‘¶‚·‚é
 	void savePCImage();
 };
 

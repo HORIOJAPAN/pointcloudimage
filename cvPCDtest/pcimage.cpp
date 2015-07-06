@@ -289,7 +289,8 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 
 	//上下左右のリミットチェック
 	//画像の端に近付いたら次の画像を用意し，離れたら保存する
-	//上方向のリミットチェック
+
+	//↑上方向のリミットチェック↑
 	if (!checkPrepare(xy[0]+1,xy[1]) && yi < limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1]);
@@ -300,7 +301,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage( xy[0] + 1, xy[1] );
 		isPrepareTOP = false;		//フラグをfalseにする
 	}
-	//右方向のリミットチェック
+	//→右方向のリミットチェック→
 	if (!checkPrepare(xy[0], xy[1] + 1) && xi > pcimage[nowimage].cols - limitpix)
 	{
 		prepareImage(xy[0], xy[1] + 1);
@@ -311,7 +312,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage(xy[0], xy[1] + 1);
 		isPrepareRIGHT = false;
 	}
-	//下方向のリミットチェック
+	//↓下方向のリミットチェック↓
 	if (!checkPrepare(xy[0] - 1, xy[1]) && yi >  pcimage[nowimage].rows - limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1]);
@@ -322,7 +323,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage(xy[0] - 1, xy[1]);
 		isPrepareBOTTOM = false;
 	}
-	//左方向のリミットチェック
+	//←左方向のリミットチェック←
 	if (!checkPrepare(xy[0], xy[1] - 1) && xi < limitpix)
 	{
 		prepareImage(xy[0], xy[1] - 1);
@@ -334,7 +335,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		isPrepareLEFT = false;
 	}
 
-	//右上方向のリミットチェック
+	//→↑右上方向のリミットチェック→↑
 	if (!checkPrepare(xy[0] + 1, xy[1] + 1) && yi < limitpix && xi > pcimage[nowimage].cols - limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1] + 1);
@@ -345,7 +346,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage(xy[0] + 1, xy[1] + 1);
 		isPrepareTOP = false;		
 	}
-	//右下方向のリミットチェック
+	//→↓右下方向のリミットチェック→↓
 	if (!checkPrepare(xy[0] + 1, xy[1] - 1) && xi > pcimage[nowimage].cols - limitpix && yi >  pcimage[nowimage].rows - limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1] - 1);
@@ -356,7 +357,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage(xy[0] + 1, xy[1] - 1);
 		isPrepareRIGHT = false;
 	}
-	//左下方向のリミットチェック
+	//←↓左下方向のリミットチェック←↓
 	if (!checkPrepare(xy[0] - 1, xy[1] - 1) && yi >  pcimage[nowimage].rows - limitpix && xi < limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1] - 1);
@@ -368,7 +369,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		savePCImage(xy[0] - 1, xy[1] - 1);
 		isPrepareBOTTOM = false;
 	}
-	//左上方向のリミットチェック
+	//←↑左上方向のリミットチェック←↑
 	if (!checkPrepare(xy[0] - 1, xy[1] + 1) && xi < limitpix && yi < limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1] + 1);
@@ -530,7 +531,7 @@ int PCImage::prepareImage(int x, int y)
 int PCImage::getEmptyImage()
 {
 	for (int i = 0; i < imageNum; i++)
-		if (pcimage[i].getCondition() == NONE) return i;
+		if (pcimage[i].empty()) return i;
 	return -1;
 }
 
@@ -616,6 +617,12 @@ PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 	return *this;
 }
 
+PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
+{
+	//念のため領域を解放しておく
+	Mat::release();
+}
+
 /*
 *　概要：メンバの初期化
 *　引数:
@@ -625,10 +632,6 @@ PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 *　返り値:
 *	なし
 */
-PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
-{
-	imageCondition = NONE;
-}
 void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
 {
 	imageNumXY[0] = x;
@@ -746,10 +749,16 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 void PCImage::PCI::savePCImage()
 {
 	imwrite( name, *this );
-	this->release();
+}
+void PCImage::PCI::release()
+{
+	imwrite(name, *this);
+	this->Mat::release();
 	name = "";
 	imageCondition = NONE;
 }
+
+
 
 void PCImage::PCI::setCondition(PCImage::Direction dir)
 {
