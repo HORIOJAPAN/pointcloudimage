@@ -103,7 +103,7 @@ private:
 	int					imageNumXY[2];			//‰æ‘œ‚ÌˆÊ’u
 
 public:
-	PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer){};
+	PCI(PCImage& pcimage_outer);
 	PCI& operator=(cv::Mat& mat);
 
 

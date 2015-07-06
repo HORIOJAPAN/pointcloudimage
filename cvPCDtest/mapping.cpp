@@ -291,11 +291,11 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
-	DL = (signed int)data1 * 25;
-	DR = (signed int)data2 * 25;
+	DL = (signed int)data1 * 24.78367538;
+	DR = (signed int)data2 * 24.78367538;
 
 	DIS = (DL + DR) / 2;
-	ANG = (DL - DR) / 215 / 2;
+	ANG = (DL - DR) / 526 ;
 
 	dist += DIS;
 	rad += ANG;
@@ -338,8 +338,8 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 				z = 120.0;
 
 				//2ŸŒ³•½–Ê‚ÌÀ•W•ÏŠ·
-				pointpos[0] = cos(urgpos[2]) * x - sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-				pointpos[1] = sin(urgpos[2]) * x + cos(urgpos[2]) * y + sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+				pointpos[0] = cos(urgpos[2]) * x + sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+				pointpos[1] = -sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
 				pointpos[2] = z;
 
 				//À•W‚ğ•Û‘¶
@@ -519,10 +519,12 @@ int main(int argc, char *argv[])
 		getData4URG(dist, rad);
 
 		startpos[0] = cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-		startpos[1] = sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+		startpos[1] = -sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
 		printf("%f %f\n", startpos[0], startpos[1]);
 
 		DIS_old = chairpos;
+
+		if (cv::waitKey(1) > 0) break;
 
 	}
 

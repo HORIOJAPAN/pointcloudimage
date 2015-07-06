@@ -625,6 +625,10 @@ PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 *Å@ï‘ÇËíl:
 *	Ç»Çµ
 */
+PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
+{
+	imageCondition = NONE;
+}
 void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
 {
 	imageNumXY[0] = x;
