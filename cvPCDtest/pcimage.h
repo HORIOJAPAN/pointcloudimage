@@ -9,6 +9,8 @@
 
 const int imageNum = 4;		//事前に用意する画像領域の数
 
+int getURGdata();
+
 //pcdファイル名を指定すると画像に変換して保存
 int save_pcdtoimg(std::string fileName, std::string imgName, int resolution = 1);
 
@@ -23,8 +25,8 @@ int PCIclasstest();
 class PCImage
 {
 public:
-	enum Direction { NONE, TOP, RIGHT, LEFT, BOTTOM, CENTER, UPPERRIGHT, LOWERRIGHT, UPPERLEFT, LOWERLEFT };		//方向を表す列挙型
-	enum Number { ZERO, ONE, TWO, THREE };							//画像番号
+	//enum Direction { NONE, TOP, RIGHT, LEFT, BOTTOM, CENTER, UPPERRIGHT, LOWERRIGHT, UPPERLEFT, LOWERLEFT };		//方向を表す列挙型
+	//enum Number { ZERO, ONE, TWO, THREE };							//画像番号
 
 	//Matクラスを継承した点群画像クラス
 	//画像位置を考慮した処理を行う
@@ -44,7 +46,7 @@ private:
 	//上下左右について次の画像が用意されているかどうかのフラグ
 	bool isPrepareTOP = false, isPrepareRIGHT = false, isPrepareBOTTOM = false, isPrepareLEFT = false;
 
-	Number nowimage;						//現在走行している画像の番号
+	int nowimage;						//現在走行している画像の番号
 
 public:
 	//コンストラクタ
@@ -69,21 +71,21 @@ public:
 	bool checkPrepare(int x, int y);
 
 	//次の画像を用意する
-	int prepareImage(Direction direction);
+	//int prepareImage(Direction direction);
 	int prepareImage(int x , int y);
 
 	//使われていない画像の番号を返す
 	int getEmptyImage();
 
 	//画像を保存して領域を解放する
-	void savePCImage(Direction direction);
+	//void savePCImage(Direction direction);
 	void savePCImage(int x , int y);
 
 	//画像を読み込む
 	int loadPCImage(int emptyImageNum);
 
 	//中心画像を指定方向にシフトする
-	int shiftCenterImage(Direction direction);
+	//int shiftCenterImage(Direction direction);
 	int shiftCenterImage(int x, int y);
 
 	//現在の時刻を文字列で取得する
@@ -98,7 +100,7 @@ class PCImage::PCI : public cv::Mat
 private:
 	PCImage& pciOut;	//PCImageクラスへの参照
 
-	PCImage::Direction	imageCondition;			//現在の状態
+	//PCImage::Direction	imageCondition;			//現在の状態
 	std::string			name;					//保存時の名前
 	int					imageNumXY[2];			//画像の位置
 
@@ -108,13 +110,13 @@ public:
 
 
 	//画像情報をセットする
-	void setPCI(int x, int y, PCImage::Direction dir);
+	//void setPCI(int x, int y, PCImage::Direction dir);
 	void setPCI(int x, int y);
 
 	//画像の状態を返す
-	PCImage::Direction getCondition();
+	//PCImage::Direction getCondition();
 	//画像の状態を変更する
-	void setCondition(PCImage::Direction dir);
+	//void setCondition(PCImage::Direction dir);
 
 	//画像の位置を返す
 	void getImageNumber(int xy[]);

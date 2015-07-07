@@ -16,74 +16,16 @@ using namespace std;
 
 int open_urg_sensor(urg_t *urg, int argc, char *argv[]);
 
-//GLUI関係の変数
 
-float xy_aspect;
-int   last_x, last_y;
-int	  last_z;
-float rotationX = 0.0, rotationY = 0.0;
-int   main_window;
-float gridsize;
-
-float view_pos[3] = { -300.0, -100.0, 1000.0 };//視点初期位置
-
-int V_Rotate = 0;//視界を回転させる状態かどうか
-int V_Baning = 0;//視界を平行移動させる状態かどうか
-int V_Zoom = 0;//視界を前後移動させる状態かどうか
-
-float view_direc[3] = { 0.0, -0.1, 1.0 };//視線中央方向ベクトル
-float view_top[3] = { 0.0, 1.0, 0.0 };//視界上向きベクトル
-float view_right[3] = { 1.0, 0.0, 0.0 };//視界右向きベクトル
-
-int view_dist = 2000;//視界設定用のパラメータ
-int mouse_state = 0;//マウスの状態、0で押されていない、1で左、2で真ん中、3で右が押されている
-
-
-//OpenGL内の各表面の描画色初期設定値
-
-char  text[200] = { "URG Viewer" };
-
-float view_rotate[16] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-float obj_pos[] = { 0.0, 0.0, 0.0 };
-float obj_zoom[] = { 0.0 };
-
-int comid_urg = 18;
-int comid_wheelchair = 16;
-
-int range2D = 1000;//2次元平面レーダーの描画最大半径
-
-int range3D = 1000;//3次元空間の描画最大範囲
-
-int drawaxis = 0;//座標軸の描画
-int drawpoint = 0;//点群の描画
-int drawgap = 0;//段差の描画
-int drawsurface = 0;//平面の描画
-int drawcolorsurface = 0;//色付き平面の描画
-
-int drawnorm = 0;//法線色の描画
-
-
-int lengthRingBuffer = 800;//3次元平面の最大何ラインを可視化するか
-int widthRingBuffer;
-
-int refpointRingBuffer = 0;//RingBufferへの書き込み累計回数
-
-float **pointcloudcoord;//三次元点群の計測データ、センサの計測点数×最大計測ライン を2次元配列(各要素はXYZの順に並ぶ)で保持する
-
-float **pointcloudnorm;//三次元点群の法線方向データ、センサの計測点数×最大計測ライン を2次元配列(各要素はXYZの順に並ぶ)で保持する
-
+//初期設定値
+int COMID_urg = 18;
+int COMID_Arduino_Encoder = 16;
 
 float urgpos[3] = { 120.0, 0.0, 0.0 };//センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
 
 float scaninterval = 0.0;//計測を実施する最低間隔[mm]
 
-float drawmaxheight = 100.0;//描画の対象とする床上高さ[mm]
-float drawmaxdist = 500.0;//描画の対象とする回転中心からの距離[mm]
-
-float mindthegap = 10.0;//段差の検出基準値[mm]
-
 //URG関係のグローバル変数
-
 enum {
 	CAPTURE_TIMES = 1,
 };
@@ -94,11 +36,6 @@ long time_stamp;
 int urgconnect = 0;//URGへの接続指令
 int urgconnected = 0;//URGへの接続状態
 
-int refresh3dsurface = 0;//点群情報の更新の有無
-int refresh2drader = 0;//2Dレーダーの更新の有無
-
-int continuousscan = 0;//連続取得のONOFF
-
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
 float chairpos = 0.0;//車いすの現在の進行 
 float startpos[2] = { 0.0, 0.0 };
@@ -107,33 +44,13 @@ float DIS_old = 0.0;
 float movepos[2] = { 0.0, 0.0 };
 float movedis = 0.0;
 HANDLE hComm;
+PCImage pcimage;
 
-int serialread(float *);
-
-int init_serialreadthread();
-int read_serialreadthread(float *);
-
-int serialreadCmd(float *, int);
-
-int serialreadCmdOpen(int);
-int serialreadCmdCont(float *);
-int serialreadCmdClose();
-
+//プロトタイプ宣言
 HANDLE CommOpen(char *pport);
 int CommClose(HANDLE hComm);
-int RoombaStop(HANDLE hComm, short sMode);
-int RoombaMove1(HANDLE hComm, short sMode);
-int RoombaMove2(HANDLE hComm, short sMode);
-int RoombaTurn1(HANDLE hComm, short sMode);
-int RoombaTurn2(HANDLE hComm, short sMode);
-int StatesSend(HANDLE hComm, short sMode);
-int StartStates(HANDLE hComm, short sMode);
 int Encoder(HANDLE hComm, float& dist, float& rad);
 
-void end_serialreadthread();
-void estPointCoord(float *, float *, float, float);
-
-PCImage pcimage;
 
 int CommClose(HANDLE hComm)
 {
@@ -223,19 +140,9 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 {
 	unsigned char	sendbuf[1];
 	unsigned char	receive_data[2];
-	char			*pt;
-	int				enc;
 	int				ret;
-	float			ELC1, ELC2, ERC1, ERC2;
 	float			DL, DR, DIS, ANG;
-	int;
-	int				n;
 	unsigned long	len;
-	int				StartEncoderleft1;
-	int				StartEncoderleft2;
-	int				StartEncoderright1;
-	int				StartEncoderright2;
-	FILE			*fp1, *fp2, *fp3, *fp4, *fp5, *fp6;
 
 	// ハンドルチェック
 	/*if( !hComm ){
@@ -259,11 +166,9 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	PurgeComm(hComm, PURGE_RXCLEAR);
 
-	n = ReadFile(hComm, &receive_data, 2, &len, NULL);
+	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
-	//cout << (int)receive_data[0] << "," << (int)receive_data[1] << endl;
-	//printf("%d %d %d %d",ret , n ,len , sizeof(receive_data));
-	//printf("%s %s \n", receive_data[0], receive_data[1]);
+
 	int data1 = 0, data2 = 0;
 	/*
 	if (receive_data[0] | 128 > 0)
@@ -288,7 +193,6 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	}
 	else data2 = receive_data[1];
 
-
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
 	DL = (signed int)data1 * 24.78367538;
@@ -300,7 +204,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	dist += DIS;
 	rad += ANG;
 
-	printf("%d %f \n", (int)DIS, ANG);
+	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
 	return ret;
 }
@@ -348,12 +252,11 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 			}
 		}
 	}
-	refpointRingBuffer++;
 }
 
 int connectURG(){
 
-	if (open_urg_sensor(&urg, comid_urg, 0) < 0) {
+	if (open_urg_sensor(&urg, COMID_urg, 0) < 0) {
 		return 1;
 	}
 
@@ -386,10 +289,9 @@ int getData4URG(float& dist, float& rad){
 	int n;
 	int i;
 	HANDLE hComm;
-	FILE *fp1, *fp2, *fp3, *fp4;
 
 	char	COM_PORT[256];
-	wsprintf(COM_PORT, "COM%d", comid_wheelchair);
+	wsprintf(COM_PORT, "COM%d", COMID_Arduino_Encoder);
 
 	//データ取得
 #if 0
@@ -440,12 +342,12 @@ int getData4URG(float& dist, float& rad){
 
 
 
-int main(int argc, char *argv[])
+int getURGdata()
 {
 	HANDLE	hComm;
 	int		ret = 0;
 	char	COM_PORT[256];
-	wsprintf(COM_PORT, "COM%d", comid_wheelchair);
+	wsprintf(COM_PORT, "COM%d", COMID_Arduino_Encoder);
 
 	//printf(" %d , %d \n", urgconnect, urgconnected);
 
@@ -474,60 +376,56 @@ int main(int argc, char *argv[])
 
 	float dist = 0;
 	float rad = 0;
-
+	/*hComm = CreateFile(
+	(LPCWSTR)COM_PORT,
+	GENERIC_READ | GENERIC_WRITE,
+	FILE_SHARE_READ | FILE_SHARE_WRITE,//COMポートを送信側、受信側で共有
+	NULL,
+	OPEN_EXISTING,
+	FILE_ATTRIBUTE_NORMAL,
+	NULL
+	);*/
+	//if (!hComm){
+	//	printf("ERROR:Com port open error\n");
+	//}
+	//hComm = CreateFileA("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
+	hComm = CreateFile("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hComm == INVALID_HANDLE_VALUE){
+		printf("シリアルポートを開くことができませんでした。");
+		char z;
+		z = getchar();
+		return 0;
+	}
+	else
+	{
+		DCB lpTest;
+		GetCommState(hComm, &lpTest);
+		lpTest.BaudRate = 9600;
+		lpTest.ByteSize = 8;
+		lpTest.Parity = NOPARITY;
+		lpTest.StopBits = ONESTOPBIT;
+		SetCommState(hComm, &lpTest);
+	}
 
 	while (1){
-		/*hComm = CreateFile(
-		(LPCWSTR)COM_PORT,
-		GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE,//COMポートを送信側、受信側で共有
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL
-		);*/
-		//if (!hComm){
-		//	printf("ERROR:Com port open error\n");
-		//}
-		//hComm = CreateFileA("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
-		hComm = CreateFile("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hComm == INVALID_HANDLE_VALUE){
-			printf("シリアルポートを開くことができませんでした。");
-			char z;
-			z = getchar();
-			return 0;
-		}
-		else
-		{
-			DCB lpTest;
-			GetCommState(hComm, &lpTest);
-			lpTest.BaudRate = 9600;
-			lpTest.ByteSize = 8;
-			lpTest.Parity = NOPARITY;
-			lpTest.StopBits = ONESTOPBIT;
-			SetCommState(hComm, &lpTest);
-		}
 
 		startpos[0] = startpos[0] + (cos(urgpos[2]) - sin(urgpos[2])) * urgpos[1];
 		startpos[1] = startpos[1] + (cos(urgpos[2]) + sin(urgpos[2])) * urgpos[1];
 
 		Encoder(hComm, dist, rad);
-		cout << "\n\n " << dist << "," << rad << endl << endl;
-
-		CommClose(hComm);
+		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
 
 		getData4URG(dist, rad);
 
 		startpos[0] = cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
 		startpos[1] = -sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
-		printf("%f %f\n", startpos[0], startpos[1]);
+		printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
 
 		DIS_old = chairpos;
 
-		if (cv::waitKey(1) > 0) break;
-
 	}
 
+	CommClose(hComm);
 }
 
 

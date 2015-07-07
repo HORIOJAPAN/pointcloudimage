@@ -67,16 +67,15 @@ void FeatureMatching(
 
 
 
-int unkomain()
+int main()
 {
 	string fileName = "./pointcloud.pcd";
 	string imgName = "pcd.jpg";
 	string floorimgName = "pcd_floor.jpg";
 
-
+	/*
 	Timer t;
 	t.Start(0);
-	/*
 	//FeatureMatching("0_0_1.jpg", "0_0_2.jpg", "ORB", "ORB","BruteForce");
 	cv::Mat im = cv::imread("0_0_2.jpg");
 	cv::Mat tmp = cv::imread("0_0_2_2.jpg");
@@ -96,7 +95,9 @@ int unkomain()
 	//save_pcdtoimg(fileName, imgName,1);
 	//save_floorimg(imgName, floorimgName);
 
-	PCIclasstest();
+	//PCIclasstest();
+
+	getURGdata();
 
 	/*
 	cv::Mat image(cv::Size(50, 50), CV_8U, cv::Scalar::all(0));

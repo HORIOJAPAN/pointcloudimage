@@ -162,7 +162,7 @@ int PCIclasstest(){
 	}
 
 	cout << "complete" << endl;
-	pcimage.savePCImage(PCImage::CENTER);
+	pcimage.~PCImage();
 
 	return 0;
 }
@@ -198,8 +198,8 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum , *th
 	}
 
 	//pcimage[0]を準備する
-	nowimage = ZERO;
-	pcimage[nowimage].setPCI(0, 0, CENTER);
+	nowimage = 0;
+	pcimage[nowimage].setPCI(0, 0);
 	pcimage[nowimage] = Mat(Size(width, height), CV_8U, Scalar::all(0));
 
 
@@ -224,7 +224,7 @@ PCImage::PCImage(int resolution )
 PCImage::~PCImage()
 {
 	for (int i = 0; i < imageNum; i++)
-		if (pcimage[i].getCondition() != NONE)
+		if (!pcimage[i].empty())
 		{
 			pcimage[i].savePCImage();
 		}
@@ -427,14 +427,6 @@ int PCImage::readPoint(int x_val, int y_val)
 *　返り値:
 *	なし
 */
-void PCImage::savePCImage(Direction direction)
-{
-	for (int i = 0; i < imageNum ; i++)
-	{
-		if (pcimage[i].getCondition() == direction) pcimage[i].savePCImage();
-	}
-
-}
 void PCImage::savePCImage(int x , int y)
 {
 	for (int i = 0; i < imageNum; i++)
@@ -469,43 +461,6 @@ int PCImage::loadPCImage(int emptyImageNum)
 *	成功　0
 *	失敗　-1
 */
-int PCImage::prepareImage(Direction direction)
-{
-	int emptyImageNum;
-	int xy[2];
-
-	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
-
-	switch (direction)
-	{
-	case TOP:
-		emptyImageNum = getEmptyImage();						//空いている画像の番号を取得
-		pcimage[emptyImageNum].setPCI(xy[0], xy[1] + 1, TOP);	//画像を用意
-		loadPCImage(emptyImageNum);								//既に作成されている場合は読み込む
-		return 0;
-
-	case RIGHT:
-		emptyImageNum = getEmptyImage();
-		pcimage[emptyImageNum].setPCI(xy[0] + 1, xy[1] , RIGHT);
-		loadPCImage(emptyImageNum);
-		return 0;
-
-	case BOTTOM:
-		emptyImageNum = getEmptyImage();
-		pcimage[emptyImageNum].setPCI(xy[0], xy[1] - 1, BOTTOM);
-		loadPCImage(emptyImageNum);
-		return 0;
-
-	case LEFT:
-		emptyImageNum = getEmptyImage();
-		pcimage[emptyImageNum].setPCI(xy[0] - 1 , xy[1] , LEFT);
-		loadPCImage(emptyImageNum);
-		return 0;
-
-	default:
-		return -1;
-	}
-}
 int PCImage::prepareImage(int x, int y)
 {
 	int emptyImageNum;
@@ -542,21 +497,6 @@ int PCImage::getEmptyImage()
 *　返り値:
 *	なし
 */
-int PCImage::shiftCenterImage(Direction direction)
-{
-
-	for (int i = 0; i < imageNum; i++)
-	{
-		if (pcimage[i].getCondition() == CENTER) pcimage[i].setCondition(direction);
-		if (pcimage[i].getCondition() == direction)
-		{
-			pcimage[i].setCondition(CENTER);
-			nowimage = (Number)i;
-		}
-	}
-
-	return 0;
-}
 int PCImage::shiftCenterImage(int x,int y)
 {
 	int nowXY[2];
@@ -568,7 +508,7 @@ int PCImage::shiftCenterImage(int x,int y)
 		if (pcimage[i].isCoordinates(nowXY[0] + x, nowXY[1] + y))
 		{
 			pcimage[i].setCoordinates(nowXY);
-			nowimage = (Number)i;
+			nowimage = i;
 		}
 	}
 
@@ -632,19 +572,11 @@ PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
 *　返り値:
 *	なし
 */
-void PCImage::PCI::setPCI(int x, int y, PCImage::Direction dir)
-{
-	imageNumXY[0] = x;
-	imageNumXY[1] = y;
-	imageCondition = dir;
-	name = "./" + pciOut.dirname + "/" +  to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
-}
 void PCImage::PCI::setPCI(int x, int y)
 {
 	imageNumXY[0] = x;
 	imageNumXY[1] = y;
-	imageCondition = RIGHT;
-	name = "./" + pciOut.dirname + "/" + to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
+	name = "./" + pciOut.dirname + "/" +  to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
 }
 
 /*
@@ -654,10 +586,7 @@ void PCImage::PCI::setPCI(int x, int y)
 *　返り値:
 *	Direction　imageCondition　画像の状態(中心から見てどの方向か，もしくは空か)
 */
-PCImage::Direction PCImage::PCI::getCondition()
-{
-	return imageCondition;
-}
+
 
 /*
 *　概要：画像の位置(x,y)を返す
@@ -755,14 +684,6 @@ void PCImage::PCI::release()
 	imwrite(name, *this);
 	this->Mat::release();
 	name = "";
-	imageCondition = NONE;
-}
-
-
-
-void PCImage::PCI::setCondition(PCImage::Direction dir)
-{
-	imageCondition = dir;
 }
 
 bool PCImage::PCI::isCoordinates(int x, int y)
