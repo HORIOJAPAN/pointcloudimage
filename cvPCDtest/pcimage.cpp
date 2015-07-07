@@ -220,7 +220,8 @@ PCImage::PCImage(int resolution )
 
 }
 
-
+//デストラクタ
+//解放されていない画像領域があれば念のため保存しておく
 PCImage::~PCImage()
 {
 	for (int i = 0; i < imageNum; i++)
@@ -287,106 +288,91 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 
 	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
 
-	//上下左右のリミットチェック
-	//画像の端に近付いたら次の画像を用意し，離れたら保存する
+	//8近傍のリミットチェック
+	//画像端までlimitpix以下なら次の画像を用意し，離れたら近傍画像を保存する
 
 	//↑上方向のリミットチェック↑
 	if (!checkPrepare(xy[0]+1,xy[1]) && yi < limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1]);
-		isPrepareTOP = true;		//フラグをtrueにする
 	}
 	else if (checkPrepare( xy[0] + 1, xy[1] ) && yi > limitpix)
 	{
 		savePCImage( xy[0] + 1, xy[1] );
-		isPrepareTOP = false;		//フラグをfalseにする
 	}
 	//→右方向のリミットチェック→
 	if (!checkPrepare(xy[0], xy[1] + 1) && xi > pcimage[nowimage].cols - limitpix)
 	{
 		prepareImage(xy[0], xy[1] + 1);
-		isPrepareRIGHT = true;
 	}
 	else if ( checkPrepare(xy[0], xy[1] + 1) && xi < pcimage[nowimage].cols - limitpix)
 	{
 		savePCImage(xy[0], xy[1] + 1);
-		isPrepareRIGHT = false;
 	}
 	//↓下方向のリミットチェック↓
 	if (!checkPrepare(xy[0] - 1, xy[1]) && yi >  pcimage[nowimage].rows - limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1]);
-		isPrepareBOTTOM = true;
 	}
 	else if (checkPrepare(xy[0] - 1, xy[1]) && yi <  pcimage[nowimage].rows - limitpix)
 	{
 		savePCImage(xy[0] - 1, xy[1]);
-		isPrepareBOTTOM = false;
 	}
 	//←左方向のリミットチェック←
 	if (!checkPrepare(xy[0], xy[1] - 1) && xi < limitpix)
 	{
 		prepareImage(xy[0], xy[1] - 1);
-		isPrepareLEFT = true;
 	}
 	else if (checkPrepare(xy[0], xy[1] - 1) && xi > limitpix)
 	{
 		savePCImage(xy[0], xy[1] - 1);
-		isPrepareLEFT = false;
 	}
 
 	//→↑右上方向のリミットチェック→↑
 	if (!checkPrepare(xy[0] + 1, xy[1] + 1) && yi < limitpix && xi > pcimage[nowimage].cols - limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1] + 1);
-		isPrepareTOP = true;		
 	}
 	else if (checkPrepare(xy[0] + 1, xy[1] + 1) && yi > limitpix && xi < pcimage[nowimage].cols - limitpix)
 	{
 		savePCImage(xy[0] + 1, xy[1] + 1);
-		isPrepareTOP = false;		
 	}
 	//→↓右下方向のリミットチェック→↓
 	if (!checkPrepare(xy[0] + 1, xy[1] - 1) && xi > pcimage[nowimage].cols - limitpix && yi >  pcimage[nowimage].rows - limitpix)
 	{
 		prepareImage(xy[0] + 1, xy[1] - 1);
-		isPrepareRIGHT = true;
 	}
 	else if (checkPrepare(xy[0] + 1, xy[1] - 1) && xi < pcimage[nowimage].cols - limitpix && yi <  pcimage[nowimage].rows - limitpix)
 	{
 		savePCImage(xy[0] + 1, xy[1] - 1);
-		isPrepareRIGHT = false;
 	}
 	//←↓左下方向のリミットチェック←↓
 	if (!checkPrepare(xy[0] - 1, xy[1] - 1) && yi >  pcimage[nowimage].rows - limitpix && xi < limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1] - 1);
-		isPrepareBOTTOM = true;
 
 	}
 	else if (checkPrepare(xy[0] - 1, xy[1] - 1) && yi <  pcimage[nowimage].rows - limitpix && xi > limitpix)
 	{
 		savePCImage(xy[0] - 1, xy[1] - 1);
-		isPrepareBOTTOM = false;
 	}
 	//←↑左上方向のリミットチェック←↑
 	if (!checkPrepare(xy[0] - 1, xy[1] + 1) && xi < limitpix && yi < limitpix)
 	{
 		prepareImage(xy[0] - 1, xy[1] + 1);
-		isPrepareLEFT = true;
 	}
 	else if (checkPrepare(xy[0] - 1, xy[1] + 1) && xi > limitpix && yi < limitpix)
 	{
 		savePCImage(xy[0] - 1, xy[1] + 1);
-		isPrepareLEFT = false;
 	}
 
 	int xshift = 0;
 	int yshift = 0;
 
-	/*
-	*>>>>>>次の画像にシフトする処理<<<<<
-	*/
+	/************************************
+	*>>>>>>次の画像にシフトする処理<<<<<*
+	************************************/
+	//画像端までの距離がlimitpixの1/3以下になったらシフト
 	//上方向のリミットチェック
 	if ( yi < limitpix/3)
 	{
@@ -407,9 +393,8 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	{
 		xshift = -1;
 	}
-
-	if (xshift * xshift + yshift*yshift > 0) shiftCenterImage(xshift, yshift);
-
+	//xshiftもしくはyshiftが0以外なら画像シフトを実行
+	if (xshift || yshift ) shiftCenterImage(xshift, yshift);
 
 	return 0;
 }
@@ -493,30 +478,36 @@ int PCImage::getEmptyImage()
 /*
 *　概要：中心画像を指定方向にシフトする
 *　引数:
-*	Direction direction シフトする方向
+*	int x　画像領域座標における現在画像からのx方向変位(-1~1)
+*	int y　画像領域座標における現在画像からのy方向変位(-1~1)
 *　返り値:
 *	なし
 */
 int PCImage::shiftCenterImage(int x,int y)
 {
 	int nowXY[2];
-	pcimage[nowimage].getImageNumber(nowXY);
+	pcimage[nowimage].getImageNumber(nowXY);	//現在画像の座標を取得
 
+	//指定した座標の画像があれば画像番号をnowimageに代入
 	for (int i = 0; i < imageNum; i++)
 	{
-		if (pcimage[i].isCoordinates(nowXY)) pcimage[i].setCoordinates(nowXY[0] + x , nowXY[1] + y);
 		if (pcimage[i].isCoordinates(nowXY[0] + x, nowXY[1] + y))
 		{
-			pcimage[i].setCoordinates(nowXY);
 			nowimage = i;
+			return 0;
 		}
 	}
-
-	return 0;
+	return -1;
 }
 
-
-//画像の領域番号を問い合わせると真偽を返す
+/*
+*　概要：指定した画像領域座標の画像が用意されていると真を返す
+*　引数:
+*	int x　画像領域座標における現在画像からのx方向変位(-1~1)
+*	int y　画像領域座標における現在画像からのy方向変位(-1~1)
+*　返り値:
+*	True or False
+*/
 bool PCImage::checkPrepare(int x, int y)
 {
 	for (int i = 0; i < imageNum; i++)
@@ -695,14 +686,4 @@ bool PCImage::PCI::isCoordinates(int xy[])
 {
 	if (imageNumXY[0] == xy[0] && imageNumXY[1] == xy[1]) return true;
 	return false;
-}
-void PCImage::PCI::setCoordinates(int x, int y)
-{
-	imageNumXY[0] = x;
-	imageNumXY[1] = y;
-}
-void PCImage::PCI::setCoordinates(int xy[])
-{
-	imageNumXY[0] = xy[0];
-	imageNumXY[1] = xy[1];
 }

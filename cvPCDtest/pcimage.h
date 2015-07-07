@@ -33,24 +33,37 @@ public:
 private:
 	std::vector<PCI> pcimage;				//画像領域の配列
 
-
 	int img_width;							//用意する画像の幅
 	int img_height;							//用意する画像の高さ
 	int coefficient;						//データを解像度に合わせる係数
 	int imgval_increment;					//画素値の増加量
 	int limit , limitpix;					//次の画像を読み込むボーダーライン(m),(pix)
-
-	//上下左右について次の画像が用意されているかどうかのフラグ
-	bool isPrepareTOP = false, isPrepareRIGHT = false, isPrepareBOTTOM = false, isPrepareLEFT = false;
-
 	int nowimage;						//現在走行している画像の番号
+
+
+	//自己位置に応じて画像の用意などの処理をする
+	int checkPosition(float pos_x, float pos_y);
+
+	//画像の領域番号を問い合わせると真偽を返す
+	bool checkPrepare(int x, int y);
+
+	//次の画像を用意する
+	int prepareImage(int x, int y);
+
+	//使われていない画像の番号を返す
+	int getEmptyImage();
+
+	//画像を読み込む
+	int loadPCImage(int emptyImageNum);
+
+	//中心画像を指定方向にシフトする
+	int shiftCenterImage(int x, int y);
 
 public:
 	//コンストラクタ
 	PCImage();
 	PCImage( int resolution );
 	PCImage( int width, int height, int resolution);
-	PCImage(PCImage& pcimage_ptr);
 	//デストラクタ
 	~PCImage();
 
@@ -61,26 +74,8 @@ public:
 	//指定した点の画素を読み取る
 	int readPoint(int x_val, int y_val);
 
-	//自己位置に応じて画像の用意などの処理をする
-	int checkPosition(float pos_x, float pos_y);
-
-	//画像の領域番号を問い合わせると真偽を返す
-	bool checkPrepare(int x, int y);
-
-	//次の画像を用意する
-	int prepareImage(int x , int y);
-
-	//使われていない画像の番号を返す
-	int getEmptyImage();
-
 	//画像を保存して領域を解放する
 	void savePCImage(int x , int y);
-
-	//画像を読み込む
-	int loadPCImage(int emptyImageNum);
-
-	//中心画像を指定方向にシフトする
-	int shiftCenterImage(int x, int y);
 
 	//現在の時刻を文字列で取得する
 	static void getNowTime(std::string& nowstr);
@@ -101,7 +96,6 @@ public:
 	PCI(PCImage& pcimage_outer);
 	PCI& operator=(cv::Mat& mat);
 
-
 	//画像情報をセットする
 	void setPCI(int x, int y);
 
@@ -115,10 +109,6 @@ public:
 	//画像の領域番号を問い合わせると真偽を返す
 	bool isCoordinates( int x , int y);
 	bool isCoordinates(int xy[]);
-
-	//画像の領域番号セットする
-	void setCoordinates(int x, int y);
-	void setCoordinates(int xy[]);
 
 	//画像に点を書き込む
 	int writePoint(float x_val, float y_val);
