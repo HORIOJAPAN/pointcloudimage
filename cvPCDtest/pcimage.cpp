@@ -206,6 +206,7 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum , *th
 	cout << "Width:" << pcimage[nowimage].cols
 		<< "\nHeight:" << pcimage[nowimage].rows << endl;
 
+
 }
 
 //コンストラクタのオーバーロード
