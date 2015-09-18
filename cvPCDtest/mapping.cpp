@@ -18,7 +18,7 @@ int open_urg_sensor(urg_t *urg, int argc, char *argv[]);
 
 
 //初期設定値
-int COMID_urg = 18;
+int COMID_urg = 4;
 int COMID_Arduino_Encoder = 16;
 
 float urgpos[3] = { 120.0, 0.0, 0.0 };//センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角

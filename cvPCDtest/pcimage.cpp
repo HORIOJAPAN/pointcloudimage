@@ -656,6 +656,8 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	}
 	else data[(int)y_val * cols + (int)x_val] = 255;
 
+	imshow(name, *this);
+
 	return 0;
 }
 
