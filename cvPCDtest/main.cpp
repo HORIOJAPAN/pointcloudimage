@@ -1,7 +1,7 @@
 #include "pcimage.h"
 #include <opencv2/nonfree/nonfree.hpp> // SIFT・SURFモジュール用
 
-#include "Timer.h"
+//#include "Timer.h"
 
 using namespace std;
 

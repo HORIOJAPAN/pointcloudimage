@@ -315,7 +315,7 @@ int getData4URG(float& dist, float& rad){
 
 		//printf("%f , %f\n", chairpos , urgpos[2] );
 
-		if (-100 < (chairpos - chairpos_old) || (chairpos - chairpos_old) < 100){
+		//if (-100 < (chairpos - chairpos_old) || (chairpos - chairpos_old) < 100){
 
 			set_3D_surface(&urg, data, n, time_stamp);
 
@@ -324,15 +324,15 @@ int getData4URG(float& dist, float& rad){
 
 			//printf("%f , %f\n", chairpos , urgpos[2] );
 
-		}
-		else{
+		//}
+		//else{
 
-			chairpos = dist;
-			urgpos[2] = rad;
+			//chairpos = dist;
+			//urgpos[2] = rad;
 
 			//	printf("%f , %f\n", chairpos , urgpos[2] );
 
-		}
+		//}
 
 	}
 
@@ -389,7 +389,7 @@ int getURGdata()
 	//	printf("ERROR:Com port open error\n");
 	//}
 	//hComm = CreateFileA("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
-	hComm = CreateFile("\\\\.\\COM16", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hComm = CreateFile("\\\\.\\COM9", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
 		char z;
