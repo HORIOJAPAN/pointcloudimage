@@ -79,6 +79,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\Timer\Timer\Timer.h" />
     <ClInclude Include="pcimage.h" />
+    <ClInclude Include="urg_open.h" />
+    <ClInclude Include="urg_unko.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

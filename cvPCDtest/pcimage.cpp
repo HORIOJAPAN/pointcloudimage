@@ -232,6 +232,7 @@ PCImage::PCImage(int width, int height, int resolution)
 	cout << "Image name : " << *img_name_ptr << endl;
 	cout << "Width:" << pcimage_ptr->cols
 		<< "\nHeight:" << pcimage_ptr->rows << endl;
+	Sleep(2000);
 
 }
 
@@ -436,4 +437,9 @@ void PCImage::getImageNumber( int xy[] )
 		xy[0] = stoi(img_name[nowimage].substr(0, x_pos));
 		xy[1] = stoi(img_name[nowimage].substr(x_pos + 1));
 	}
+}
+
+std::string PCImage::getDirname()
+{
+	return dirname;
 }

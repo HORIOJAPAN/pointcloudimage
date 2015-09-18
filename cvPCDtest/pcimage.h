@@ -4,6 +4,7 @@
 
 #include <string>
 
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
@@ -59,6 +60,8 @@ public:
 	void getImageNumber(int xy[] );
 
 	int savePCImage();
+
+	std::string getDirname();
 
 
 };
