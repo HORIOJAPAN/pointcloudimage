@@ -65,8 +65,6 @@ void FeatureMatching(
 
 
 
-
-
 int main()
 {
 	string fileName = "./pointcloud.pcd";
@@ -105,7 +103,7 @@ int main()
 	cv::imwrite("testimg.jpg", image);
 	*/
 	
-	z = getchar();
+	//z = getchar();
 
 	return 0;
 }

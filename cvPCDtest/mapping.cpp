@@ -44,7 +44,7 @@ float DIS_old = 0.0;
 float movepos[2] = { 0.0, 0.0 };
 float movedis = 0.0;
 HANDLE hComm;
-PCImage pcimage;
+PCImage pcimage(10000,10000,5);
 
 //プロトタイプ宣言
 HANDLE CommOpen(char *pport);
@@ -247,7 +247,7 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 				pointpos[2] = z;
 
 				//座標を保存
-				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 , startpos[0] , startpos[1]);
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 );
 			}
 		}
 	}
@@ -405,6 +405,7 @@ int getURGdata()
 		lpTest.StopBits = ONESTOPBIT;
 		SetCommState(hComm, &lpTest);
 	}
+	cv::namedWindow("q");
 
 	while (1){
 
@@ -422,7 +423,15 @@ int getURGdata()
 
 		DIS_old = chairpos;
 
+		
+		if (cv::waitKey(1) == 'q')
+		{
+			break;
+		}
+
+
 	}
+	pcimage.savePCImage();
 
 	CommClose(hComm);
 }
