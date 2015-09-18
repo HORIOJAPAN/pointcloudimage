@@ -247,7 +247,7 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 				pointpos[2] = z;
 
 				//ç¿ïWÇï€ë∂
-				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 , startpos[0] , startpos[1]);
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 );
 
 			}
 		}
@@ -315,7 +315,7 @@ int getData4URG(float& dist, float& rad){
 
 		//printf("%f , %f\n", chairpos , urgpos[2] );
 
-		//if (-100 < (chairpos - chairpos_old) || (chairpos - chairpos_old) < 100){
+		if (-100 < (chairpos - chairpos_old) || (chairpos - chairpos_old) < 100){
 
 			set_3D_surface(&urg, data, n, time_stamp);
 
@@ -324,15 +324,15 @@ int getData4URG(float& dist, float& rad){
 
 			//printf("%f , %f\n", chairpos , urgpos[2] );
 
-		//}
-		//else{
+		}
+		else{
 
 			//chairpos = dist;
 			//urgpos[2] = rad;
 
 			//	printf("%f , %f\n", chairpos , urgpos[2] );
 
-		//}
+		}
 
 	}
 

@@ -8,6 +8,59 @@
   $Id: urg_utils.h,v 630ee326c5ce 2011/02/19 08:06:25 Satofumi $
 */
 
+/*!
+\file
+\brief TCP/IP read/write functions
+
+\author Katsumi Kimoto
+
+$Id: urg_tcpclient.h,v 1d233c7a2240 2011/02/19 03:08:45 Satofumi $
+*/
+
+/*!
+\file
+\brief シリアル通信
+
+\author Satofumi KAMIMURA
+
+$Id: urg_serial.h,v 1d233c7a2240 2011/02/19 03:08:45 Satofumi $
+*/
+
+/*!
+\file
+\author Satofumi KAMIMURA
+
+$Id: urg_sensor.h,v 540bc11f70c8 2011/05/08 23:04:49 satofumi $
+*/
+
+/*!
+\file
+\brief OS の検出
+
+\author Satofumi KAMIMURA
+
+$Id: urg_detect_os.h,v 6c17b740611a 2014/03/24 09:58:01 jun $
+*/
+
+/*!
+\file
+\brief URG ドライバ
+
+\author Satofumi KAMIMURA
+
+$Id: Urg_driver.h 1937 2010-10-25 01:12:49Z satofumi $
+*/
+
+/*!
+\file
+\brief 通信の処理
+
+\author Satofumi KAMIMURA
+
+$Id: urg_connection.h,v 1d233c7a2240 2011/02/19 03:08:45 Satofumi $
+*/
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
