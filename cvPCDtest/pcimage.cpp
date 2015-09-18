@@ -282,12 +282,14 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 */
 int PCImage::checkPosition(float pos_x, float pos_y)
 {
+	//x,yの値を指定した解像度に合わせる
 	int xi = int(pos_x * coefficient);
 	int yi = int(pos_y * -coefficient);
 
+	//現在の画像のXY
 	int xy[2];
 
-	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
+	pcimage[nowimage].getImageNumber(xy);		//中心画像のX,Y番号を取得
 
 	//8近傍のリミットチェック
 	//画像端までlimitpix以下なら次の画像を用意し，離れたら近傍画像を保存する
@@ -619,9 +621,9 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	x_val *= pciOut.coefficient;
 	y_val *= -pciOut.coefficient;
 
-	//x,yの値を画像の位置に合わせる
-	x_val -= imageNumXY[0] * pciOut.img_width - pciOut.limitpix;
-	y_val -= -imageNumXY[1] * pciOut.img_height - rows / 2;
+	//x,yの値を画像の位置に合わせる(怪しい) 
+	x_val -= (imageNumXY[0] * pciOut.img_width + pciOut.limitpix);
+	y_val -= (imageNumXY[1] * pciOut.img_height - rows / 2);
 
 	//当画像領域内の点か確認して当画像領域外の場合は該当領域のIDを返す
 	int x_coord = 0;
@@ -657,7 +659,7 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	}
 	else data[(int)y_val * cols + (int)x_val] = 255;
 
-	imshow(name, *this);
+	imshow("show", *this);
 
 	return 0;
 }
