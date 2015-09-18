@@ -248,7 +248,6 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 
 				//À•W‚ğ•Û‘¶
 				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 , startpos[0] , startpos[1]);
-
 			}
 		}
 	}
