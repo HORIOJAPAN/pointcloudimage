@@ -294,6 +294,8 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	//8近傍のリミットチェック
 	//画像端までlimitpix以下なら次の画像を用意し，離れたら近傍画像を保存する
 
+	//（ずれてるというかXとY間違えてる）
+
 	//↑上方向のリミットチェック↑
 	if (!checkPrepare(xy[0]+1,xy[1]) && yi < limitpix)
 	{
