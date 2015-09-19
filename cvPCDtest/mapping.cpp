@@ -190,8 +190,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
-	DL = (signed int)data2 * 24.78367538;
-	DR = (signed int)data1 * 24.78367538;
+	DL = (signed int)data1 * 24.78367538;
+	DR = (signed int)data2 * 24.78367538;
 
 	DIS = (DL + DR) / 2;
 	ANG = (DL - DR) / 526 ;
@@ -564,8 +564,8 @@ void urg_unko::set_3D_surface( int data_n)
 				z = 120.0;
 
 				//2éüå≥ïΩñ ÇÃç¿ïWïœä∑
-				pointpos[0] = + cos(urgpos[2]) * x - sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-				pointpos[1] = + sin(urgpos[2]) * x + cos(urgpos[2]) * y + sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+				pointpos[0] = + cos(urgpos[2]) * x + sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+				pointpos[1] = - sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
 				pointpos[2] = z;
 
 				//ç¿ïWÇï€ë∂
