@@ -22,6 +22,9 @@ private:
 	int pcdnum;
 	int pcdcount;
 
+	float urgpos[3];
+	float startpos[2];
+
 	urg_t urg;
 	long *data = NULL;
 	long time_stamp;
@@ -38,7 +41,7 @@ public:
 	urg_unko();
 	~urg_unko();
 
-	void init(int COM);
+	void init(int COM , float pos[]);
 	int getData4URG(float& dist, float& rad);
 
 	void pcdinit();

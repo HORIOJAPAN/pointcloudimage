@@ -196,7 +196,7 @@ PCImage::PCImage(int width, int height, int resolution)
 	img_height = height;
 	coefficient = 100 / resolution;
 	imgval_increment = 80;
-	limit = 250;
+	limit = 100;
 	limitpix = limit * coefficient;
 
 	for (int i = 0; i<4 ; i++)
@@ -273,7 +273,8 @@ void PCImage::writePoint(float x_val, float y_val)
 	else pcimage_ptr->data[(pcimage_ptr->rows / 2 + (int)y_val) * pcimage_ptr->cols + (int)x_val + limitpix] = 255;
 	
 
-	//imshow("pci", pcimage);
+	//imshow("pci" + dirname, *pcimage_ptr);
+	//waitKey(1);
 }
 /*
 *　概要：指定座標(絶対座標)に点を書き込む

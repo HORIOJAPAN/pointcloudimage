@@ -37,7 +37,7 @@ int main()
 
 	//PCIclasstest();
 
-	int URG_COM[] = {3, 4 };
+	int URG_COM[] = {7, 11 };
 	int ARDUINO_COM = 0;
 
 	cout << "\nunko" << sizeof(URG_COM) / sizeof(int) << endl << endl;

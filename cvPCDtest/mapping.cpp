@@ -15,7 +15,7 @@ using namespace std;
 int COMID_urg = 4;
 int COMID_Arduino_Encoder = 16;
 
-float urgpos[3] = { 120.0, 0.0, 0.0 };//センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
+//float urgpos[3] = { 120.0, 0.0, 0.0 };//センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
 
 float scaninterval = 0.0;//計測を実施する最低間隔[mm]
 
@@ -32,7 +32,7 @@ int urgconnected = 0;//URGへの接続状態
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
 float chairpos = 0.0;//車いすの現在の進行 
-float startpos[2] = { 0.0, 0.0 };
+//float startpos[2] = { 0.0, 0.0 };
 float startpos_old[2] = { 0.0, 0.0 };
 float DIS_old = 0.0;
 float movepos[2] = { 0.0, 0.0 };
@@ -190,8 +190,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
-	DL = (signed int)data1 * 24.78367538;
-	DR = (signed int)data2 * 24.78367538;
+	DL = (signed int)data2 * 24.78367538;
+	DR = (signed int)data1 * 24.78367538;
 
 	DIS = (DL + DR) / 2;
 	ANG = (DL - DR) / 526 ;
@@ -237,9 +237,9 @@ static void set_3D_surface(urg_t *urg, long data[], int data_n, long time_stamp)
 				z = 120.0;
 
 				//2次元平面の座標変換
-				pointpos[0] = cos(urgpos[2]) * x + sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-				pointpos[1] = -sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
-				pointpos[2] = z;
+				//pointpos[0] = cos(urgpos[2]) * x + sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+				//pointpos[1] = -sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+				//pointpos[2] = z;
 
 				//座標を保存
 				//pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000 );
@@ -314,7 +314,7 @@ int getData4URG(float& dist, float& rad){
 			set_3D_surface(&urg, data, n, time_stamp);
 
 			chairpos = dist;
-			urgpos[2] = rad;
+			//urgpos[2] = rad;
 
 			//printf("%f , %f\n", chairpos , urgpos[2] );
 
@@ -404,17 +404,17 @@ int getURGdata()
 
 	while (1){
 
-		startpos[0] = startpos[0] + (cos(urgpos[2]) - sin(urgpos[2])) * urgpos[1];
-		startpos[1] = startpos[1] + (cos(urgpos[2]) + sin(urgpos[2])) * urgpos[1];
+		//startpos[0] = startpos[0] + (cos(urgpos[2]) - sin(urgpos[2])) * urgpos[1];
+		//startpos[1] = startpos[1] + (cos(urgpos[2]) + sin(urgpos[2])) * urgpos[1];
 
 		Encoder(hComm, dist, rad);
 		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
 
 		getData4URG(dist, rad);
 
-		startpos[0] = cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-		startpos[1] = -sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
-		printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
+		//startpos[0] = cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+		//startpos[1] = -sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+		//printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
 
 		DIS_old = chairpos;
 
@@ -436,16 +436,25 @@ int getURGdata()
 *	こっからurg_unkoの中身
 *
 */
-urg_unko::urg_unko() :pcimage(10000, 10000, 5)
+urg_unko::urg_unko() :pcimage(5000, 5000, 5)
 {
 	COMport = 0;
 	pcdnum = 0;
 
 }
-void urg_unko::init(int COM)
+void urg_unko::init(int COM , float pos[])
 {
 	COMport = COM;
 	urg_unko::connectURG();
+
+	startpos[0] = 0.0;
+	startpos[1] = 0.0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		urgpos[i] = pos[i];
+	}
+
 }
 
 int urg_unko::disconnectURG(){
@@ -492,6 +501,9 @@ int urg_unko::getData4URG(float& dist, float& rad){
 		urg_deg2step(&this->urg, +90), 0);
 #endif
 
+	//startpos[0] = startpos[0] + (cos(urgpos[2]) - sin(urgpos[2])) * urgpos[1];
+	//startpos[1] = startpos[1] + (cos(urgpos[2]) + sin(urgpos[2])) * urgpos[1];
+
 	urg_start_measurement(&this->urg, URG_DISTANCE, 1, 0);
 
 	for (i = 0; i < CAPTURE_TIMES; ++i) {
@@ -509,6 +521,9 @@ int urg_unko::getData4URG(float& dist, float& rad){
 		urgpos[2] = rad;
 
 	}
+	startpos[0] = + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+	startpos[1] = - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+	printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
 
 	return 0;
 
@@ -549,8 +564,8 @@ void urg_unko::set_3D_surface( int data_n)
 				z = 120.0;
 
 				//2次元平面の座標変換
-				pointpos[0] = cos(urgpos[2]) * x + sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-				pointpos[1] = -sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
+				pointpos[0] = + cos(urgpos[2]) * x - sin(urgpos[2]) * y + cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
+				pointpos[1] = + sin(urgpos[2]) * x + cos(urgpos[2]) * y + sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
 				pointpos[2] = z;
 
 				//座標を保存
@@ -610,7 +625,7 @@ void urg_unko::pcdSave()
 
 int getArduinoHandle(HANDLE& hComm)
 {
-	hComm = CreateFile("\\\\.\\COM9", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hComm = CreateFile("\\\\.\\COM10", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
 		char z;
@@ -638,6 +653,9 @@ int getDataUNKO( int URG_COM[] , int ARDUINO_COM )
 	float dist = 0;
 	float rad = 0;
 
+	float urgPOS[][3] = { 1100.0, 285.0, 0.0 ,
+							20.0, 443.0, 0.0};
+
 	getArduinoHandle(handle_ARDUINO);
 
 	Sleep(2000);
@@ -646,15 +664,13 @@ int getDataUNKO( int URG_COM[] , int ARDUINO_COM )
 
 	for (int i = 0; i < URGCOUNT; i++)
 	{
-		unkoArray[i].init(URG_COM[i]);
+		unkoArray[i].init(URG_COM[i],urgPOS[i]);
 
 	}
 
 	cv::namedWindow("q");
 
 	while (true){
-		startpos[0] = startpos[0] + (cos(urgpos[2]) - sin(urgpos[2])) * urgpos[1];
-		startpos[1] = startpos[1] + (cos(urgpos[2]) + sin(urgpos[2])) * urgpos[1];
 
 		Encoder(handle_ARDUINO, dist, rad);
 		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
@@ -664,9 +680,7 @@ int getDataUNKO( int URG_COM[] , int ARDUINO_COM )
 			unkoArray[i].getData4URG(dist, rad);
 		}
 
-		startpos[0] = cos(urgpos[2]) * (chairpos - DIS_old) + startpos[0];
-		startpos[1] = -sin(urgpos[2]) * (chairpos - DIS_old) + startpos[1];
-		printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
+		
 
 		DIS_old = chairpos;
 
