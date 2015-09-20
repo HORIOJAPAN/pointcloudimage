@@ -81,11 +81,15 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	}
 	else data2 = receive_data[1];
 	*/
+
+	//取得した値を符号つきに代入
 	signed char receive_char1, receive_char2;
 	receive_char1 = receive_data[0];
 	receive_char2 = receive_data[1];
 
 	//cout << "\n\n\ndata1:" << data1 << " ,  data2:" << data2 << endl << endl;
+
+	//char型を整数値として表示
 	cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
 
 	//DL = receive_data[0] * 2.5;
@@ -95,14 +99,17 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	DR = (signed int)data2 * 24.78367538;
 	*/
 
+	//左右輪の回転量から移動量を計算
 	DL = receive_char1 * 24.78367538;
 	DR = receive_char2 * 24.78367538;
 
+	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
 	ANG = (DL - DR) / 526 ;
 
 	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
+	//移動量，回転量を積算用変数へ積算
 	dist += DIS;
 	rad += ANG;
 
@@ -121,6 +128,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
  */
 void getArduinoHandle(HANDLE& hComm)
 {
+	//シリアルポートを開いてハンドルを取得
 	hComm = CreateFile("\\\\.\\COM10", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
@@ -128,6 +136,7 @@ void getArduinoHandle(HANDLE& hComm)
 		z = getchar();
 		return;
 	}
+	//ポートを開けていれば通信設定を行う
 	else
 	{
 		DCB lpTest;
@@ -138,7 +147,6 @@ void getArduinoHandle(HANDLE& hComm)
 		lpTest.StopBits = ONESTOPBIT;
 		SetCommState(hComm, &lpTest);
 	}
-	return;
 }
 
 /*
@@ -153,63 +161,64 @@ void getArduinoHandle(HANDLE& hComm)
 *	返り値:
 *		なし
 */
-void getDataUNKO(int URG_COM[], int ARDUINO_COM)
+void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG)
 {
-	HANDLE handle_ARDUINO;
+	HANDLE handle_ARDUINO;	//Arduino用ハンドル
 
-	urg_unko unkoArray[URGCOUNT];
+	urg_unko *unkoArray = new urg_unko[NumOfURG];	//urg_unko型変数の配列
 
-	float dist = 0.0;
-	float rad = 0.0;
+	float dist = 0.0;	//移動距離の積算用変数
+	float rad = 0.0;	//回転量の積算用変数
 
-	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
-		20.0, 443.0, 0.0 };
-
+	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(handle_ARDUINO);
 
-	Sleep(2000);
-
-	cout << sizeof(URG_COM) / sizeof(int) << endl;
-
-	for (int i = 0; i < URGCOUNT; i++)
+	//接続したURGの数だけurg_unko型オブジェクトを初期化
+	for (int i = 0; i < NumOfURG; i++)
 	{
-		unkoArray[i].init(URG_COM[i], urgPOS[i]);
+		unkoArray[i].init(URG_COM[i], URGPOS[i]);
 
 	}
 
+	//ループを抜けるためのキー入力を待つウィンドウを作成
 	cv::namedWindow("q");
 
+	//マップ作成を行うループ
+	//'q'を入力するとループを抜ける
 	while (true){
 
+		//エンコーダから移動量，回転量を取得
 		Encoder(handle_ARDUINO, dist, rad);
 		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
 
-		for (int i = 0; i < URGCOUNT; i++)
+		//URGからデータを取得し，エンコーダの値を基にマップ，pcdファイルを作成
+		for (int i = 0; i < NumOfURG; i++)
 		{
 			unkoArray[i].getData4URG(dist, rad);
 		}
 
-
-
+		//現在の移動量を保存
 		DIS_old = chairpos;
 
+		//'q'が入力されたらループを抜ける
 		if (cv::waitKey(1) == 'q')
 		{
+			delete[] unkoArray;
 			break;
 		}
-
 	}
 
+	//Arduinoのハンドルを解放
 	CommClose(handle_ARDUINO);
 
 	return;
 }
 
-/*
+/********************************************
 *
 *	こっからurg_unkoの実装部分
 *
-*/
+*********************************************/
 
 /*
 *	概要:
@@ -238,9 +247,13 @@ urg_unko::urg_unko() :pcimage(5000, 5000, 5)
 */
 void urg_unko::init(int COM , float pos[])
 {
+	// 引数のCOMをメンバのCOMportに格納
 	COMport = COM;
-	urg_unko::connectURG();
 
+	//指定されたCOMポートのURGと接続
+	connectURG();
+
+	//以下，メンバの初期化
 	startpos[0] = 0.0;
 	startpos[1] = 0.0;
 
@@ -298,17 +311,20 @@ urg_unko::~urg_unko()
 *		0
 */
 int urg_unko::connectURG(){
-	if (open_urg_sensor(&this->urg, COMport) < 0) {
+
+	//urgオブジェクトの取得
+	if (open_urg_sensor(&urg, COMport) < 0) {
 		return 1;
 	}
 
-	this->data = (long *)malloc(urg_max_data_size(&this->urg) * sizeof(this->data[0]));
-	if (!this->data) {
+	//データ取得用のメモリを確保
+	data = (long *)malloc(urg_max_data_size(&urg) * sizeof(data[0]));
+	if (!data) {
 		perror("urg_max_index()");
 		return 1;
 	}
 
-	printf("URG connected : urg_max_data_size =  %d \n", urg_max_data_size(&this->urg));
+	printf("URG connected : urg_max_data_size =  %d \n", urg_max_data_size(&urg));
 	return 0;
 }
 
@@ -329,31 +345,38 @@ int urg_unko::getData4URG(float& dist, float& rad){
 	//データ取得
 #if 0
 	//データの取得範囲を変更する場合
-	urg_set_scanning_parameter(&this->urg,
-		urg_deg2step(&this->urg, -90),
-		urg_deg2step(&this->urg, +90), 0);
+	urg_set_scanning_parameter(&urg,
+		urg_deg2step(&urg, -90),
+		urg_deg2step(&urg, +90), 0);
 #endif
 
+	//現在の位置を保存
 	startpos_old[0] = startpos[0];
 	startpos_old[1] = startpos[1];
 
-	urg_start_measurement(&this->urg, URG_DISTANCE, 1, 0);
+	//測定の開始
+	urg_start_measurement(&urg, URG_DISTANCE, 1, 0);
 
 	for (i = 0; i < CAPTURE_TIMES; ++i) {
-		n = urg_get_distance(&this->urg, this->data, &this->time_stamp);
+		//測定データの取得
+		n = urg_get_distance(&urg, data, &time_stamp);
 		if (n <= 0) {
-			printf("urg_get_distance: %s\n", urg_error(&this->urg));
-			free(this->data);
-			urg_close(&this->urg);
+			printf("urg_get_distance: %s\n", urg_error(&urg));
+			free(data);
+			urg_close(&urg);
 			return 1;
 		}
 
+		//測定データからマップ，pcdファイルを作成
 		set_3D_surface( n );
 
+		//積算した距離と回転角を格納
 		chairpos = dist;
 		urgpos[2] = rad;
 
 	}
+
+	//現在の位置を更新
 	startpos[0] = + cos(urgpos[2]) * (chairpos - DIS_old) + startpos_old[0];
 	startpos[1] = - sin(urgpos[2]) * (chairpos - DIS_old) + startpos_old[1];
 	printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
@@ -380,25 +403,32 @@ void urg_unko::set_3D_surface( int data_n)
 	long min_distance;
 	long max_distance;
 
+
 	if (chairpos >= 0){//位置の取得が成功したとき
 
-		if (abs(chairpos - chairpos_old) >= scaninterval){//椅子の位置が設定値以上動いたとき
+		if (abs(chairpos - chairpos_old) >= scaninterval){//位置が設定値以上動いたとき
 
 			// 全てのデータの X-Y の位置を取得
+			//正常に取得されるデータの最大値，最小値を取得
 			urg_distance_min_max(&urg, &min_distance, &max_distance);
 
+			//pcdファイルの初期化
 			pcdinit();
 
+			//データの数だけ実際の座標を計算してマップ，pcdファイルに書き込む
 			for (i = 0; i < data_n; ++i) {
-				long l = data[i];
+				long l = data[i];	//取得した点までの距離
 				double radian;
 				float x, y, z;
 				float pointpos[3];
 
+				//異常値ならとばす
 				if ((l <= min_distance) || (l >= max_distance)) {
 					continue;
 				}
 
+				//点までの角度を取得してxyに変換
+				//(極座標で取得されるデータをデカルト座標に変換)
 				radian = urg_index2rad(&urg, i);
 				x = (float)(l * cos(radian));
 				y = (float)(l * sin(radian));
@@ -411,11 +441,11 @@ void urg_unko::set_3D_surface( int data_n)
 
 				//座標を保存
 				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000);
-
-				this->pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000);
 
 			}
-			this->pcdSave();
+			//１スキャン分のpcdファイルを保存
+			pcdSave();
 		}
 	}
 }
@@ -430,10 +460,14 @@ void urg_unko::set_3D_surface( int data_n)
 */
 void urg_unko::pcdinit()
 {
+	//ファイル名を指定してファイルストリームを開く
 	ofs.open( "./" + pcimage.getDirname() + "/pointcloud_" + std::to_string(pcdnum) + ".pcd");
 
+	//pcdファイル番号を進めてデータ数カウント用変数を初期化
 	pcdnum++;
 	pcdcount = 0;
+
+	//ヘッダを記入
 	ofs << "# .PCD v.7 - Point Cloud Data file format\n"
 		<< "VERSION .7\n"
 		<< "FIELDS x y z rgb\n"
@@ -458,6 +492,7 @@ void urg_unko::pcdinit()
 */
 void urg_unko::pcdWrite(float x, float y)
 {
+	//データを書き込んでデータ数をカウント
 	ofs << x << " " << y << " " << "0.0" << endl;
 	pcdcount++;
 }
@@ -472,8 +507,8 @@ void urg_unko::pcdWrite(float x, float y)
 */
 void urg_unko::pcdSave()
 {
+	//最終的なデータ数を追記
 	ofs.seekp(0, ios_base::beg);
-
 	ofs << "# .PCD v.7 - Point Cloud Data file format\n"
 		<< "VERSION .7\n"
 		<< "FIELDS x y z rgb\n"
@@ -486,6 +521,7 @@ void urg_unko::pcdSave()
 		<< "POINTS " + std::to_string(pcdcount) + "\n"
 		<< "DATA ascii" << endl;
 
+	//ファイルストリームを緘
 	ofs.close();
 	ofs.flush();
 }

@@ -9,14 +9,15 @@
 #include <Windows.h>
 #include <fstream>
 
-#define URGCOUNT 2
+//接続したURGの個数を自動で判断するようにしたマクロ
+#define getDataUNKO(aURGCOM , aURGPOS , ARDUINOCOM) getDataUNKOOrigin( (aURGCOM),(aURGPOS),(ARDUINOCOM),sizeof((aURGCOM))/sizeof(aURGCOM[0])) 
 
 //指定したCOMポートを閉じる
 int CommClose(HANDLE hComm);
 //Arduinoのハンドルを取得
 void getArduinoHandle(HANDLE& hComm);
 //urg_unkoのmainループ
-void getDataUNKO(int URG_COM[], int ARDUINO_COM );
+void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG);
 
 /*
 *
@@ -36,7 +37,7 @@ private:
 
 	float urgpos[3];	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
 	float startpos[2];	//測定開始位置から見た現在の位置
-	float startpos_old[2] ;
+	float startpos_old[2] ;	//直前の位置を保存する変数
 
 	urg_t urg;			//URGオブジェクト
 	long *data = NULL;	
