@@ -32,6 +32,16 @@ int CommClose(HANDLE hComm)
 	return 1;
 }
 
+/*
+*	概要:
+*		Arduinoから左右輪の変化量を取得し，移動量，回転量を積算する
+*	引数：
+*		HANDLE hComm	Arduinoのハンドル
+*		float& dist		移動量を積算する変数への参照
+*		float& rad		回転量を積算する変数への参照
+*	返り値:
+*		int ret	成功したかどうか
+*/
 int Encoder(HANDLE hComm, float& dist, float& rad)
 {
 	unsigned char	sendbuf[1];
@@ -41,10 +51,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	unsigned long	len;
 
 	// ハンドルチェック
-	/*if( !hComm ){
-	return -1;
-	}*/
-
+	if( !hComm )	return -1;
 
 	// バッファクリア
 	memset(sendbuf, 0x00, sizeof(sendbuf));
@@ -105,7 +112,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
-	ANG = (DL - DR) / 526 ;
+	ANG = (DL - DR) / 526 ;	//右回転が正
 
 	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
@@ -196,9 +203,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		{
 			unkoArray[i].getData4URG(dist, rad);
 		}
-
-		//現在の移動量を保存
-		DIS_old = chairpos;
 
 		//'q'が入力されたらループを抜ける
 		if (cv::waitKey(1) == 'q')
@@ -350,10 +354,6 @@ int urg_unko::getData4URG(float& dist, float& rad){
 		urg_deg2step(&urg, +90), 0);
 #endif
 
-	//現在の位置を保存
-	startpos_old[0] = startpos[0];
-	startpos_old[1] = startpos[1];
-
 	//測定の開始
 	urg_start_measurement(&urg, URG_DISTANCE, 1, 0);
 
@@ -367,19 +367,30 @@ int urg_unko::getData4URG(float& dist, float& rad){
 			return 1;
 		}
 
-		//測定データからマップ，pcdファイルを作成
-		set_3D_surface( n );
-
 		//積算した距離と回転角を格納
 		chairpos = dist;
 		urgpos[2] = rad;
 
+		//測定データからマップ，pcdファイルを作成
+		set_3D_surface(n);
+
 	}
 
+	//現在の位置を保存
+	startpos_old[0] = startpos[0];
+	startpos_old[1] = startpos[1];
+
 	//現在の位置を更新
-	startpos[0] = + cos(urgpos[2]) * (chairpos - DIS_old) + startpos_old[0];
-	startpos[1] = - sin(urgpos[2]) * (chairpos - DIS_old) + startpos_old[1];
+	//測定開始時点を基準に
+	//		xの正：前
+	//		yの正：左
+	startpos[0] += cos(urgpos[2]) * (chairpos - DIS_old);
+	startpos[1] -= sin(urgpos[2]) * (chairpos - DIS_old);
 	printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
+
+
+	//現在の移動量を保存
+	DIS_old = chairpos;
 
 	return 0;
 

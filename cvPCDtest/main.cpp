@@ -11,7 +11,7 @@ int main()
 	//URGの位置を指定
 	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
 							20.0, 443.0, 0.0 };
-	
+
 	//ArduinoのCOMポートを指定
 	int ARDUINO_COM = 0;
 
