@@ -1,14 +1,10 @@
 #ifndef _INC_PCIMAGE
 #define _INC_PCIMAGE
 
-
 #include <string>
-
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
-
-int getURGdata();
 
 //pcdファイル名を指定すると画像に変換して保存
 int save_pcdtoimg(std::string fileName, std::string imgName, int resolution = 1);
