@@ -16,7 +16,7 @@ int CommClose(HANDLE hComm);
 //Arduinoのハンドルを取得
 void getArduinoHandle(HANDLE& hComm);
 //urg_unkoのmainループ
-int getDataUNKO(int URG_COM[], int ARDUINO_COM );
+void getDataUNKO(int URG_COM[], int ARDUINO_COM );
 
 /*
 *
@@ -53,6 +53,7 @@ private:
 	//URGと接続
 	int connectURG();
 
+	//取得したデータから実際の二次元情報を計算してマップ，pcdファイルへの書き込みを行う
 	void set_3D_surface(int data_n);
 
 	//pcdファイルを作成して書き込む準備を行う

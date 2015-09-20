@@ -22,7 +22,6 @@ float chairpos_old = 0.0;//車いすの車輪の直前の進行
 float chairpos = 0.0;//車いすの現在の進行 
 float DIS_old = 0.0;
 
-HANDLE hComm;
 
 int CommClose(HANDLE hComm)
 {
@@ -59,10 +58,13 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	// 送信
 	ret = WriteFile(hComm, &sendbuf, 1, &len, NULL);
 
+	// バッファクリア
 	memset(receive_data, 0x00, sizeof(receive_data));
 
+	// 通信バッファクリア
 	PurgeComm(hComm, PURGE_RXCLEAR);
 
+	// Arduinoからデータを受信
 	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
 
@@ -127,13 +129,17 @@ void getArduinoHandle(HANDLE& hComm)
 
 /*
 *	概要:
-*		urg_unkoのmainループ
+*		マップ作成用のメインループ
+*		'q'で終了
+*		適切に終了しないと画像が保存されない
 *	引数：
-*		HANDLE&	hComm	ハンドル変数への参照
+*		int URG_COM[]	接続したURGのCOMポートの配列
+*		int ARDUINO_COM	接続したArduinoのCOMポート
+
 *	返り値:
 *		なし
 */
-int getDataUNKO(int URG_COM[], int ARDUINO_COM)
+void getDataUNKO(int URG_COM[], int ARDUINO_COM)
 {
 	HANDLE handle_ARDUINO;
 
@@ -180,9 +186,9 @@ int getDataUNKO(int URG_COM[], int ARDUINO_COM)
 
 	}
 
-	CommClose(hComm);
+	CommClose(handle_ARDUINO);
 
-	return 0;
+	return;
 }
 
 /*
@@ -190,12 +196,32 @@ int getDataUNKO(int URG_COM[], int ARDUINO_COM)
 *	こっからurg_unkoの実装部分
 *
 */
+
+/*
+*	概要:
+*		コンストラクタ
+*		pcimage，COMport，pcdnumを初期化する
+*	引数：
+*		なし
+*	返り値:
+*		なし
+*/
 urg_unko::urg_unko() :pcimage(5000, 5000, 5)
 {
 	COMport = 0;
 	pcdnum = 0;
 
 }
+
+/*
+*	概要:
+*		オブジェクトの初期化処理
+*	引数：
+*		int COM		URGのCOMポート番号
+*		float pos[]	NCWCの回転中心から見たURGの位置
+*	返り値:
+*		なし
+*/
 void urg_unko::init(int COM , float pos[])
 {
 	COMport = COM;
@@ -214,22 +240,49 @@ void urg_unko::init(int COM , float pos[])
 
 }
 
+/*
+*	概要:
+*		URGの接続を切断
+*	引数：
+*		なし
+*	返り値:
+*		0
+*/
 int urg_unko::disconnectURG(){
 
 	//切断
-	free(this->data);
-	urg_close(&this->urg);
+	free(data);
+	urg_close(&urg);
 
 	printf("URG disconnected \n");
 	return 0;
 
 }
+
+/*
+*	概要:
+*		デストラクタ
+*		URGの切断，画像の保存を行う
+*	引数：
+*		なし
+*	返り値:
+*		なし
+*/
 urg_unko::~urg_unko()
 {
 	disconnectURG();
 	pcimage.savePCImage();
 }
 
+/*
+*	概要:
+*		URGと接続する
+*		init(int COM , float pos[])で指定したURGと接続する
+*	引数：
+*		なし
+*	返り値:
+*		0
+*/
 int urg_unko::connectURG(){
 	if (open_urg_sensor(&this->urg, COMport) < 0) {
 		return 1;
@@ -245,6 +298,15 @@ int urg_unko::connectURG(){
 	return 0;
 }
 
+/*
+*	概要:
+*		URGからデータを取得する
+*	引数：
+*		float& dist	積算する距離データ用変数の参照
+*		float& rad	積算する回転角データ用変数の参照
+*	返り値:
+*		0
+*/
 int urg_unko::getData4URG(float& dist, float& rad){
 
 	int n;
@@ -286,6 +348,14 @@ int urg_unko::getData4URG(float& dist, float& rad){
 
 }
 
+/*
+*	概要:
+*		取得したデータから実際の二次元情報を計算してマップ，pcdファイルへの書き込みを行う
+*	引数：
+*		int data_n	取得したデータの数
+*	返り値:
+*		なし
+*/
 void urg_unko::set_3D_surface( int data_n)
 {
 	printf(" set_3D_surface data_n = %d \n", data_n);
@@ -336,6 +406,14 @@ void urg_unko::set_3D_surface( int data_n)
 	}
 }
 
+/*
+*	概要:
+*		pcdファイルを作成して初期化する
+*	引数：
+*		なし
+*	返り値:
+*		なし
+*/
 void urg_unko::pcdinit()
 {
 	ofs.open( "./" + pcimage.getDirname() + "/pointcloud_" + std::to_string(pcdnum) + ".pcd");
@@ -355,11 +433,29 @@ void urg_unko::pcdinit()
 		<< "DATA ascii" << endl;
 }
 
+/*
+*	概要:
+*		pcdファイルにデータを書き込む
+*	引数：
+*		float x	x座標値
+*		float y	y座標値
+*	返り値:
+*		なし
+*/
 void urg_unko::pcdWrite(float x, float y)
 {
 	ofs << x << " " << y << " " << "0.0" << endl;
 	pcdcount++;
 }
+
+/*
+*	概要:
+*		ファイルストリームを閉じて保存する
+*	引数：
+*		なし
+*	返り値:
+*		なし
+*/
 void urg_unko::pcdSave()
 {
 	ofs.seekp(0, ios_base::beg);
