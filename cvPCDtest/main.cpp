@@ -14,7 +14,7 @@ int main()
 
 	getDataUNKO(URG_COM, ARDUINO_COM);
 
-	//z = getchar();
+	z = getchar();
 
 	return 0;
 }
