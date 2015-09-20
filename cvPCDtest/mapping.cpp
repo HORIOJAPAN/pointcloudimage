@@ -66,8 +66,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
 
-	int data1 = 0, data2 = 0;
-
+	//int data1 = 0, data2 = 0;
+	/*
 	if ((int)receive_data[0] == 255)
 	{
 		data1 = -256 | receive_data[0];
@@ -78,19 +78,33 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 		data2 = -256 | receive_data[1];
 	}
 	else data2 = receive_data[1];
+	*/
+	signed char receive_char1, receive_char2;
+	receive_char1 = receive_data[0];
+	receive_char2 = receive_data[1];
+
+	//cout << "\n\n\ndata1:" << data1 << " ,  data2:" << data2 << endl << endl;
+	cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
+	/*
 	DL = (signed int)data1 * 24.78367538;
 	DR = (signed int)data2 * 24.78367538;
+	*/
+
+	DL = receive_char1 * 24.78367538;
+	DR = receive_char2 * 24.78367538;
 
 	DIS = (DL + DR) / 2;
 	ANG = (DL - DR) / 526 ;
 
+	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
+
 	dist += DIS;
 	rad += ANG;
 
-	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
+	printf("Distance = %d , Angle = %f \n", (int)dist, rad);
 
 	return ret;
 }
@@ -139,8 +153,8 @@ int getDataUNKO(int URG_COM[], int ARDUINO_COM)
 
 	urg_unko unkoArray[URGCOUNT];
 
-	float dist = 0;
-	float rad = 0;
+	float dist = 0.0;
+	float rad = 0.0;
 
 	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
 		20.0, 443.0, 0.0 };
