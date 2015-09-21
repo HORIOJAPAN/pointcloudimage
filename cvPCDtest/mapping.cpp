@@ -115,11 +115,11 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//char型を整数値として表示
 	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
-	//int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
-//	meter(picture, data, 2);
+	int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
+	meter(picture, data, 2);
 	data_L += static_cast<int>(receive_char1);
 	data_R += static_cast<int>(receive_char2);
-	//cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
+	cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
 
 
 	//DL = receive_data[0] * 2.5;
@@ -130,12 +130,12 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	*/
 
 	//左右輪の回転量から移動量を計算
-	DL = receive_char1 * 24.78367538;
-	DR = receive_char2 * 24.78367538;
+	DL = receive_char1 * 24.87094184;
+	DR = receive_char2 * 24.87094184;
 
 	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
-	ANG = (DL - DR) / 526 ;	//右回転が正
+	ANG = (DL - DR) / 530 ;	//右回転が正
 
 	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
@@ -159,7 +159,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 void getArduinoHandle(HANDLE& hComm)
 {
 	//シリアルポートを開いてハンドルを取得
-	hComm = CreateFile("\\\\.\\COM9", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hComm = CreateFile("\\\\.\\COM10", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
 		char z;
@@ -262,7 +262,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *	返り値:
 *		なし
 */
-urg_unko::urg_unko() :pcimage(1000, 1000, 5)
+urg_unko::urg_unko() :pcimage(5000, 5000, 5)
 {
 	COMport = 0;
 	pcdnum = 0;
