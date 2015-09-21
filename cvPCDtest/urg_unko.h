@@ -8,6 +8,8 @@
 
 #include <Windows.h>
 #include <fstream>
+#include <opencv2/opencv.hpp>
+#include <opencv2/opencv_lib.hpp>
 
 //Ú‘±‚µ‚½URG‚ÌŒÂ”‚ðŽ©“®‚Å”»’f‚·‚é‚æ‚¤‚É‚µ‚½ƒ}ƒNƒ
 #define getDataUNKO(aURGCOM , aURGPOS , ARDUINOCOM) getDataUNKOOrigin( (aURGCOM),(aURGPOS),(ARDUINOCOM),sizeof((aURGCOM))/sizeof(aURGCOM[0])) 

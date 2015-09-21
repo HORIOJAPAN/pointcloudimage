@@ -10,6 +10,7 @@
 #include <vector>
 
 using namespace std;
+using namespace cv;
 
 float scaninterval = 0.0;//計測を実施する最低間隔[mm]
 
@@ -21,6 +22,20 @@ enum {
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
 float chairpos = 0.0;//車いすの現在の進行 
 float DIS_old = 0.0;
+
+Mat picture;
+
+void meter(Mat pic, int data[] , int NumOfData)
+{
+	int baseline = 0;
+	pic = Mat::zeros(500, 500, CV_8UC3);
+	Size textSize = getTextSize("OpenCV ", FONT_HERSHEY_SIMPLEX, 2, 2, &baseline);
+	for (int i = 0; i < NumOfData; i++){
+		putText(pic, "data" + to_string(i) + " : " + to_string(data[i]), cv::Point(50, 50 + textSize.height*i), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 0, 200), 2, CV_AA);
+	}
+	
+	imshow("meter", pic);
+}
 
 
 int CommClose(HANDLE hComm)
@@ -97,7 +112,9 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//cout << "\n\n\ndata1:" << data1 << " ,  data2:" << data2 << endl << endl;
 
 	//char型を整数値として表示
-	cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
+	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
+	int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
+	meter(picture, data, 2);
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
