@@ -25,6 +25,8 @@ float DIS_old = 0.0;
 
 Mat picture;
 
+int data_L = 0, data_R = 0;
+
 void meter(Mat pic, int data[] , int NumOfData)
 {
 	int baseline = 0;
@@ -113,8 +115,12 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//char型を整数値として表示
 	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
-	int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
-	meter(picture, data, 2);
+	//int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
+//	meter(picture, data, 2);
+	data_L += static_cast<int>(receive_char1);
+	data_R += static_cast<int>(receive_char2);
+	//cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
+
 
 	//DL = receive_data[0] * 2.5;
 	//DR = receive_data[1] * 2.5;
@@ -131,7 +137,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	DIS = (DL + DR) / 2;
 	ANG = (DL - DR) / 526 ;	//右回転が正
 
-	printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
+	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
 	//移動量，回転量を積算用変数へ積算
 	dist += DIS;
@@ -153,7 +159,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 void getArduinoHandle(HANDLE& hComm)
 {
 	//シリアルポートを開いてハンドルを取得
-	hComm = CreateFile("\\\\.\\COM10", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hComm = CreateFile("\\\\.\\COM9", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
 		char z;
@@ -215,11 +221,17 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		Encoder(handle_ARDUINO, dist, rad);
 		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
 
+		//積算した距離を格納
+		chairpos = dist;
+
 		//URGからデータを取得し，エンコーダの値を基にマップ，pcdファイルを作成
 		for (int i = 0; i < NumOfURG; i++)
 		{
 			unkoArray[i].getData4URG(dist, rad);
 		}
+
+		//現在の移動量を保存
+		DIS_old = chairpos;
 
 		//'q'が入力されたらループを抜ける
 		if (cv::waitKey(1) == 'q')
@@ -250,7 +262,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *	返り値:
 *		なし
 */
-urg_unko::urg_unko() :pcimage(5000, 5000, 5)
+urg_unko::urg_unko() :pcimage(1000, 1000, 5)
 {
 	COMport = 0;
 	pcdnum = 0;
@@ -359,10 +371,6 @@ int urg_unko::connectURG(){
 *		0
 */
 int urg_unko::getData4URG(float& dist, float& rad){
-
-	int n;
-	int i;
-
 	//データ取得
 #if 0
 	//データの取得範囲を変更する場合
@@ -374,7 +382,9 @@ int urg_unko::getData4URG(float& dist, float& rad){
 	//測定の開始
 	urg_start_measurement(&urg, URG_DISTANCE, 1, 0);
 
-	for (i = 0; i < CAPTURE_TIMES; ++i) {
+	for (int i = 0; i < CAPTURE_TIMES; ++i) {
+		int n;
+
 		//測定データの取得
 		n = urg_get_distance(&urg, data, &time_stamp);
 		if (n <= 0) {
@@ -384,13 +394,11 @@ int urg_unko::getData4URG(float& dist, float& rad){
 			return 1;
 		}
 
-		//積算した距離と回転角を格納
-		chairpos = dist;
+		//積算した回転角を格納
 		urgpos[2] = rad;
 
 		//測定データからマップ，pcdファイルを作成
 		set_3D_surface(n);
-
 	}
 
 	//現在の位置を保存
@@ -404,10 +412,6 @@ int urg_unko::getData4URG(float& dist, float& rad){
 	startpos[0] += cos(urgpos[2]) * (chairpos - DIS_old);
 	startpos[1] -= sin(urgpos[2]) * (chairpos - DIS_old);
 	printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
-
-
-	//現在の移動量を保存
-	DIS_old = chairpos;
 
 	return 0;
 
@@ -427,10 +431,8 @@ void urg_unko::set_3D_surface( int data_n)
 
 	(void)time_stamp;
 
-	int i;
 	long min_distance;
 	long max_distance;
-
 
 	if (chairpos >= 0){//位置の取得が成功したとき
 
@@ -444,7 +446,7 @@ void urg_unko::set_3D_surface( int data_n)
 			pcdinit();
 
 			//データの数だけ実際の座標を計算してマップ，pcdファイルに書き込む
-			for (i = 0; i < data_n; ++i) {
+			for (int i = 0; i < data_n; ++i) {
 				long l = data[i];	//取得した点までの距離
 				double radian;
 				float x, y, z;

@@ -196,7 +196,7 @@ PCImage::PCImage(int width, int height, int resolution)
 	img_height = height;
 	coefficient = 100 / resolution;
 	imgval_increment = 80;
-	limit = 100;
+	limit = 10;
 	limitpix = limit * coefficient;
 
 	for (int i = 0; i<4 ; i++)
