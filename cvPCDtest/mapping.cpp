@@ -34,6 +34,8 @@ Mat arroypic;
 Mat rotatepic;
 Mat affine_mat;
 
+bool isInitialized = false;
+
 
 //左右輪のエンコーダ生データ積算用
 int data_L = 0, data_R = 0;
@@ -53,6 +55,7 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 
 void showDirection(float radian)
 {
+	//rotatepic = Mat::zeros(arroypic.cols, arroypic.rows, CV_8UC3);
 	affine_mat = getRotationMatrix2D(Point(arroypic.cols,arroypic.rows), radian / PI * 180 , 1);
 	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
 	imshow("direction", rotatepic);
@@ -109,6 +112,13 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	// Arduinoからデータを受信
 	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
+
+	//初期化されていなければ初期化(初めのデータを捨てる)
+	if (!isInitialized)
+	{
+		isInitialized = true;
+		return 0;
+	}
 
 	//int data1 = 0, data2 = 0;
 	/*
@@ -226,6 +236,8 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(handle_ARDUINO);
+	//エンコーダの初期化
+	Encoder(handle_ARDUINO, dist, rad);
 
 	//接続したURGの数だけurg_unko型オブジェクトを初期化
 	for (int i = 0; i < NumOfURG; i++)
