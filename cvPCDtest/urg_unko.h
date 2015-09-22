@@ -38,9 +38,7 @@ private:
 	int pcdcount;		//pcdファイルに書き込む点の数をカウントする変数
 
 	float urgpos[3];	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
-	float startpos[2];	//測定開始位置から見た現在の位置
-	float startpos_old[2] ;	//直前の位置を保存する変数
-
+	
 	urg_t urg;			//URGオブジェクト
 	long *data = NULL;	
 	long time_stamp;

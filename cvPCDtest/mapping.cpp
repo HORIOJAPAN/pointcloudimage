@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#define PI 3.14
+
 using namespace std;
 using namespace cv;
 
@@ -23,22 +25,38 @@ float chairpos_old = 0.0;//車いすの車輪の直前の進行
 float chairpos = 0.0;//車いすの現在の進行 
 float DIS_old = 0.0;
 
-Mat picture;
+float startpos[2] = {};	//測定開始位置から見た現在の位置
+float startpos_old[2] = {};	//直前の位置を保存する変数
 
+//数値表示用
+Mat picture;
+Mat arroypic;
+Mat rotatepic;
+Mat affine_mat;
+
+
+//左右輪のエンコーダ生データ積算用
 int data_L = 0, data_R = 0;
 
-void meter(Mat pic, int data[] , int NumOfData)
+//数値の表示
+void meter(Mat pic, float data[] , string name[], int NumOfData)
 {
 	int baseline = 0;
-	pic = Mat::zeros(500, 500, CV_8UC3);
+	pic = Mat::zeros(500, 1000, CV_8UC3);
 	Size textSize = getTextSize("OpenCV ", FONT_HERSHEY_SIMPLEX, 2, 2, &baseline);
 	for (int i = 0; i < NumOfData; i++){
-		putText(pic, "data" + to_string(i) + " : " + to_string(data[i]), cv::Point(50, 50 + textSize.height*i), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 0, 200), 2, CV_AA);
+		putText(pic, name[i] + " : " + to_string(data[i]), cv::Point(50, 50 + textSize.height*i), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 200,0 ), 2, CV_AA);
 	}
 	
 	imshow("meter", pic);
 }
 
+void showDirection(float radian)
+{
+	affine_mat = getRotationMatrix2D(Point(arroypic.cols,arroypic.rows), radian / PI * 180 , 1);
+	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
+	imshow("direction", rotatepic);
+}
 
 int CommClose(HANDLE hComm)
 {
@@ -115,8 +133,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//char型を整数値として表示
 	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
-	int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
-	meter(picture, data, 2);
+	//int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
+	//meter(picture, data, 2);
 	data_L += static_cast<int>(receive_char1);
 	data_R += static_cast<int>(receive_char2);
 	cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
@@ -200,6 +218,12 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	float dist = 0.0;	//移動距離の積算用変数
 	float rad = 0.0;	//回転量の積算用変数
 
+	string meterName[] = { "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
+							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]" };
+	float		meterData[6] = {};
+
+	arroypic = imread("arrow.jpg");
+
 	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(handle_ARDUINO);
 
@@ -211,7 +235,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	}
 
 	//ループを抜けるためのキー入力を待つウィンドウを作成
-	cv::namedWindow("q");
+	//cv::namedWindow("q");
 
 	//マップ作成を行うループ
 	//'q'を入力するとループを抜ける
@@ -230,6 +254,18 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			unkoArray[i].getData4URG(dist, rad);
 		}
 
+		//現在の位置を保存
+		startpos_old[0] = startpos[0];
+		startpos_old[1] = startpos[1];
+
+		//現在の位置を更新
+		//測定開始時点を基準に
+		//		xの正：前
+		//		yの正：左
+		startpos[0] += cos(rad) * (chairpos - DIS_old);
+		startpos[1] -= sin(rad) * (chairpos - DIS_old);
+		printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
+
 		//現在の移動量を保存
 		DIS_old = chairpos;
 
@@ -239,6 +275,21 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			delete[] unkoArray;
 			break;
 		}
+
+		{
+			meterData[0] = data_L - data_R;
+			if (data_R)	meterData[1] = data_L / data_R * 100;
+			else meterData[1] = 0;
+			meterData[2] = startpos[0];
+			meterData[3] = startpos[1];
+			meterData[4] = dist;
+			meterData[5] = rad;
+
+			meter(picture, meterData, meterName, 6);
+			showDirection(rad);
+		}
+
+
 	}
 
 	//Arduinoのハンドルを解放
@@ -287,12 +338,6 @@ void urg_unko::init(int COM , float pos[])
 	connectURG();
 
 	//以下，メンバの初期化
-	startpos[0] = 0.0;
-	startpos[1] = 0.0;
-
-	startpos_old[0] = 0.0;
-	startpos_old[1] = 0.0;
-
 	for (int i = 0; i < 3; i++)
 	{
 		urgpos[i] = pos[i];
@@ -400,18 +445,6 @@ int urg_unko::getData4URG(float& dist, float& rad){
 		//測定データからマップ，pcdファイルを作成
 		set_3D_surface(n);
 	}
-
-	//現在の位置を保存
-	startpos_old[0] = startpos[0];
-	startpos_old[1] = startpos[1];
-
-	//現在の位置を更新
-	//測定開始時点を基準に
-	//		xの正：前
-	//		yの正：左
-	startpos[0] += cos(urgpos[2]) * (chairpos - DIS_old);
-	startpos[1] -= sin(urgpos[2]) * (chairpos - DIS_old);
-	printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
 
 	return 0;
 
