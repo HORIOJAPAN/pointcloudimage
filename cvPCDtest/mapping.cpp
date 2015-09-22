@@ -53,7 +53,7 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 
 void showDirection(float radian)
 {
-	affine_mat = getRotationMatrix2D(Point(arroypic.cols,arroypic.rows), radian / PI * 180 , 1);
+	affine_mat = getRotationMatrix2D(Point(arroypic.cols/2,arroypic.rows/2), -radian / PI * 180 , 1);
 	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
 	imshow("direction", rotatepic);
 }
@@ -218,9 +218,9 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	float dist = 0.0;	//ˆÚ“®‹——£‚ÌÏZ—p•Ï”
 	float rad = 0.0;	//‰ñ“]—Ê‚ÌÏZ—p•Ï”
 
-	string meterName[] = { "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
+	string meterName[] = {"dataL","dataR", "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
 							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]" };
-	float		meterData[6] = {};
+	float		meterData[8] = {};
 
 	arroypic = imread("arrow.jpg");
 
@@ -277,13 +277,15 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		}
 
 		{
-			meterData[0] = data_L - data_R;
-			if (data_R)	meterData[1] = data_L / data_R * 100;
-			else meterData[1] = 0;
-			meterData[2] = startpos[0];
-			meterData[3] = startpos[1];
-			meterData[4] = dist;
-			meterData[5] = rad;
+			meterData[0] = data_L;
+			meterData[1] = data_R;
+			meterData[2] = data_L - data_R;
+			if (data_R)	meterData[3] = (float)data_L / (float)data_R * 100;
+			else meterData[3] = 0;
+			meterData[4] = startpos[0];
+			meterData[5] = startpos[1];
+			meterData[6] = dist;
+			meterData[7] = rad;
 
 			meter(picture, meterData, meterName, 6);
 			showDirection(rad);
