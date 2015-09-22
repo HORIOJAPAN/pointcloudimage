@@ -53,6 +53,7 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 	imshow("meter", pic);
 }
 
+//‰ñ“]Šp‚ð–îˆó‚Å•\Ž¦
 void showDirection(float radian)
 {
 	//rotatepic = Mat::zeros(arroypic.cols, arroypic.rows, CV_8UC3);
