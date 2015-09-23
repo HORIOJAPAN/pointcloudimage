@@ -164,7 +164,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
 	DIS = (DL + DR) / 2;
-	ANG = (DL - DR) / 530 ;	//‰E‰ñ“]‚ª³
+	ANG = (DL - DR) / 530 / 6.5 * 6.28;	//‰E‰ñ“]‚ª³
 
 	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
@@ -300,7 +300,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			meterData[6] = dist;
 			meterData[7] = rad;
 
-			meter(picture, meterData, meterName, 6);
+			meter(picture, meterData, meterName, 8);
 			showDirection(rad);
 		}
 
