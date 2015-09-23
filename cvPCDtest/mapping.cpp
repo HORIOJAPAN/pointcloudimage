@@ -548,12 +548,12 @@ void urg_unko::pcdinit()
 	//ヘッダを記入
 	ofs << "# .PCD v.7 - Point Cloud Data file format\n"
 		<< "VERSION .7\n"
-		<< "FIELDS x y z rgb\n"
-		<< "SIZE 4 4 4 4\n"
-		<< "TYPE F F F F\n"
-		<< "COUNT 1 1 1 1\n"
-		<< "WIDTH\n"
-		<< "HEIGHT\n"
+		<< "FIELDS x y z\n"
+		<< "SIZE 4 4 4\n"
+		<< "TYPE F F F\n"
+		<< "COUNT 1 1 1\n"
+		<< "WIDTH 400\n"
+		<< "HEIGHT 1\n"
 		<< "VIEWPOINT 0 0 0 1 0 0 0\n"
 		<< "POINTS 400\n"
 		<< "DATA ascii" << endl;
@@ -587,14 +587,15 @@ void urg_unko::pcdSave()
 {
 	//最終的なデータ数を追記
 	ofs.seekp(0, ios_base::beg);
+
 	ofs << "# .PCD v.7 - Point Cloud Data file format\n"
 		<< "VERSION .7\n"
-		<< "FIELDS x y z rgb\n"
-		<< "SIZE 4 4 4 4\n"
-		<< "TYPE F F F F\n"
-		<< "COUNT 1 1 1 1\n"
-		<< "WIDTH\n"
-		<< "HEIGHT\n"
+		<< "FIELDS x y z\n"
+		<< "SIZE 4 4 4\n"
+		<< "TYPE F F F\n"
+		<< "COUNT 1 1 1\n"
+		<< "WIDTH " + std::to_string(pcdcount) + "\n"
+		<< "HEIGHT 1\n"
 		<< "VIEWPOINT 0 0 0 1 0 0 0\n"
 		<< "POINTS " + std::to_string(pcdcount) + "\n"
 		<< "DATA ascii" << endl;
