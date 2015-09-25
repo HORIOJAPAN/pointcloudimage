@@ -164,7 +164,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
-	ANG = DR/(1060*DR/(DR-DL));	//右回転が正
+	ANG = (DL - DR) / 530 / 6.52 * 6.28;	//右回転が正
 
 	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
