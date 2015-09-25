@@ -24,37 +24,73 @@ namespace csPCIform
     }
 
 
-    class SharedMemory
+    class SharedMemoryInt
     {
         String FILEMAPNAME;
         MemoryMappedFile mmf;
 
-        public SharedMemory(String str)
+        public SharedMemoryInt(String str)
         {
             FILEMAPNAME = str;
             mmf = MemoryMappedFile.CreateNew(FILEMAPNAME, 10000);
         }
 
-        ~SharedMemory()
+        ~SharedMemoryInt()
         {
             mmf.Dispose();
         }
 
-        public string getShMemData(int offset = 0)
+        public Int32 getShMemData(int offset = 0)
         {
             using (MemoryMappedViewStream stream = mmf.CreateViewStream())
             {
                 BinaryReader reader = new BinaryReader(stream);
-                for (int i = 0; i < offset; i++) reader.ReadString();
-                return reader.ReadString();
+                for (int i = 0; i < offset; i++) reader.ReadInt32();
+                return reader.ReadInt32();
             }
         }
-        public void setShMemData(string data, int offset = 0)
+        public void setShMemData(Int32 data, int offset = 0)
         {
             using (MemoryMappedViewStream stream = mmf.CreateViewStream())
             {
                 BinaryWriter writer = new BinaryWriter(stream);
-                //writer.Seek(offset * sizeof(string), SeekOrigin.Begin);
+                writer.Seek(offset * sizeof(Int32), SeekOrigin.Begin);
+                writer.Write(data);
+            }
+        }
+
+    }
+    class SharedMemoryChar
+    {
+        String FILEMAPNAME;
+        MemoryMappedFile mmf;
+
+        public SharedMemoryChar(String str)
+        {
+            FILEMAPNAME = str;
+            mmf = MemoryMappedFile.CreateNew(FILEMAPNAME, 10000);
+        }
+
+        ~SharedMemoryChar()
+        {
+            mmf.Dispose();
+        }
+
+        public Int32 getShMemData(int offset = 0)
+        {
+            using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+            {
+                BinaryReader reader = new BinaryReader(stream);
+                for (int i = 0; i < offset; i++) reader.ReadChar();
+                return reader.ReadChar();
+            }
+        }
+        public void setShMemData(char data, int offset = 0)
+        {
+            using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+            {
+                BinaryWriter writer = new BinaryWriter(stream);
+                writer.Seek(offset * sizeof(char), SeekOrigin.Begin);
                 writer.Write(data);
             }
         }

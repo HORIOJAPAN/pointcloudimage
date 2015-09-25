@@ -242,8 +242,9 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	// csFormとの懸け橋
 	// ループ抜けるタイミングとディレクトリ名のやり取り用
-	SharedMemory<string> shMem("MappingForm");
-	shMem.setShMemData(to_string(0) , 0);
+	SharedMemory<int> shMemInt("MappingFormInt");
+	shMemInt.setShMemData(0, 0);
+	SharedMemory<char> shMemChar("MappingFormChar");
 
 	// 姿勢表示用矢印の読み込み
 	arroypic = imread("arrow.jpg");
@@ -261,8 +262,11 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
-		shMem.setShMemData(unkoArray[i].getDirName(), 1 + i);
-
+		shMemInt.setShMemData(unkoArray[i].getDirName().size(), 1 + i);
+		for (int i = 0; i < unkoArray[i].getDirName().size(); i++)
+		{
+			shMemChar.setShMemData(unkoArray[i].getDirName().c_str()[i], i + unkoArray[0].getDirName().size());
+		}
 	}
 
 	//ループを抜けるためのキー入力を待つウィンドウを作成
@@ -302,8 +306,8 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 		//'q'が入力されたらループを抜ける
 		// もしくは共有メモリの0番地に0が入力されたら(ry
-		cout << "shMem:" << stoi(shMem.getShMemData(0)) << endl;
-		if (cv::waitKey(1) == 'q' || atoi(shMem.getShMemData(0).c_str()))
+		cout << "shMem:" << shMemInt.getShMemData(0) << endl;
+		if (cv::waitKey(1) == 'q' || shMemInt.getShMemData(0))
 		{
 			//Newで確保した配列の解放
 			delete[] unkoArray;

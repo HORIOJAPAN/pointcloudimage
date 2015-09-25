@@ -18,13 +18,15 @@ namespace csPCIform
     {
 
         bool isRunning;
-        SharedMemory shMem;
+        SharedMemoryInt shMemInt;
+        SharedMemoryChar shMemChar;
 
         public MappingForm()
         {
             InitializeComponent();
             isRunning = false;
-            shMem = new SharedMemory("MappingForm");
+            shMemInt = new SharedMemoryInt("MappingFormInt");
+            shMemChar = new SharedMemoryChar("MappingFormChar");
         }
 
         private void COMportNameSet()
@@ -68,7 +70,7 @@ namespace csPCIform
             if (!isRunning)
             {
                 // 終了の合図用メモリを初期化しておく
-                shMem.setShMemData(0.ToString());
+                shMemInt.setShMemData(0);
 
                 // 以下プロセスの起動系
                 Process myProcess = new Process();
@@ -93,9 +95,20 @@ namespace csPCIform
             }
             else
             {
-                shMem.setShMemData(1.ToString());
-                dirListBox.Items.Add(shMem.getShMemData(1));
-                dirListBox.Items.Add(shMem.getShMemData(2));
+                shMemInt.setShMemData(1);
+                string dirname1 = "", dirname2 = "";
+
+                for (int i = 0; i < shMemInt.getShMemData(1);i++ )
+                {
+                    dirname1 += shMemChar.getShMemData(i);
+                }
+                for (int i = 0; i < shMemInt.getShMemData(2); i++)
+                {
+                    dirname2 += shMemChar.getShMemData(i + shMemInt.getShMemData(1));
+                }
+
+                dirListBox.Items.Add(dirname1);
+                dirListBox.Items.Add(dirname2);
                 isRunning = false;
                 startBtn.Text = "Start";
             }
