@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "urg_unko.h"
+#include "SharedMemory.h"
 #include "open_urg_sensor.c"
 
 #include <stdlib.h>
@@ -9,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#define PI 3.14
+#define PI 3.14159265359
 
 using namespace std;
 using namespace cv;
@@ -40,6 +41,10 @@ bool isInitialized = false;
 //左右輪のエンコーダ生データ積算用
 int data_L = 0, data_R = 0;
 
+//pcimageの引数．画像のサイズと解像度
+extern int imgWidth, imgHeight, imgResolution;
+
+
 //数値の表示
 void meter(Mat pic, float data[] , string name[], int NumOfData)
 {
@@ -56,9 +61,9 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 //回転角を矢印で表示
 void showDirection(float radian)
 {
-	//rotatepic = Mat::zeros(arroypic.cols, arroypic.rows, CV_8UC3);
 	affine_mat = getRotationMatrix2D(Point(arroypic.cols / 2, arroypic.rows / 2), -radian / PI * 180, 1);
 	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
+	putText(arroypic, to_string((int)(-radian/(2*PI))), cv::Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(100,0,230), 2, CV_AA);
 	imshow("direction", rotatepic);
 }
 
@@ -185,10 +190,11 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
  *	返り値:
  *		なし
  */
-void getArduinoHandle(HANDLE& hComm)
+void getArduinoHandle(int arduinoCOM , HANDLE& hComm)
 {
 	//シリアルポートを開いてハンドルを取得
-	hComm = CreateFile("\\\\.\\COM10", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	string com = "\\\\.\\COM" + to_string(arduinoCOM);
+	hComm = CreateFile( com.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hComm == INVALID_HANDLE_VALUE){
 		printf("シリアルポートを開くことができませんでした。");
 		char z;
@@ -229,21 +235,32 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	float dist = 0.0;	//移動距離の積算用変数
 	float rad = 0.0;	//回転量の積算用変数
 
+	// 数値表示用の変数達
 	string meterName[] = {"dataL","dataR", "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
 							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]" };
 	float		meterData[8] = {};
 
+	// csFormとの懸け橋
+	// ループ抜けるタイミングとディレクトリ名のやり取り用
+	SharedMemory<string> shMem("MappingForm");
+	shMem.setShMemData(to_string(0) , 0);
+
+	// 姿勢表示用矢印の読み込み
 	arroypic = imread("arrow.jpg");
+	arroypic = ~arroypic;
+
 
 	//Arduinoとシリアル通信を行うためのハンドルを取得
-	getArduinoHandle(handle_ARDUINO);
+	getArduinoHandle(ARDUINO_COM,handle_ARDUINO);
 	//エンコーダの初期化
 	Encoder(handle_ARDUINO, dist, rad);
 
 	//接続したURGの数だけurg_unko型オブジェクトを初期化
+	// ついでに共有メモリに作成したディレクトリの名前を格納
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
+		shMem.setShMemData(unkoArray[i].getDirName(), 1 + i);
 
 	}
 
@@ -283,9 +300,12 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		DIS_old = chairpos;
 
 		//'q'が入力されたらループを抜ける
-		if (cv::waitKey(1) == 'q')
+		// もしくは共有メモリの0番地に0が入力されたら(ry
+		if (cv::waitKey(1) == 'q' || atoi(shMem.getShMemData(0).c_str()))
 		{
+			//Newで確保した配列の解放
 			delete[] unkoArray;
+
 			break;
 		}
 
@@ -328,7 +348,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *	返り値:
 *		なし
 */
-urg_unko::urg_unko() :pcimage(5000, 5000, 5)
+urg_unko::urg_unko() :pcimage(imgWidth, imgHeight, imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
@@ -603,4 +623,9 @@ void urg_unko::pcdSave()
 	//ファイルストリームを緘
 	ofs.close();
 	ofs.flush();
+}
+
+std::string	urg_unko::getDirName()
+{
+	return pcimage.getDirname();
 }

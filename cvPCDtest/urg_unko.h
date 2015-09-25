@@ -17,7 +17,7 @@
 //指定したCOMポートを閉じる
 int CommClose(HANDLE hComm);
 //Arduinoのハンドルを取得
-void getArduinoHandle(HANDLE& hComm);
+void getArduinoHandle(int arduinoCOM, HANDLE& hComm);
 //urg_unkoのmainループ
 void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG);
 
@@ -79,6 +79,7 @@ public:
 	//URGからデータを取得するメソッド
 	int getData4URG(float& dist, float& rad);
 
+	std::string	getDirName();
 };
 
 

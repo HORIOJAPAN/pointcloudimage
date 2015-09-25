@@ -1,57 +1,33 @@
 #include "Timer.h"
 
+// 2015/09/25 ver0.1
+
 #include <iostream>
 #include <fstream>
+#include <windows.h>
 
-
-void Timer::Start(int timeNum)
+//èâä˙âª
+void Timer::Start()
 {
-	if (start.size() < timeNum + 1)
+	rawLap.push_back(std::chrono::system_clock::now());
+}
+
+//ë™íËèIóπ
+void Timer::Save( string filename,  tUnit unit)
+{
+	_time	now = std::chrono::system_clock::now();
+	int		count = 0;
+
+	ofstream ofs(filename, ios::app);
+	for (int i = 0; i < lapTime.size(); i++)
 	{
-		start.push_back(std::chrono::system_clock::now());
-		end.push_back(std::chrono::system_clock::now());
-
+		ofs << "No." << count << " , " << lapTime[i] << " , " << unitname(unit) << endl;
 	}
-	else start[timeNum] = std::chrono::system_clock::now();
+
+	cout << "Saved" << endl;
 }
 
-void Timer::End(int timeNum, string filename, string label, tUnit unit)
-{
-	end[timeNum] = std::chrono::system_clock::now();
-
-	int ret;
-
-	ret = retTime(start[timeNum], end[timeNum], unit);
-
-	if (label.empty()) label = "No." + to_string(timeNum);
-
-	cout << label << " : " << ret << unitname(unit) << endl;
-
-	if (!filename.empty())
-	{
-		ofstream ofs(filename,ios::app);
-		ofs << label << " , " << ret << " , " << unitname(unit) << endl;
-
-	}
-}
-void Timer::End(int timeNum, string filename)
-{
-	this->End(timeNum, filename, "", millisec);
-}
-void Timer::End(int timeNum, string filename, string label)
-{
-	this->End(timeNum, filename, label, millisec);
-}
-void Timer::End(int timeNum, tUnit unit)
-{
-	this->End(timeNum, "", "", unit);
-}
-void Timer::End(int timeNum)
-{
-	this->End(timeNum, "", "", millisec);
-}
-
-int Timer::retTime(std::chrono::time_point<std::chrono::system_clock> start, std::chrono::time_point<std::chrono::system_clock> end, tUnit unit)
+int Timer::getTime(std::chrono::time_point<std::chrono::system_clock> start, std::chrono::time_point<std::chrono::system_clock> end, tUnit unit)
 {
 	switch (unit)
 	{
@@ -84,4 +60,41 @@ string Timer::unitname(tUnit unit)
 	default:
 		return " ";
 	}
+}
+
+int Timer::getLapTime(int Criteria, tUnit unit , bool isSavaLap)
+{
+	int retTime;
+	_time	now = std::chrono::system_clock::now();
+
+	switch (Criteria)
+	{
+	case -1:
+		retTime = getTime(rawLap[0], now, millisec);
+		break;
+	case 0 :
+		return -1;
+	default:
+		retTime = getTime(rawLap[rawLap.size() - Criteria], now, millisec);
+		break;
+	}
+
+	if (isSavaLap) rawLap.push_back(now);
+	lapTime.push_back(retTime);
+
+	//cout << "Lap time : " << retTime << " " << unitname(unit) << endl;
+	return retTime;
+
+}
+
+//åªç›ÇÃéûçèÇï∂éöóÒÇ≈éÊìæÇ∑ÇÈ
+string Timer::getNowTime(){
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	char szTime[25] = { 0 };
+	// wHourÇÇXéûä‘ë´ÇµÇƒÅAì˙ñ{éûä‘Ç…Ç∑ÇÈ
+	wsprintf(szTime, "%04d%02d%02d%02d%02d%02d",
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour + 9, st.wMinute, st.wSecond);
+	return (string)szTime;
 }

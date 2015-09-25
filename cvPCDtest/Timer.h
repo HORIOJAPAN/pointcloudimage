@@ -1,6 +1,8 @@
 #ifndef _INC_TIMER
 #define _INC_TIMER
 
+// 2015/09/25 ver0.1
+
 #include <string>
 #include <chrono>
 #include <vector>
@@ -14,32 +16,33 @@ public:
 	enum tUnit { sec, millisec, microsec, nanosec };
 
 private:
-	//計測開始点，終了点を格納する配列
-	vector<std::chrono::time_point<std::chrono::system_clock>> start, end;
+	//長いので型を短く定義
+	typedef std::chrono::time_point<std::chrono::system_clock> _time;
 
-	//指定した単位で時間を返す
-	int retTime(std::chrono::time_point<std::chrono::system_clock> start, std::chrono::time_point<std::chrono::system_clock> end, tUnit unit);
+	//計測開始点，中間点を格納する
+	vector<_time>	rawLap;
+	vector<int >	lapTime;
 
 	//単位の名前を返す
 	string unitname( tUnit unit);
 
+	//指定した単位で時間を返す
+	int getTime(_time start, _time end, tUnit unit);
+
 public:
 	//計測開始点
-	//複数保存する場合は番号(int型の整数)を指定
-	//番号が連続でないとうまく測れないので注意
-	void Start( int timeNum );
+	void Start();
 
 	//計測結果保存
-	//引数は番号，単位，ラベル，保存時のファイル名
-	//番号以外は省略可能(オーバーロードされている形のみ)
-	//保存時のファイル名を指定するとそのファイルの最後尾に追記する
-	//ファイル名指定なしの場合は保存しない
-	void End(int timeNum , string filename , string label, tUnit unit);
-	void End(int timeNum , string filename);
-	void End(int timeNum , string filename, string label);
-	void End(int timeNum , tUnit unit);
-	void End(int timeNum);
+	//引数はファイル名,単位
+	//指定したファイルが既に存在したらファイルの最後尾に追記する
+	void Save(string filename, tUnit unit = millisec);
 
+	// 指定した時点からの経過時間を取得
+	int getLapTime(int Criteria = 1, tUnit unit = millisec, bool isSavaLap = true);
+
+	// 現在時刻を返す
+	string getNowTime();
 };
 
 #endif
