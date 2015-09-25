@@ -21,13 +21,13 @@ int main(int argc, char* argv[])
 	imgHeight = 5000;
 	imgResolution = 5;
 
-	/*
+	
 	cout << argc << endl;
 	for (int i = 0; i < argc; i++)
 	{
 		cout << argv[i] << endl;
 	}
-	*/
+	
 
 	if (argc == 11)
 	{

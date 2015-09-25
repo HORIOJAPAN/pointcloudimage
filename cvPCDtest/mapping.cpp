@@ -247,6 +247,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	// 姿勢表示用矢印の読み込み
 	arroypic = imread("arrow.jpg");
+	if (arroypic.empty()) cout << "unko" << endl;
 	arroypic = ~arroypic;
 
 
@@ -301,6 +302,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 		//'q'が入力されたらループを抜ける
 		// もしくは共有メモリの0番地に0が入力されたら(ry
+		cout << "shMem:" << stoi(shMem.getShMemData(0)) << endl;
 		if (cv::waitKey(1) == 'q' || atoi(shMem.getShMemData(0).c_str()))
 		{
 			//Newで確保した配列の解放
