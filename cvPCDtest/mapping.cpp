@@ -63,7 +63,7 @@ void showDirection(float radian)
 {
 	affine_mat = getRotationMatrix2D(Point(arroypic.cols / 2, arroypic.rows / 2), -radian / PI * 180, 1);
 	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
-	putText(arroypic, to_string((int)(-radian/(2*PI))), cv::Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(100,0,230), 2, CV_AA);
+	putText(rotatepic, to_string((int)(-radian / (2 * PI))), cv::Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(100, 0, 230), 2, CV_AA);
 	imshow("direction", rotatepic);
 }
 
