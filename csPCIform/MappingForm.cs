@@ -218,6 +218,7 @@ namespace csPCIform
         // 選択した項目のディレクトリをエクスプローラで開く
         private void dirListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (dirListBox.SelectedIndex == -1 ) return;
             Process.Start("EXPLORER.EXE", System.IO.Path.GetFullPath(saveDirectoryName + "\\" + dirListBox.Text));
             dirListBox.ClearSelected();
         }
