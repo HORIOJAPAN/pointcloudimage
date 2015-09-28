@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
 	getDataUNKO(URG_COM, urgPOS, ARDUINO_COM);
 
-	z = getchar();
+	//z = getchar();
 
 	return 0;
 }

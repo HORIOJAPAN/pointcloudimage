@@ -18,20 +18,19 @@ namespace csPCIform
     public partial class MappingForm : Form
     {
         // もろもろの変数
-        private bool            isRunning;
-        private SharedMemoryInt shMemInt;
-        private string          saveDirectoryName;
-        private string[]        directories;
+        private bool            isRunning;          // Mappingプロセスが起動しているかどうか
+        private SharedMemoryInt shMemInt;           // int型の共有メモリを扱うクラス
+        private string[]        directories;        // Form起動前から存在しているディレクトリ達
 
-
+        // コンストラクタ
         public MappingForm()
         {
             InitializeComponent();
             isRunning = false;
             shMemInt = new SharedMemoryInt("MappingFormInt");
 
-            saveDirectoryName = "../Debug";
-            directories = System.IO.Directory.GetDirectories(saveDirectoryName, "*");
+            savedirpathTxtbox.Text = ".\\";     // 保存先のディレクトリのパス
+            directories = System.IO.Directory.GetDirectories(savedirpathTxtbox.Text.ToString(), "*");
             int index;
             // パスを除去してディレクトリ名のみにする
             for (int i = 0; i < directories.Length; i++)
@@ -41,6 +40,8 @@ namespace csPCIform
             }
         }
 
+        // COMポートのプロパティを取得する
+        // 未使用
         private string[] GetDeviceNames()
         {
             var deviceNameList = new System.Collections.ArrayList();
@@ -117,7 +118,7 @@ namespace csPCIform
             listbox.Items.Clear();
 
             // ディレクトリの一覧を取得してListBoxに結果を表示する
-            string[] subFolders = System.IO.Directory.GetDirectories(saveDirectoryName, "*");
+            string[] subFolders = System.IO.Directory.GetDirectories(savedirpathTxtbox.Text.ToString(), "*");
             int index;
             // パスを除去してディレクトリ名のみにする
             for(int i = 0 ; i < subFolders.Length ; i++ )
@@ -149,18 +150,23 @@ namespace csPCIform
                         
         }
 
+        // フォームが読み込まれた際の初期化処理
         private void MappingForm_Load(object sender, EventArgs e)
         {
             COMportNameSet();
 
             addDirectoryName( dirListBox );
+
+            savedirpathDlog.SelectedPath = "./Debug";
         }
 
+        // COMポートを読み込み直す
         private void reloadBtn_Click(object sender, EventArgs e)
         {
             COMportNameSet();
         }
 
+        // Mappingを開始/停止する
         private void startBtn_Click(object sender, EventArgs e)
         {
 
@@ -192,9 +198,9 @@ namespace csPCIform
             }
             else
             {
-                //Mappingプロセスに終了の合図を送る
+                // Mappingプロセスに終了の合図を送る
                 shMemInt.setShMemData(1);
-
+                // Mappingで作成されたディレクトリを一覧に追加する
                 addDirectoryName(dirListBox);
 
                 isRunning = false;
@@ -202,6 +208,7 @@ namespace csPCIform
             }
         }
 
+        // URGのパラメータを左右で入れ替える
         private void replaceBtn_Click(object sender, EventArgs e)
         {
             String tmp;
@@ -219,7 +226,7 @@ namespace csPCIform
         private void dirListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dirListBox.SelectedIndex == -1 ) return;
-            Process.Start("EXPLORER.EXE", System.IO.Path.GetFullPath(saveDirectoryName + "\\" + dirListBox.Text));
+            Process.Start("EXPLORER.EXE", System.IO.Path.GetFullPath(savedirpathTxtbox.Text.ToString() + "\\" + dirListBox.Text));
             dirListBox.ClearSelected();
         }
 
@@ -229,9 +236,21 @@ namespace csPCIform
             addDirectoryName(dirListBox);
         }
 
+        // デバイスマネージャを開く
         private void devmngerBtn_Click(object sender, EventArgs e)
         {
             Process.Start("devmgmt.msc");
+        }
+
+        // マップの保存先を指定
+        private void savadirpathBtn_Click(object sender, EventArgs e)
+        {
+            DialogResult result =  savedirpathDlog.ShowDialog();
+
+            if(result == DialogResult.OK)
+            {
+                savedirpathTxtbox.Text = savedirpathDlog.SelectedPath;
+            }
         }
 
     }

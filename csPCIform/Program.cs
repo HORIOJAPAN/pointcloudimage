@@ -23,7 +23,7 @@ namespace csPCIform
         }
     }
 
-
+    // Int型の共有メモリを扱うクラス
     class SharedMemoryInt
     {
         String FILEMAPNAME;

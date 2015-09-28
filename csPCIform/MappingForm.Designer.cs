@@ -55,6 +55,9 @@
             this.replaceBtn = new System.Windows.Forms.Button();
             this.alldirCheckbox = new System.Windows.Forms.CheckBox();
             this.devmngerBtn = new System.Windows.Forms.Button();
+            this.savedirpathTxtbox = new System.Windows.Forms.TextBox();
+            this.savadirpathBtn = new System.Windows.Forms.Button();
+            this.savedirpathDlog = new System.Windows.Forms.FolderBrowserDialog();
             this.SuspendLayout();
             // 
             // startBtn
@@ -71,9 +74,9 @@
             // 
             this.dirListBox.FormattingEnabled = true;
             this.dirListBox.ItemHeight = 18;
-            this.dirListBox.Location = new System.Drawing.Point(574, 60);
+            this.dirListBox.Location = new System.Drawing.Point(574, 78);
             this.dirListBox.Name = "dirListBox";
-            this.dirListBox.Size = new System.Drawing.Size(370, 526);
+            this.dirListBox.Size = new System.Drawing.Size(370, 508);
             this.dirListBox.TabIndex = 2;
             this.dirListBox.SelectedIndexChanged += new System.EventHandler(this.dirListBox_SelectedIndexChanged);
             // 
@@ -270,7 +273,7 @@
             // alldirCheckbox
             // 
             this.alldirCheckbox.AutoSize = true;
-            this.alldirCheckbox.Location = new System.Drawing.Point(807, 35);
+            this.alldirCheckbox.Location = new System.Drawing.Point(807, 50);
             this.alldirCheckbox.Name = "alldirCheckbox";
             this.alldirCheckbox.Size = new System.Drawing.Size(137, 22);
             this.alldirCheckbox.TabIndex = 26;
@@ -288,11 +291,35 @@
             this.devmngerBtn.UseVisualStyleBackColor = true;
             this.devmngerBtn.Click += new System.EventHandler(this.devmngerBtn_Click);
             // 
+            // savedirpathTxtbox
+            // 
+            this.savedirpathTxtbox.BackColor = System.Drawing.SystemColors.Control;
+            this.savedirpathTxtbox.Location = new System.Drawing.Point(574, 17);
+            this.savedirpathTxtbox.Multiline = true;
+            this.savedirpathTxtbox.Name = "savedirpathTxtbox";
+            this.savedirpathTxtbox.Size = new System.Drawing.Size(333, 27);
+            this.savedirpathTxtbox.TabIndex = 28;
+            // 
+            // savadirpathBtn
+            // 
+            this.savadirpathBtn.Location = new System.Drawing.Point(913, 15);
+            this.savadirpathBtn.Name = "savadirpathBtn";
+            this.savadirpathBtn.Size = new System.Drawing.Size(31, 29);
+            this.savadirpathBtn.TabIndex = 29;
+            this.savadirpathBtn.Text = "...";
+            this.savadirpathBtn.UseVisualStyleBackColor = true;
+            this.savadirpathBtn.Click += new System.EventHandler(this.savadirpathBtn_Click);
+            // 
+            // savedirpathDlog
+            // 
+            // 
             // MappingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(966, 602);
+            this.Controls.Add(this.savadirpathBtn);
+            this.Controls.Add(this.savedirpathTxtbox);
             this.Controls.Add(this.devmngerBtn);
             this.Controls.Add(this.alldirCheckbox);
             this.Controls.Add(this.replaceBtn);
@@ -356,6 +383,9 @@
         private System.Windows.Forms.Button replaceBtn;
         private System.Windows.Forms.CheckBox alldirCheckbox;
         private System.Windows.Forms.Button devmngerBtn;
+        private System.Windows.Forms.TextBox savedirpathTxtbox;
+        private System.Windows.Forms.Button savadirpathBtn;
+        private System.Windows.Forms.FolderBrowserDialog savedirpathDlog;
     }
 }
 
