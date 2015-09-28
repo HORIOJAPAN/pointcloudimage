@@ -53,11 +53,13 @@
             this.urg2distanceLbl = new System.Windows.Forms.Label();
             this.reloadBtn = new System.Windows.Forms.Button();
             this.replaceBtn = new System.Windows.Forms.Button();
+            this.alldirCheckbox = new System.Windows.Forms.CheckBox();
+            this.devmngerBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // startBtn
             // 
-            this.startBtn.Location = new System.Drawing.Point(327, 401);
+            this.startBtn.Location = new System.Drawing.Point(331, 437);
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(190, 60);
             this.startBtn.TabIndex = 0;
@@ -73,10 +75,11 @@
             this.dirListBox.Name = "dirListBox";
             this.dirListBox.Size = new System.Drawing.Size(370, 526);
             this.dirListBox.TabIndex = 2;
+            this.dirListBox.SelectedIndexChanged += new System.EventHandler(this.dirListBox_SelectedIndexChanged);
             // 
             // imgWidthTxtbox
             // 
-            this.imgWidthTxtbox.Location = new System.Drawing.Point(39, 329);
+            this.imgWidthTxtbox.Location = new System.Drawing.Point(43, 365);
             this.imgWidthTxtbox.Name = "imgWidthTxtbox";
             this.imgWidthTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgWidthTxtbox.TabIndex = 3;
@@ -84,7 +87,7 @@
             // 
             // imgHeightTxtbox
             // 
-            this.imgHeightTxtbox.Location = new System.Drawing.Point(171, 329);
+            this.imgHeightTxtbox.Location = new System.Drawing.Point(175, 365);
             this.imgHeightTxtbox.Name = "imgHeightTxtbox";
             this.imgHeightTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgHeightTxtbox.TabIndex = 4;
@@ -93,7 +96,7 @@
             // imgWidthLbl
             // 
             this.imgWidthLbl.AutoSize = true;
-            this.imgWidthLbl.Location = new System.Drawing.Point(36, 297);
+            this.imgWidthLbl.Location = new System.Drawing.Point(40, 333);
             this.imgWidthLbl.Name = "imgWidthLbl";
             this.imgWidthLbl.Size = new System.Drawing.Size(92, 18);
             this.imgWidthLbl.TabIndex = 5;
@@ -102,7 +105,7 @@
             // imgHeightLbl
             // 
             this.imgHeightLbl.AutoSize = true;
-            this.imgHeightLbl.Location = new System.Drawing.Point(168, 297);
+            this.imgHeightLbl.Location = new System.Drawing.Point(172, 333);
             this.imgHeightLbl.Name = "imgHeightLbl";
             this.imgHeightLbl.Size = new System.Drawing.Size(99, 18);
             this.imgHeightLbl.TabIndex = 6;
@@ -111,7 +114,7 @@
             // imgResolutionLbl
             // 
             this.imgResolutionLbl.AutoSize = true;
-            this.imgResolutionLbl.Location = new System.Drawing.Point(36, 372);
+            this.imgResolutionLbl.Location = new System.Drawing.Point(40, 408);
             this.imgResolutionLbl.Name = "imgResolutionLbl";
             this.imgResolutionLbl.Size = new System.Drawing.Size(129, 18);
             this.imgResolutionLbl.TabIndex = 8;
@@ -119,7 +122,7 @@
             // 
             // imgResolutionTxtbox
             // 
-            this.imgResolutionTxtbox.Location = new System.Drawing.Point(39, 404);
+            this.imgResolutionTxtbox.Location = new System.Drawing.Point(43, 440);
             this.imgResolutionTxtbox.Name = "imgResolutionTxtbox";
             this.imgResolutionTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgResolutionTxtbox.TabIndex = 7;
@@ -128,7 +131,7 @@
             // urg1comCbbox
             // 
             this.urg1comCbbox.FormattingEnabled = true;
-            this.urg1comCbbox.Location = new System.Drawing.Point(36, 60);
+            this.urg1comCbbox.Location = new System.Drawing.Point(40, 96);
             this.urg1comCbbox.Name = "urg1comCbbox";
             this.urg1comCbbox.Size = new System.Drawing.Size(121, 26);
             this.urg1comCbbox.TabIndex = 9;
@@ -136,7 +139,7 @@
             // urg1Lbl
             // 
             this.urg1Lbl.AutoSize = true;
-            this.urg1Lbl.Location = new System.Drawing.Point(33, 39);
+            this.urg1Lbl.Location = new System.Drawing.Point(37, 75);
             this.urg1Lbl.Name = "urg1Lbl";
             this.urg1Lbl.Size = new System.Drawing.Size(52, 18);
             this.urg1Lbl.TabIndex = 10;
@@ -145,7 +148,7 @@
             // urg2Lbl
             // 
             this.urg2Lbl.AutoSize = true;
-            this.urg2Lbl.Location = new System.Drawing.Point(219, 39);
+            this.urg2Lbl.Location = new System.Drawing.Point(223, 75);
             this.urg2Lbl.Name = "urg2Lbl";
             this.urg2Lbl.Size = new System.Drawing.Size(52, 18);
             this.urg2Lbl.TabIndex = 12;
@@ -154,7 +157,7 @@
             // urg2comCbbox
             // 
             this.urg2comCbbox.FormattingEnabled = true;
-            this.urg2comCbbox.Location = new System.Drawing.Point(222, 60);
+            this.urg2comCbbox.Location = new System.Drawing.Point(226, 96);
             this.urg2comCbbox.Name = "urg2comCbbox";
             this.urg2comCbbox.Size = new System.Drawing.Size(121, 26);
             this.urg2comCbbox.TabIndex = 11;
@@ -162,7 +165,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(393, 39);
+            this.label1.Location = new System.Drawing.Point(397, 75);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 18);
             this.label1.TabIndex = 14;
@@ -171,14 +174,14 @@
             // arduinocomCbbox
             // 
             this.arduinocomCbbox.FormattingEnabled = true;
-            this.arduinocomCbbox.Location = new System.Drawing.Point(396, 60);
+            this.arduinocomCbbox.Location = new System.Drawing.Point(400, 96);
             this.arduinocomCbbox.Name = "arduinocomCbbox";
             this.arduinocomCbbox.Size = new System.Drawing.Size(121, 26);
             this.arduinocomCbbox.TabIndex = 13;
             // 
             // urg1heightTxtbox
             // 
-            this.urg1heightTxtbox.Location = new System.Drawing.Point(36, 134);
+            this.urg1heightTxtbox.Location = new System.Drawing.Point(40, 170);
             this.urg1heightTxtbox.Name = "urg1heightTxtbox";
             this.urg1heightTxtbox.Size = new System.Drawing.Size(100, 25);
             this.urg1heightTxtbox.TabIndex = 15;
@@ -187,7 +190,7 @@
             // urg1heightLbl
             // 
             this.urg1heightLbl.AutoSize = true;
-            this.urg1heightLbl.Location = new System.Drawing.Point(33, 113);
+            this.urg1heightLbl.Location = new System.Drawing.Point(37, 149);
             this.urg1heightLbl.Name = "urg1heightLbl";
             this.urg1heightLbl.Size = new System.Drawing.Size(116, 18);
             this.urg1heightLbl.TabIndex = 16;
@@ -196,7 +199,7 @@
             // urg1distanceLbl
             // 
             this.urg1distanceLbl.AutoSize = true;
-            this.urg1distanceLbl.Location = new System.Drawing.Point(33, 170);
+            this.urg1distanceLbl.Location = new System.Drawing.Point(37, 206);
             this.urg1distanceLbl.Name = "urg1distanceLbl";
             this.urg1distanceLbl.Size = new System.Drawing.Size(158, 18);
             this.urg1distanceLbl.TabIndex = 18;
@@ -204,7 +207,7 @@
             // 
             // urg1distanceTxtbox
             // 
-            this.urg1distanceTxtbox.Location = new System.Drawing.Point(36, 191);
+            this.urg1distanceTxtbox.Location = new System.Drawing.Point(40, 227);
             this.urg1distanceTxtbox.Name = "urg1distanceTxtbox";
             this.urg1distanceTxtbox.Size = new System.Drawing.Size(100, 25);
             this.urg1distanceTxtbox.TabIndex = 17;
@@ -212,7 +215,7 @@
             // 
             // urg2distanceTxtbox
             // 
-            this.urg2distanceTxtbox.Location = new System.Drawing.Point(222, 191);
+            this.urg2distanceTxtbox.Location = new System.Drawing.Point(226, 227);
             this.urg2distanceTxtbox.Name = "urg2distanceTxtbox";
             this.urg2distanceTxtbox.Size = new System.Drawing.Size(100, 25);
             this.urg2distanceTxtbox.TabIndex = 21;
@@ -220,7 +223,7 @@
             // 
             // urg2heightTxtbox
             // 
-            this.urg2heightTxtbox.Location = new System.Drawing.Point(222, 134);
+            this.urg2heightTxtbox.Location = new System.Drawing.Point(226, 170);
             this.urg2heightTxtbox.Name = "urg2heightTxtbox";
             this.urg2heightTxtbox.Size = new System.Drawing.Size(100, 25);
             this.urg2heightTxtbox.TabIndex = 19;
@@ -229,7 +232,7 @@
             // urg2heightLbl
             // 
             this.urg2heightLbl.AutoSize = true;
-            this.urg2heightLbl.Location = new System.Drawing.Point(219, 113);
+            this.urg2heightLbl.Location = new System.Drawing.Point(223, 149);
             this.urg2heightLbl.Name = "urg2heightLbl";
             this.urg2heightLbl.Size = new System.Drawing.Size(116, 18);
             this.urg2heightLbl.TabIndex = 22;
@@ -238,7 +241,7 @@
             // urg2distanceLbl
             // 
             this.urg2distanceLbl.AutoSize = true;
-            this.urg2distanceLbl.Location = new System.Drawing.Point(219, 170);
+            this.urg2distanceLbl.Location = new System.Drawing.Point(223, 206);
             this.urg2distanceLbl.Name = "urg2distanceLbl";
             this.urg2distanceLbl.Size = new System.Drawing.Size(158, 18);
             this.urg2distanceLbl.TabIndex = 23;
@@ -246,7 +249,7 @@
             // 
             // reloadBtn
             // 
-            this.reloadBtn.Location = new System.Drawing.Point(405, 113);
+            this.reloadBtn.Location = new System.Drawing.Point(409, 149);
             this.reloadBtn.Name = "reloadBtn";
             this.reloadBtn.Size = new System.Drawing.Size(112, 40);
             this.reloadBtn.TabIndex = 24;
@@ -256,7 +259,7 @@
             // 
             // replaceBtn
             // 
-            this.replaceBtn.Location = new System.Drawing.Point(134, 222);
+            this.replaceBtn.Location = new System.Drawing.Point(138, 258);
             this.replaceBtn.Name = "replaceBtn";
             this.replaceBtn.Size = new System.Drawing.Size(93, 33);
             this.replaceBtn.TabIndex = 25;
@@ -264,11 +267,34 @@
             this.replaceBtn.UseVisualStyleBackColor = true;
             this.replaceBtn.Click += new System.EventHandler(this.replaceBtn_Click);
             // 
+            // alldirCheckbox
+            // 
+            this.alldirCheckbox.AutoSize = true;
+            this.alldirCheckbox.Location = new System.Drawing.Point(807, 35);
+            this.alldirCheckbox.Name = "alldirCheckbox";
+            this.alldirCheckbox.Size = new System.Drawing.Size(137, 22);
+            this.alldirCheckbox.TabIndex = 26;
+            this.alldirCheckbox.Text = "All directories";
+            this.alldirCheckbox.UseVisualStyleBackColor = true;
+            this.alldirCheckbox.CheckedChanged += new System.EventHandler(this.alldirCheckbox_CheckedChanged);
+            // 
+            // devmngerBtn
+            // 
+            this.devmngerBtn.Location = new System.Drawing.Point(12, 12);
+            this.devmngerBtn.Name = "devmngerBtn";
+            this.devmngerBtn.Size = new System.Drawing.Size(157, 34);
+            this.devmngerBtn.TabIndex = 27;
+            this.devmngerBtn.Text = "DeviceManager";
+            this.devmngerBtn.UseVisualStyleBackColor = true;
+            this.devmngerBtn.Click += new System.EventHandler(this.devmngerBtn_Click);
+            // 
             // MappingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(966, 602);
+            this.Controls.Add(this.devmngerBtn);
+            this.Controls.Add(this.alldirCheckbox);
             this.Controls.Add(this.replaceBtn);
             this.Controls.Add(this.reloadBtn);
             this.Controls.Add(this.urg2distanceLbl);
@@ -328,6 +354,8 @@
         private System.Windows.Forms.Label urg2distanceLbl;
         private System.Windows.Forms.Button reloadBtn;
         private System.Windows.Forms.Button replaceBtn;
+        private System.Windows.Forms.CheckBox alldirCheckbox;
+        private System.Windows.Forms.Button devmngerBtn;
     }
 }
 

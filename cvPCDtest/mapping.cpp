@@ -244,11 +244,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	// ループ抜けるタイミングとディレクトリ名のやり取り用
 	SharedMemory<int> shMemInt("MappingFormInt");
 	shMemInt.setShMemData(0, 0);
-	SharedMemory<char> shMemChar("MappingFormChar");
 
 	// 姿勢表示用矢印の読み込み
 	arroypic = imread("arrow.jpg");
-	if (arroypic.empty()) cout << "unko" << endl;
+	if (arroypic.empty()) cout << "No arrow image" << endl;
 	arroypic = ~arroypic;
 
 
@@ -262,11 +261,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
-		shMemInt.setShMemData(unkoArray[i].getDirName().size(), 1 + i);
-		for (int i = 0; i < unkoArray[i].getDirName().size(); i++)
-		{
-			shMemChar.setShMemData(unkoArray[i].getDirName().c_str()[i], i + unkoArray[0].getDirName().size());
-		}
 	}
 
 	//ループを抜けるためのキー入力を待つウィンドウを作成
@@ -311,6 +305,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		{
 			//Newで確保した配列の解放
 			delete[] unkoArray;
+
+			// 表示している画像を閉じる
+			destroyWindow("meter");
+			destroyWindow("direction");
 
 			break;
 		}

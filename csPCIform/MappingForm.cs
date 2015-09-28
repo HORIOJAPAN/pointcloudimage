@@ -11,24 +11,81 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Diagnostics;
 using System.Threading;
+using System.Management;
 
 namespace csPCIform
 {
     public partial class MappingForm : Form
     {
+        // もろもろの変数
+        private bool            isRunning;
+        private SharedMemoryInt shMemInt;
+        private string          saveDirectoryName;
+        private string[]        directories;
 
-        bool isRunning;
-        SharedMemoryInt shMemInt;
-        SharedMemoryChar shMemChar;
 
         public MappingForm()
         {
             InitializeComponent();
             isRunning = false;
             shMemInt = new SharedMemoryInt("MappingFormInt");
-            shMemChar = new SharedMemoryChar("MappingFormChar");
+
+            saveDirectoryName = "../Debug";
+            directories = System.IO.Directory.GetDirectories(saveDirectoryName, "*");
+            int index;
+            // パスを除去してディレクトリ名のみにする
+            for (int i = 0; i < directories.Length; i++)
+            {
+                index = directories[i].LastIndexOf("\\");
+                directories[i] = directories[i].Substring(index + 1);
+            }
         }
 
+        private string[] GetDeviceNames()
+        {
+            var deviceNameList = new System.Collections.ArrayList();
+            var check = new System.Text.RegularExpressions.Regex("(COM[1-9][0-9]?[0-9]?)");
+
+            ManagementClass device = new ManagementClass("Win32_SerialPort");
+            ManagementObjectCollection manageObjCol = device.GetInstances();
+
+            //全てのデバイスを探索しシリアル通信が行われるデバイスを随時追加する
+            foreach (ManagementObject manageObj in manageObjCol)
+            {
+                //Nameプロパティを取得
+                var namePropertyValue = manageObj.GetPropertyValue("Name");
+                if (namePropertyValue == null)
+                {
+                    continue;
+                }
+
+                //Nameプロパティ文字列の一部が"(COM1)～(COM999)"と一致するときリストに追加"
+                string name = namePropertyValue.ToString();
+                //MessageBox.Show(name);
+                if (check.IsMatch(name))
+                {
+                    deviceNameList.Add(name);
+                }
+            }
+
+            //戻り値作成
+            if (deviceNameList.Count > 0)
+            {
+                string[] deviceNames = new string[deviceNameList.Count];
+                int index = 0;
+                foreach (var name in deviceNameList)
+                {
+                    deviceNames[index++] = name.ToString();
+                }
+                return deviceNames;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        // COMポートの一覧をセットする
         private void COMportNameSet()
         {
             //! 利用可能なシリアルポート名の配列を取得する.
@@ -53,10 +110,50 @@ namespace csPCIform
             }
         }
 
+        // ディレクトリ名のリストボックスを更新
+        private void addDirectoryName( ListBox listbox )
+        {
+            // ListBoxの内容をいったん破棄
+            listbox.Items.Clear();
+
+            // ディレクトリの一覧を取得してListBoxに結果を表示する
+            string[] subFolders = System.IO.Directory.GetDirectories(saveDirectoryName, "*");
+            int index;
+            // パスを除去してディレクトリ名のみにする
+            for(int i = 0 ; i < subFolders.Length ; i++ )
+            {
+                index = subFolders[i].LastIndexOf("\\");
+                subFolders[i] = subFolders[i].Substring(index + 1);
+            }
+
+            // 全ディレクトリ名を表示するかどうか
+            if (alldirCheckbox.Checked)
+            {
+                listbox.Items.AddRange(subFolders);
+            }
+            else
+            {
+                // 増えたディレクトリ名を検索して差分のみ追加
+                int newDirNum = subFolders.Length - directories.Length ; // 増えたディレクトリ数
+                string[] newDirName = new string[newDirNum];            // ディレクトリ名を追加する配列を増分だけ確保
+                for(int i = subFolders.Length - 1 ; newDirNum != 0 ; i--)
+                {
+                    if(Array.IndexOf(directories,subFolders[i]) == -1)
+                    {
+                        newDirName[newDirNum - 1] = subFolders[i];
+                        newDirNum--;
+                    }
+                }
+                listbox.Items.AddRange(newDirName);
+            }
+                        
+        }
+
         private void MappingForm_Load(object sender, EventArgs e)
         {
             COMportNameSet();
 
+            addDirectoryName( dirListBox );
         }
 
         private void reloadBtn_Click(object sender, EventArgs e)
@@ -95,20 +192,11 @@ namespace csPCIform
             }
             else
             {
+                //Mappingプロセスに終了の合図を送る
                 shMemInt.setShMemData(1);
-                string dirname1 = "", dirname2 = "";
 
-                for (int i = 0; i < shMemInt.getShMemData(1);i++ )
-                {
-                    dirname1 += shMemChar.getShMemData(i);
-                }
-                for (int i = 0; i < shMemInt.getShMemData(2); i++)
-                {
-                    dirname2 += shMemChar.getShMemData(i + shMemInt.getShMemData(1));
-                }
+                addDirectoryName(dirListBox);
 
-                dirListBox.Items.Add(dirname1);
-                dirListBox.Items.Add(dirname2);
                 isRunning = false;
                 startBtn.Text = "Start";
             }
@@ -125,6 +213,24 @@ namespace csPCIform
             urg1distanceTxtbox.Text = urg2distanceTxtbox.Text;
             urg2distanceTxtbox.Text = tmp;
 
+        }
+        
+        // 選択した項目のディレクトリをエクスプローラで開く
+        private void dirListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Process.Start("EXPLORER.EXE", System.IO.Path.GetFullPath(saveDirectoryName + "\\" + dirListBox.Text));
+            dirListBox.ClearSelected();
+        }
+
+        // チェックボックスが変化したらListBoxも更新
+        private void alldirCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            addDirectoryName(dirListBox);
+        }
+
+        private void devmngerBtn_Click(object sender, EventArgs e)
+        {
+            Process.Start("devmgmt.msc");
         }
 
     }
