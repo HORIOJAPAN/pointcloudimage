@@ -367,14 +367,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *		なし
 */
 // urg_unkoを配列で宣言したときに引数を渡せないのでpcimageの引数はとりあえずグローバル変数から受け取る
-urg_unko::urg_unko(int imgWidth, int imgHeight, int imgResolution) :pcimage(::imgWidth, ::imgHeight, ::imgResolution)
+urg_unko::urg_unko() :pcimage(::imgWidth, ::imgHeight, ::imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
-}
-urg_unko::urg_unko()
-{
-	this->urg_unko::urg_unko(5000, 5000, 5);
 }
 
 /*
