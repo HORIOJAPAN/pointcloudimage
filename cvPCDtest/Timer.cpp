@@ -1,6 +1,6 @@
 #include "Timer.h"
 
-// 2015/09/25 ver0.1
+// 2015/10/05
 
 #include <iostream>
 #include <fstream>
@@ -12,7 +12,7 @@ void Timer::Start()
 	rawLap.push_back(std::chrono::system_clock::now());
 }
 
-//測定終了
+//測定結果を保存
 void Timer::Save( string filename,  tUnit unit)
 {
 	_time	now = std::chrono::system_clock::now();
@@ -27,6 +27,7 @@ void Timer::Save( string filename,  tUnit unit)
 	cout << "Saved" << endl;
 }
 
+// 単位を指定して経過時間を取得
 int Timer::getTime(std::chrono::time_point<std::chrono::system_clock> start, std::chrono::time_point<std::chrono::system_clock> end, tUnit unit)
 {
 	switch (unit)
@@ -45,6 +46,7 @@ int Timer::getTime(std::chrono::time_point<std::chrono::system_clock> start, std
 
 }
 
+// 単位を文字列で取得
 string Timer::unitname(tUnit unit)
 {
 	switch (unit)
@@ -62,6 +64,7 @@ string Timer::unitname(tUnit unit)
 	}
 }
 
+// 指定回数前のラップタイムからの経過時間を取得
 int Timer::getLapTime(int Criteria, tUnit unit , bool isSavaLap)
 {
 	int retTime;

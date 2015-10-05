@@ -41,7 +41,7 @@
             this.urg1Lbl = new System.Windows.Forms.Label();
             this.urg2Lbl = new System.Windows.Forms.Label();
             this.urg2comCbbox = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.arduinocomLbl = new System.Windows.Forms.Label();
             this.arduinocomCbbox = new System.Windows.Forms.ComboBox();
             this.urg1heightTxtbox = new System.Windows.Forms.TextBox();
             this.urg1heightLbl = new System.Windows.Forms.Label();
@@ -58,11 +58,13 @@
             this.savedirpathTxtbox = new System.Windows.Forms.TextBox();
             this.savadirpathBtn = new System.Windows.Forms.Button();
             this.savedirpathDlog = new System.Windows.Forms.FolderBrowserDialog();
+            this.intervalLbl = new System.Windows.Forms.Label();
+            this.intervalTxtbox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // startBtn
             // 
-            this.startBtn.Location = new System.Drawing.Point(331, 437);
+            this.startBtn.Location = new System.Drawing.Point(331, 526);
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(190, 60);
             this.startBtn.TabIndex = 0;
@@ -82,7 +84,7 @@
             // 
             // imgWidthTxtbox
             // 
-            this.imgWidthTxtbox.Location = new System.Drawing.Point(43, 365);
+            this.imgWidthTxtbox.Location = new System.Drawing.Point(40, 469);
             this.imgWidthTxtbox.Name = "imgWidthTxtbox";
             this.imgWidthTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgWidthTxtbox.TabIndex = 3;
@@ -90,7 +92,7 @@
             // 
             // imgHeightTxtbox
             // 
-            this.imgHeightTxtbox.Location = new System.Drawing.Point(175, 365);
+            this.imgHeightTxtbox.Location = new System.Drawing.Point(172, 469);
             this.imgHeightTxtbox.Name = "imgHeightTxtbox";
             this.imgHeightTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgHeightTxtbox.TabIndex = 4;
@@ -99,7 +101,7 @@
             // imgWidthLbl
             // 
             this.imgWidthLbl.AutoSize = true;
-            this.imgWidthLbl.Location = new System.Drawing.Point(40, 333);
+            this.imgWidthLbl.Location = new System.Drawing.Point(37, 437);
             this.imgWidthLbl.Name = "imgWidthLbl";
             this.imgWidthLbl.Size = new System.Drawing.Size(92, 18);
             this.imgWidthLbl.TabIndex = 5;
@@ -108,7 +110,7 @@
             // imgHeightLbl
             // 
             this.imgHeightLbl.AutoSize = true;
-            this.imgHeightLbl.Location = new System.Drawing.Point(172, 333);
+            this.imgHeightLbl.Location = new System.Drawing.Point(169, 437);
             this.imgHeightLbl.Name = "imgHeightLbl";
             this.imgHeightLbl.Size = new System.Drawing.Size(99, 18);
             this.imgHeightLbl.TabIndex = 6;
@@ -117,7 +119,7 @@
             // imgResolutionLbl
             // 
             this.imgResolutionLbl.AutoSize = true;
-            this.imgResolutionLbl.Location = new System.Drawing.Point(40, 408);
+            this.imgResolutionLbl.Location = new System.Drawing.Point(37, 512);
             this.imgResolutionLbl.Name = "imgResolutionLbl";
             this.imgResolutionLbl.Size = new System.Drawing.Size(129, 18);
             this.imgResolutionLbl.TabIndex = 8;
@@ -125,7 +127,7 @@
             // 
             // imgResolutionTxtbox
             // 
-            this.imgResolutionTxtbox.Location = new System.Drawing.Point(43, 440);
+            this.imgResolutionTxtbox.Location = new System.Drawing.Point(40, 544);
             this.imgResolutionTxtbox.Name = "imgResolutionTxtbox";
             this.imgResolutionTxtbox.Size = new System.Drawing.Size(100, 25);
             this.imgResolutionTxtbox.TabIndex = 7;
@@ -165,14 +167,14 @@
             this.urg2comCbbox.Size = new System.Drawing.Size(121, 26);
             this.urg2comCbbox.TabIndex = 11;
             // 
-            // label1
+            // arduinocomLbl
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(397, 75);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 18);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "Arduino";
+            this.arduinocomLbl.AutoSize = true;
+            this.arduinocomLbl.Location = new System.Drawing.Point(397, 75);
+            this.arduinocomLbl.Name = "arduinocomLbl";
+            this.arduinocomLbl.Size = new System.Drawing.Size(65, 18);
+            this.arduinocomLbl.TabIndex = 14;
+            this.arduinocomLbl.Text = "Arduino";
             // 
             // arduinocomCbbox
             // 
@@ -310,14 +312,31 @@
             this.savadirpathBtn.UseVisualStyleBackColor = true;
             this.savadirpathBtn.Click += new System.EventHandler(this.savadirpathBtn_Click);
             // 
-            // savedirpathDlog
+            // intervalLbl
             // 
+            this.intervalLbl.AutoSize = true;
+            this.intervalLbl.Location = new System.Drawing.Point(37, 319);
+            this.intervalLbl.Name = "intervalLbl";
+            this.intervalLbl.Size = new System.Drawing.Size(131, 18);
+            this.intervalLbl.TabIndex = 31;
+            this.intervalLbl.Text = "Interval[millisec]";
+            // 
+            // intervalTxtbox
+            // 
+            this.intervalTxtbox.Location = new System.Drawing.Point(40, 351);
+            this.intervalTxtbox.Name = "intervalTxtbox";
+            this.intervalTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.intervalTxtbox.TabIndex = 30;
+            this.intervalTxtbox.Text = "20";
+            this.intervalTxtbox.TextChanged += new System.EventHandler(this.intervalTxtbox_TextChanged);
             // 
             // MappingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(966, 602);
+            this.Controls.Add(this.intervalLbl);
+            this.Controls.Add(this.intervalTxtbox);
             this.Controls.Add(this.savadirpathBtn);
             this.Controls.Add(this.savedirpathTxtbox);
             this.Controls.Add(this.devmngerBtn);
@@ -332,7 +351,7 @@
             this.Controls.Add(this.urg1distanceTxtbox);
             this.Controls.Add(this.urg1heightLbl);
             this.Controls.Add(this.urg1heightTxtbox);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.arduinocomLbl);
             this.Controls.Add(this.arduinocomCbbox);
             this.Controls.Add(this.urg2Lbl);
             this.Controls.Add(this.urg2comCbbox);
@@ -369,7 +388,7 @@
         private System.Windows.Forms.Label urg1Lbl;
         private System.Windows.Forms.Label urg2Lbl;
         private System.Windows.Forms.ComboBox urg2comCbbox;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label arduinocomLbl;
         private System.Windows.Forms.ComboBox arduinocomCbbox;
         private System.Windows.Forms.TextBox urg1heightTxtbox;
         private System.Windows.Forms.Label urg1heightLbl;
@@ -386,6 +405,8 @@
         private System.Windows.Forms.TextBox savedirpathTxtbox;
         private System.Windows.Forms.Button savadirpathBtn;
         private System.Windows.Forms.FolderBrowserDialog savedirpathDlog;
+        private System.Windows.Forms.Label intervalLbl;
+        private System.Windows.Forms.TextBox intervalTxtbox;
     }
 }
 
