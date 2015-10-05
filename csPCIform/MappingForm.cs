@@ -19,8 +19,11 @@ namespace csPCIform
     {
         // もろもろの変数
         private bool            isRunning;          // Mappingプロセスが起動しているかどうか
-        private SharedMemoryInt shMemInt;           // int型の共有メモリを扱うクラス
-        private string[]        directories;        // Form起動前から存在しているディレクトリ達
+        private string[] directories;               // Form起動前から存在しているディレクトリ達
+
+        // int型の共有メモリを扱うクラス
+        // { 終了合図用, }
+        private SharedMemoryInt shMemInt;           
 
         // コンストラクタ
         public MappingForm()
@@ -174,6 +177,7 @@ namespace csPCIform
             {
                 // 終了の合図用メモリを初期化しておく
                 shMemInt.setShMemData(0);
+                shMemInt.setShMemData(int.Parse(intervalTxtbox.Text.ToString()), 1);
 
                 // 以下プロセスの起動系
                 Process myProcess = new Process();
@@ -251,6 +255,11 @@ namespace csPCIform
             {
                 savedirpathTxtbox.Text = savedirpathDlog.SelectedPath;
             }
+        }
+
+        private void intervalTxtbox_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
     }

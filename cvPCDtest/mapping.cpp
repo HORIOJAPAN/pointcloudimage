@@ -3,6 +3,7 @@
 #include "urg_unko.h"
 #include "SharedMemory.h"
 #include "open_urg_sensor.c"
+#include "Timer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,6 +22,7 @@ float scaninterval = 0.0;//計測を実施する最低間隔[mm]
 enum {
 	CAPTURE_TIMES = 1,
 };
+
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
 float chairpos = 0.0;//車いすの現在の進行 
@@ -41,7 +43,8 @@ bool isInitialized = false;
 //左右輪のエンコーダ生データ積算用
 int data_L = 0, data_R = 0;
 
-//pcimageの引数．画像のサイズと解像度
+// pcimageの引数．画像のサイズと解像度
+// main.cppでコマンドライン
 extern int imgWidth, imgHeight, imgResolution;
 
 
@@ -232,13 +235,19 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	urg_unko *unkoArray = new urg_unko[NumOfURG];	//urg_unko型変数の配列
 
+	Timer	timer; //ループの間隔調整用タイマー
+	int		intervalTime = 10; // ループの間隔．millisecで指定
+	int		interval;
+	timer.Start();
+
 	float dist = 0.0;	//移動距離の積算用変数
 	float rad = 0.0;	//回転量の積算用変数
 
 	// 数値表示用の変数達
 	string meterName[] = {"dataL","dataR", "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
-							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]" };
-	float		meterData[8] = {};
+							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]",
+							"Interval[millisec]"};
+	float		meterData[9] = {};
 
 	// csFormとの懸け橋
 	// ループ抜けるタイミングとディレクトリ名のやり取り用
@@ -249,7 +258,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	arroypic = imread("arrow.jpg");
 	if (arroypic.empty()) cout << "No arrow image" << endl;
 	arroypic = ~arroypic;
-
 
 	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(ARDUINO_COM,handle_ARDUINO);
@@ -269,6 +277,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	//マップ作成を行うループ
 	//'q'を入力するとループを抜ける
 	while (true){
+
+		// 処理の間隔を指定時間あける
+		if (timer.getLapTime(1, Timer::millisec, false) < shMemInt.getShMemData(1)) continue;
+		interval = timer.getLapTime();
 
 		//エンコーダから移動量，回転量を取得
 		Encoder(handle_ARDUINO, dist, rad);
@@ -299,7 +311,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		DIS_old = chairpos;
 
 		//'q'が入力されたらループを抜ける
-		// もしくは共有メモリの0番地に0が入力されたら(ry
+		// もしくは共有メモリの0番地に0が入力さ(ry
 		cout << "shMem:" << shMemInt.getShMemData(0) << endl;
 		if (cv::waitKey(1) == 'q' || shMemInt.getShMemData(0))
 		{
@@ -313,6 +325,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			break;
 		}
 
+		// メーターの表示を設定
 		{
 			meterData[0] = data_L;
 			meterData[1] = data_R;
@@ -323,8 +336,9 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			meterData[5] = startpos[1];
 			meterData[6] = dist;
 			meterData[7] = rad;
+			meterData[8] = interval;
 
-			meter(picture, meterData, meterName, 8);
+			meter(picture, meterData, meterName, 9);
 			showDirection(rad);
 		}
 
@@ -352,11 +366,15 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *	返り値:
 *		なし
 */
-urg_unko::urg_unko() :pcimage(imgWidth, imgHeight, imgResolution)
+// urg_unkoを配列で宣言したときに引数を渡せないのでpcimageの引数はとりあえずグローバル変数から受け取る
+urg_unko::urg_unko(int imgWidth, int imgHeight, int imgResolution) :pcimage(::imgWidth, ::imgHeight, ::imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
-
+}
+urg_unko::urg_unko()
+{
+	this->urg_unko::urg_unko(5000, 5000, 5);
 }
 
 /*

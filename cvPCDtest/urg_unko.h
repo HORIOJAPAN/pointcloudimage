@@ -71,6 +71,7 @@ public:
 
 	//コンストラクタ
 	urg_unko();
+	urg_unko(int imgWidth, int imgHeight, int imgResolution);
 	//デストラクタ
 	~urg_unko();
 
