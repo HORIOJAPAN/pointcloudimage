@@ -4,6 +4,7 @@
 #include "SharedMemory.h"
 #include "open_urg_sensor.c"
 #include "Timer.h"
+#include "receiveAndroidSensors.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +24,8 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
+rcvAndroidSensors rcvDroid(14);
+float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
 float chairpos = 0.0;//車いすの現在の進行 
@@ -97,6 +100,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	float			DL, DR, DIS, ANG;
 	unsigned long	len;
 
+	float			droidOrientation[3];
+
 	// ハンドルチェック
 	if( !hComm )	return -1;
 
@@ -128,20 +133,6 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 		isInitialized = true;
 		return 0;
 	}
-
-	//int data1 = 0, data2 = 0;
-	/*
-	if ((int)receive_data[0] == 255)
-	{
-		data1 = -256 | receive_data[0];
-	}
-	else data1 = receive_data[0];
-	if ((int)receive_data[1] == 255)
-	{
-		data2 = -256 | receive_data[1];
-	}
-	else data2 = receive_data[1];
-	*/
 
 	//取得した値を符号つきに代入
 	signed char receive_char1, receive_char2;
@@ -178,7 +169,9 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//移動量，回転量を積算用変数へ積算
 	dist += DIS;
-	rad += ANG;
+	//rad += ANG;
+	rcvDroid.getOrientationData(droidOrientation);
+	rad = droidOrientation[0] - defaultOrientation[0];
 
 	printf("Distance = %d , Angle = %f \n", (int)dist, rad);
 
@@ -250,7 +243,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	float		meterData[9] = {};
 
 	// csFormとの懸け橋
-	// ループ抜けるタイミングとディレクトリ名のやり取り用
+	// ループ抜けるタイミングとかのやり取り用
 	SharedMemory<int> shMemInt("MappingFormInt");
 	shMemInt.setShMemData(0, 0);
 
@@ -258,6 +251,8 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	arroypic = imread("arrow.jpg");
 	if (arroypic.empty()) cout << "No arrow image" << endl;
 	arroypic = ~arroypic;
+
+	rcvDroid.getOrientationData(defaultOrientation);
 
 	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(ARDUINO_COM,handle_ARDUINO);
