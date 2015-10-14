@@ -75,6 +75,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="pcimage.cpp" />
+    <ClCompile Include="pcimageFunctions.cpp" />
     <ClCompile Include="receiveAndroidSensors.cpp" />
     <ClCompile Include="SourceReference.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

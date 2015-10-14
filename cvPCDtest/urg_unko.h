@@ -61,6 +61,7 @@ private:
 	void pcdinit();
 	//pcdファイルへ点を書き込む
 	void pcdWrite(float x, float y);
+	void pcdWrite(float x, float y, float pos_x, float pos_y);
 	//pcdファイルへの書き込みを終了して保存する
 	void pcdSave();
 

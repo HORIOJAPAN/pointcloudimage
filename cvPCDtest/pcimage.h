@@ -19,12 +19,10 @@ int PCIclasstest();
 class PCImage
 {
 private:
-	cv::Mat pcimage[4];				//画像1
-	cv::Mat* pcimage_ptr;			//現在参照している画像へのポインタ
+	cv::Mat pcimage;				//画像
 
 	std::string dirname;			//ディレクトリ名
-	std::string img_name[4];		//保存時の画像名
-	std::string* img_name_ptr;
+	std::string img_name;			//保存時の画像名
 
 	int img_width;					//用意する画像の幅
 	int img_height;					//用意する画像の高さ
@@ -32,13 +30,7 @@ private:
 	int imgval_increment;			//画素値の増加量
 	int limit , limitpix;			//次の画像を読み込むボーダーライン(m)(pix)
 
-	enum Direction { NONE , TOP , RIGHT, BOTTOM, LEFT , CENTER  };
-	enum NowNumber { ZERO , ONE, TWO, THREE };
-
-	bool isPrepareTOP, isPrepareRIGHT, isPrepareBOTTOM, isPrepareLEFT;
-
-	Direction imageCondition[4];
-	NowNumber nowimage;					//現在参照している画像の番号
+	const int lineVal = 200;		// 線を描画するときの画素値
 
 public:
 	PCImage();
@@ -46,19 +38,25 @@ public:
 	PCImage( int width, int height, int resolution);
 	~PCImage();
 
+	// 画像に点を書き込む
 	void writePoint(float x_val, float y_val);
+	// 点を書き込んだ後に線を描画する
 	void writePoint(float x_val, float y_val , float pos_x , float pos_y);
 
-	int readPoint(int x_val, int y_val);
-	int checkPosition(float pos_x, float pos_y);
-	int prepareImage(Direction direction);
-	int getEmptyImage();
-	void getImageNumber(int xy[] );
+	// 指定した二点を結ぶ直線を描画
+	void writeLine(float x_val, float y_val, float pos_x, float pos_y);
 
+	// 画素値を取得する
+	int readPoint(int x_val, int y_val);
+
+	// 画像を保存
 	int savePCImage();
 
+	// 保存したディレクトリ名を取得
 	std::string getDirname();
 
+	//現在の時刻を文字列で取得する
+	static void getNowTime(std::string& nowstr);
 
 };
 

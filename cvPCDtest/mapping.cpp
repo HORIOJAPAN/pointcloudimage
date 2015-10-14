@@ -14,6 +14,8 @@
 
 #define PI 3.14159265359
 
+#define DEBUG_WRITELINE
+
 using namespace std;
 using namespace cv;
 
@@ -550,9 +552,16 @@ void urg_unko::set_3D_surface( int data_n)
 				pointpos[1] = -sin(urgpos[2]) * x + cos(urgpos[2]) * y - sin(urgpos[2]) * (chairpos - DIS_old + urgpos[1]) + startpos[1];
 				pointpos[2] = z;
 
-				//座標を保存
+				// 座標を保存
+#ifndef DEBUG_WRITELINE
+				// 点のみ書き込む
 				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000);
 				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000);
+#else
+				// 点を書き込んで現在地からの直線を引く
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0], startpos[1]);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0], startpos[1]);
+#endif
 
 			}
 			//１スキャン分のpcdファイルを保存
@@ -605,6 +614,13 @@ void urg_unko::pcdWrite(float x, float y)
 {
 	//データを書き込んでデータ数をカウント
 	ofs << x << " " << y << " " << "0.0" << endl;
+	pcdcount++;
+}
+
+void urg_unko::pcdWrite(float x, float y , float pos_x , float pos_y)
+{
+	//データを書き込んでデータ数をカウント
+	ofs << x << ", " << y << ", " << pos_x << ", " << pos_y << ", " << endl;
 	pcdcount++;
 }
 
