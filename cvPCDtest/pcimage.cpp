@@ -99,7 +99,7 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 	pos_y = pcimage.rows / 2 + (int)pos_y;
 
 	//Žæ“¾‚µ‚½[x,y]‚ÆŒ»Ý’n‚ðü‚ÅŒ‹‚Ô
-	line(pcimage, Point(x_val, y_val), Point(pos_x, pos_y), 200);
+	line(pcimage, Point(x_val, y_val), Point(pos_x, pos_y), 100);
 
 }
 
@@ -115,8 +115,9 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 */
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
-	this->writePoint(x_val, y_val);
+	
 	this->writeLine(x_val, y_val , pos_x ,pos_y );
+	this->writePoint(x_val, y_val);
 
 }
 
