@@ -26,7 +26,7 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
-rcvAndroidSensors rcvDroid(14);
+//rcvAndroidSensors rcvDroid(14);
 float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
@@ -125,6 +125,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	// 通信バッファクリア
 	PurgeComm(hComm, PURGE_RXCLEAR);
 
+
 	// Arduinoからデータを受信
 	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
@@ -144,7 +145,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//cout << "\n\n\ndata1:" << data1 << " ,  data2:" << data2 << endl << endl;
 
 	//char型を整数値として表示
-	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
+	cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
 	//int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
 	//meter(picture, data, 2);
 	data_L += static_cast<int>(receive_char1);
@@ -171,9 +172,9 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	//移動量，回転量を積算用変数へ積算
 	dist += DIS;
-	//rad += ANG;
-	rcvDroid.getOrientationData(droidOrientation);
-	rad = droidOrientation[0] - defaultOrientation[0];
+	rad += ANG;
+	//rcvDroid.getOrientationData(droidOrientation);
+	//rad = droidOrientation[0] - defaultOrientation[0];
 
 	printf("Distance = %d , Angle = %f \n", (int)dist, rad);
 
@@ -240,7 +241,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	// 数値表示用の変数達
 	string meterName[] = {"dataL","dataR", "Difference of encoder value(L-R)", "Ratio of encoder value(L/R[%])", 
-							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[rad]",
+							"Current coordinates X", "Current coordinates Y", "Moving distance[mm]", "Angle variation[deg]",
 							"Interval[millisec]"};
 	float		meterData[9] = {};
 
@@ -254,7 +255,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	if (arroypic.empty()) cout << "No arrow image" << endl;
 	arroypic = ~arroypic;
 
-	rcvDroid.getOrientationData(defaultOrientation);
+	//rcvDroid.getOrientationData(defaultOrientation);
 
 	//Arduinoとシリアル通信を行うためのハンドルを取得
 	getArduinoHandle(ARDUINO_COM,handle_ARDUINO);
@@ -332,7 +333,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			meterData[4] = startpos[0];
 			meterData[5] = startpos[1];
 			meterData[6] = dist;
-			meterData[7] = rad;
+			meterData[7] = rad / PI *180;
 			meterData[8] = interval;
 
 			meter(picture, meterData, meterName, 9);
