@@ -560,8 +560,8 @@ void urg_unko::set_3D_surface( int data_n)
 				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000);
 #else
 				// “_‚ğ‘‚«‚ñ‚ÅŒ»İ’n‚©‚ç‚Ì’¼ü‚ğˆø‚­
-				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0], startpos[1]);
-				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0], startpos[1]);
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
 #endif
 
 			}

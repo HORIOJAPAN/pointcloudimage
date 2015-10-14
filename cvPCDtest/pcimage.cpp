@@ -89,9 +89,14 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
 	y_val *= -coefficient;
+	x_val = (int)x_val + limitpix;
+	y_val = pcimage.rows / 2 + (int)y_val;
+
 
 	pos_x *= coefficient;
 	pos_y *= -coefficient;
+	pos_x = (int)pos_x + limitpix;
+	pos_y = pcimage.rows / 2 + (int)pos_y;
 
 	//取得した[x,y]と現在地を線で結ぶ
 	line(pcimage, Point(x_val, y_val), Point(pos_x, pos_y), 200);

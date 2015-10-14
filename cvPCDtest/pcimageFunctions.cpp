@@ -1,4 +1,4 @@
-#include "pcimage.h"
+#include "../cvPCDtest/pcimage.h"
 
 #include <fstream>
 #include <iostream>
