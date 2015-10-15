@@ -11,16 +11,6 @@ const int imageNum = 4;		//事前に用意する画像領域の数
 
 int getURGdata();
 
-//pcdファイル名を指定すると画像に変換して保存
-int save_pcdtoimg(std::string fileName, std::string imgName, int resolution = 1);
-
-//点群画像に床を入れる(未完成)
-int save_floorimg(std::string src_imgName, std::string dst_imgName);
-
-//PCImageクラスのテストをする関数
-int PCIclasstest();
-
-
 //点群画像を作成するクラス
 class PCImage
 {
@@ -38,8 +28,9 @@ private:
 	int coefficient;						//データを解像度に合わせる係数
 	int imgval_increment;					//画素値の増加量
 	int limit , limitpix;					//次の画像を読み込むボーダーライン(m),(pix)
-	int nowimage;						//現在走行している画像の番号
+	int nowimage;							//現在走行している画像の番号
 
+	float selfPos_x, selfPos_y;			// 自己位置
 
 	//自己位置に応じて画像の用意などの処理をする
 	int checkPosition(float pos_x, float pos_y);
@@ -119,6 +110,8 @@ public:
 	void release();
 	//画像を保存する
 	void savePCImage();
+
+	bool isEmpty();
 };
 
 #endif

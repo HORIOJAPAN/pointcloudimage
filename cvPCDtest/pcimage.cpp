@@ -8,61 +8,6 @@
 using namespace cv;
 using namespace std;
 
-int PCIclasstest(){
-	
-	int img_width = 1000;
-	int	img_height = 1000;
-	float x_val, y_val;
-
-	PCImage pcimage;
-
-	string str, x_str, y_str;
-	string searchLine("nan");
-	string searchWord(" ");
-	string::size_type x_pos, y_pos;
-	string fileName = "./pointcloud.pcd";
-
-	//pcdファイルを読み込む
-	ifstream ifs(fileName);
-	if (ifs.fail())
-	{
-		cerr << "False" << endl;
-		return EXIT_FAILURE;
-	}
-
-	//ヘッダ部分をとばすためのループ
-	for (int i = 0; i <= 11; i++){
-		getline(ifs, str);
-	}
-
-	while (getline(ifs, str))
-	{
-		//nanの列ならスルー
-		if (str.find(searchLine) != string::npos) continue;
-
-		//先頭から半角スペースまでの文字列に係数を掛けてint型で取得
-		x_pos = str.find(searchWord);
-		if (x_pos != string::npos){
-			x_str = str.substr(0, x_pos);
-			x_val = stof(x_str);
-		}
-
-		//xの値の後ろから半角スペースまでの文字列に係数を掛けてint型で取得
-		y_pos = str.find(searchWord, x_pos + 1);
-		if (y_pos != string::npos){
-			y_str = str.substr(x_pos + 1, y_pos);
-			y_val = stof(y_str);
-		}
-		pcimage.writePoint( x_val, y_val );
-
-	}
-
-	cout << "complete" << endl;
-	pcimage.~PCImage();
-
-	return 0;
-}
-
 /*------------------------------
 *--↓--PCImageクラスの定義--↓--
 *-------------------------------*/
@@ -160,8 +105,14 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 		pcimage[ret - 1].writePoint(x_val, y_val);
 	}
 
+	// 自己位置が変化していなければ処理を返す
+	if (selfPos_x == pos_x && selfPos_y == pos_y) return;
+	// 自己位置に応じた処理を行う
 	this->checkPosition(pos_x, pos_y);
-
+	imshow("show", pcimage[nowimage]);
+	waitKey(1);
+	selfPos_x = pos_x;
+	selfPos_y = pos_y;
 }
 
 /*
@@ -181,132 +132,26 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	//x,yの値を指定した解像度に合わせる
 	int xi = int(pos_x * coefficient);
 	int yi = int(pos_y * -coefficient);
-
+	
 	//現在の画像のXY
 	int XY[2];
 
 	pcimage[nowimage].getImageNumber(XY);		//中心画像のX,Y番号を取得
 
-	if (xi < limitpix || pcimage[nowimage].cols - limitpix < xi || yi < limitpix || pcimage[nowimage].rows - limitpix < yi)
-		this->outsideProcess(xi, yi , XY);
+	xi = xi - XY[0] * img_width + limitpix;
+	yi = yi - XY[1] * img_height + img_height / 2;
+
+	if (xi < limitpix || img_width - limitpix < xi || yi < limitpix || img_height - limitpix < yi){
+		this->outsideProcess(xi, yi, XY);
+	}
 	else
 	{
 		for (int i = 0; i < imageNum; i++)
 		{
 			if (i == nowimage) continue;
-			if (!pcimage[i].empty()) pcimage[i].release();
+			if (!pcimage[i].isEmpty()) pcimage[i].release();
 		}
 	}
-
-	//8近傍のリミットチェック
-	//画像端までlimitpix以下なら次の画像を用意し，離れたら近傍画像を保存する
-	/*
-	//（ずれてるというかXとY間違えてる）
-
-	//↑上方向のリミットチェック↑
-	if (!checkPrepare(xy[0]+1,xy[1]) && yi < limitpix)
-	{
-		prepareImage(xy[0] + 1, xy[1]);
-	}
-	else if (checkPrepare( xy[0] + 1, xy[1] ) && yi > limitpix)
-	{
-		savePCImage( xy[0] + 1, xy[1] );
-	}
-	//→右方向のリミットチェック→
-	if (!checkPrepare(xy[0], xy[1] + 1) && xi > pcimage[nowimage].cols - limitpix)
-	{
-		prepareImage(xy[0], xy[1] + 1);
-	}
-	else if ( checkPrepare(xy[0], xy[1] + 1) && xi < pcimage[nowimage].cols - limitpix)
-	{
-		savePCImage(xy[0], xy[1] + 1);
-	}
-	//↓下方向のリミットチェック↓
-	if (!checkPrepare(xy[0] - 1, xy[1]) && yi >  pcimage[nowimage].rows - limitpix)
-	{
-		prepareImage(xy[0] - 1, xy[1]);
-	}
-	else if (checkPrepare(xy[0] - 1, xy[1]) && yi <  pcimage[nowimage].rows - limitpix)
-	{
-		savePCImage(xy[0] - 1, xy[1]);
-	}
-	//←左方向のリミットチェック←
-	if (!checkPrepare(xy[0], xy[1] - 1) && xi < limitpix)
-	{
-		prepareImage(xy[0], xy[1] - 1);
-	}
-	else if (checkPrepare(xy[0], xy[1] - 1) && xi > limitpix)
-	{
-		savePCImage(xy[0], xy[1] - 1);
-	}
-
-	//→↑右上方向のリミットチェック→↑
-	if (!checkPrepare(xy[0] + 1, xy[1] + 1) && yi < limitpix && xi > pcimage[nowimage].cols - limitpix)
-	{
-		prepareImage(xy[0] + 1, xy[1] + 1);
-	}
-	else if (checkPrepare(xy[0] + 1, xy[1] + 1) && yi > limitpix && xi < pcimage[nowimage].cols - limitpix)
-	{
-		savePCImage(xy[0] + 1, xy[1] + 1);
-	}
-	//→↓右下方向のリミットチェック→↓
-	if (!checkPrepare(xy[0] + 1, xy[1] - 1) && xi > pcimage[nowimage].cols - limitpix && yi >  pcimage[nowimage].rows - limitpix)
-	{
-		prepareImage(xy[0] + 1, xy[1] - 1);
-	}
-	else if (checkPrepare(xy[0] + 1, xy[1] - 1) && xi < pcimage[nowimage].cols - limitpix && yi <  pcimage[nowimage].rows - limitpix)
-	{
-		savePCImage(xy[0] + 1, xy[1] - 1);
-	}
-	//←↓左下方向のリミットチェック←↓
-	if (!checkPrepare(xy[0] - 1, xy[1] - 1) && yi >  pcimage[nowimage].rows - limitpix && xi < limitpix)
-	{
-		prepareImage(xy[0] - 1, xy[1] - 1);
-
-	}
-	else if (checkPrepare(xy[0] - 1, xy[1] - 1) && yi <  pcimage[nowimage].rows - limitpix && xi > limitpix)
-	{
-		savePCImage(xy[0] - 1, xy[1] - 1);
-	}
-	//←↑左上方向のリミットチェック←↑
-	if (!checkPrepare(xy[0] - 1, xy[1] + 1) && xi < limitpix && yi < limitpix)
-	{
-		prepareImage(xy[0] - 1, xy[1] + 1);
-	}
-	else if (checkPrepare(xy[0] - 1, xy[1] + 1) && xi > limitpix && yi < limitpix)
-	{
-		savePCImage(xy[0] - 1, xy[1] + 1);
-	}
-
-	int xshift = 0;
-	int yshift = 0;
-
-	/************************************
-	*>>>>>>次の画像にシフトする処理<<<<<*
-	************************************/
-	/*//画像端までの距離がlimitpixの1/3以下になったらシフト
-	//上方向のリミットチェック
-	if ( yi < limitpix/3)
-	{
-		yshift = 1;
-	}
-	//右方向のリミットチェック
-	if (xi > pcimage[nowimage].cols - limitpix/3)
-	{
-		xshift = 1;
-	}
-	//下方向のリミットチェック
-	if (!checkPrepare(xy[0] - 1, xy[1]) && yi >  pcimage[nowimage].rows - limitpix/3)
-	{
-		yshift = -1;
-	}
-	//左方向のリミットチェック
-	if (!checkPrepare(xy[0], xy[1] - 1) && xi < limitpix/3)
-	{
-		xshift = -1;
-	}
-	//xshiftもしくはyshiftが0以外なら画像シフトを実行
-	if (xshift || yshift ) shiftCenterImage(xshift, yshift);*/
 
 	return 0;
 }
@@ -323,14 +168,14 @@ void PCImage::outsideProcess(int pos_x, int pos_y , int XY[2] )
 		flag_y = -1;
 	}
 	//↓下方向のリミットチェック↓
-	else if (pcimage[nowimage].rows - limitpix < pos_y)
+	else if ( img_width - limitpix < pos_y)
 	{
 		//リミットを超えていた場合
 		flag_y = 1;
 	}
 
 	//→右方向のリミットチェック→
-	if ( pcimage[nowimage].cols - limitpix < pos_x )
+	if ( img_height - limitpix < pos_x )
 	{
 		// リミットを超えていた場合
 		flag_x = 1;
@@ -342,7 +187,6 @@ void PCImage::outsideProcess(int pos_x, int pos_y , int XY[2] )
 		flag_x = -1;
 	}
 
-	int flag = flag_x*flag_x + flag_y*flag_y;
 	// X,Y共にリミット外
 	if (flag_x && flag_y)
 	{
@@ -358,9 +202,11 @@ void PCImage::outsideProcess(int pos_x, int pos_y , int XY[2] )
 		for (int i = 0; i < imageNum; i++)
 		{
 			if (i == nowimage) continue;
-			if (!pcimage[i].empty() && !pcimage[i].isCoordinates(XY[0] + flag_x, XY[1] + flag_y)) pcimage[i].release();
+			if (!pcimage[i].isEmpty() && !pcimage[i].isCoordinates(XY[0] + flag_x, XY[1] + flag_y)) pcimage[i].release();
 		}
 	}
+
+	//cout << "flag:" << flag_x << ", " << flag_y << endl;
 
 	// 画像外ならそっちの画像にシフトする(改良の余地大いにあり)
 
@@ -437,14 +283,14 @@ int PCImage::loadPCImage(int emptyImageNum)
 /*
 *　概要：次の画像を用意する
 *　引数:
-*	Direction direction　用意する方向
+*	
 *　返り値:
 *	成功　0
 *	失敗　-1
 */
-int PCImage::prepareImage(int x, int y)
+int PCImage::prepareImage(int X, int Y)
 {
-	if (checkPrepare(x, y)) return 1;
+	if (checkPrepare(X, Y)) return 1;
 
 	int emptyImageNum;
 	int xy[2];
@@ -452,7 +298,8 @@ int PCImage::prepareImage(int x, int y)
 	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
 
 	emptyImageNum = getEmptyImage();						//空いている画像の番号を取得
-	pcimage[emptyImageNum].setPCI(xy[0] + x, xy[1] + y);	//画像を用意
+	//pcimage[emptyImageNum].setPCI(xy[0] + X, xy[1] + Y);	//画像を用意
+	pcimage[emptyImageNum].setPCI( X,  Y);	//画像を用意
 	loadPCImage(emptyImageNum);								//既に作成されている場合は読み込む
 	return 0;
 
@@ -468,8 +315,10 @@ int PCImage::prepareImage(int x, int y)
 */
 int PCImage::getEmptyImage()
 {
-	for (int i = 0; i < imageNum; i++)
-		if (pcimage[i].empty()) return i;
+	for (int i = 0; i < imageNum; i++){
+		cout << i << " isEmpty:" << pcimage[i].isEmpty() << endl;
+		if (pcimage[i].isEmpty()) return i;
+	}
 	return -1;
 }
 
@@ -481,15 +330,17 @@ int PCImage::getEmptyImage()
 *　返り値:
 *	なし
 */
-int PCImage::shiftCenterImage(int x,int y)
+int PCImage::shiftCenterImage(int X,int Y)
 {
+	cout << "Shift center image" << endl;
+
 	int nowXY[2];
 	pcimage[nowimage].getImageNumber(nowXY);	//現在画像の座標を取得
 
 	//指定した座標の画像があれば画像番号をnowimageに代入
 	for (int i = 0; i < imageNum; i++)
 	{
-		if (pcimage[i].isCoordinates(nowXY[0] + x, nowXY[1] + y))
+		if (pcimage[i].isCoordinates(nowXY[0] + X, nowXY[1] + Y))
 		{
 			nowimage = i;
 			return 0;
@@ -501,16 +352,16 @@ int PCImage::shiftCenterImage(int x,int y)
 /*
 *　概要：指定した画像領域座標の画像が用意されていると真を返す
 *　引数:
-*	int x　画像領域座標における現在画像からのx方向変位(-1~1)
-*	int y　画像領域座標における現在画像からのy方向変位(-1~1)
+*	int X　画像領域座標における現在画像からのx方向変位(-1~1)
+*	int Y　画像領域座標における現在画像からのy方向変位(-1~1)
 *　返り値:
 *	True or False
 */
-bool PCImage::checkPrepare(int x, int y)
+bool PCImage::checkPrepare(int X, int Y)
 {
 	for (int i = 0; i < imageNum; i++)
 	{
-		if (pcimage[i].isCoordinates(x, y)) return true;
+		if (pcimage[i].isCoordinates(X, Y)) return true;
 	}
 	return false;
 }
@@ -550,6 +401,7 @@ PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
 {
 	//念のため領域を解放しておく
 	Mat::release();
+	name = "";
 }
 
 /*
@@ -561,21 +413,12 @@ PCImage::PCI::PCI(PCImage& pcimage_outer) : pciOut(pcimage_outer)
 *　返り値:
 *	なし
 */
-void PCImage::PCI::setPCI(int x, int y)
+void PCImage::PCI::setPCI(int X, int Y)
 {
-	imageNumXY[0] = x;
-	imageNumXY[1] = y;
+	imageNumXY[0] = X;
+	imageNumXY[1] = Y;
 	name = "./" + pciOut.dirname + "/" +  to_string(imageNumXY[0]) + "_" + to_string(imageNumXY[1]) + ".jpg";
 }
-
-/*
-*　概要：画像の状態の取得
-*　引数:
-*	なし
-*　返り値:
-*	Direction　imageCondition　画像の状態(中心から見てどの方向か，もしくは空か)
-*/
-
 
 /*
 *　概要：画像の位置(x,y)を返す
@@ -616,9 +459,9 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	x_val *= pciOut.coefficient;
 	y_val *= -pciOut.coefficient;
 
-	//x,yの値を画像の位置に合わせる(怪しい) 
-	x_val -= (imageNumXY[0] * pciOut.img_width + pciOut.limitpix);
-	y_val -= (imageNumXY[1] * pciOut.img_height - rows / 2);
+	//x,yの値を画像の位置に合わせる
+	x_val = x_val - imageNumXY[0] * pciOut.img_width + pciOut.limitpix;
+	y_val = y_val - imageNumXY[1] * pciOut.img_height + rows / 2;
 
 	//当画像領域内の点か確認して当画像領域外の場合は該当領域のIDを返す
 	int x_coord = 0;
@@ -639,7 +482,10 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	{
 		y_coord = 1;
 	}
-	if (x_coord*x_coord + y_coord*y_coord > 0)
+	//cout << x_coord << "," << y_coord << endl;
+	//cout << x_val << "," << y_val << endl;
+	//cout << imageNumXY[0] << "," << imageNumXY[1] << endl;
+	if ( x_coord || y_coord )
 	{
 		for (int i = 0; i < imageNum; i++)
 		{
@@ -653,8 +499,6 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 		data[(int)y_val * cols + (int)x_val] += pciOut.imgval_increment;
 	}
 	else data[(int)y_val * cols + (int)x_val] = 255;
-
-	imshow("show", *this);
 
 	return 0;
 }
@@ -686,4 +530,10 @@ bool PCImage::PCI::isCoordinates(int xy[])
 {
 	if (imageNumXY[0] == xy[0] && imageNumXY[1] == xy[1]) return true;
 	return false;
+}
+
+bool PCImage::PCI::isEmpty()
+{
+	if (this->Mat::empty()) return true;
+	else return false;
 }
