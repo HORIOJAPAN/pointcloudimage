@@ -8,110 +8,6 @@
 using namespace cv;
 using namespace std;
 
-/*
-*　概要:pcdファイル名を指定すると画像に変換して保存
-*　引数:
-*	string fileName ファイル名
-*	string imgName 保存する画像名
-*	int resolution 1pix何cm四方にするか
-*　返り値:
-*	成功 0  失敗　1
-*/
-int save_pcdtoimg(string fileName, string imgName ,int resolution )
-{
-	const int img_width = 1000;					//用意する画像の幅
-	const int img_height = 1000;				//用意する画像の高さ
-	const int coefficient = 100 / resolution;	//データを解像度に合わせる係数
-	const int imgval_increment = 80;			//画素値の増加量
-
-	//点群座標から画像の座標に変換した値
-	int	x_val, y_val;
-
-	string str ,x_str ,y_str;
-	string searchLine("nan");
-	string searchWord(" ");
-	string::size_type x_pos , y_pos;
-
-	Mat pcd_img( Size( img_width, img_height ) , CV_8U, Scalar::all(0) );
-
-	//pcdファイルを読み込む
-	ifstream ifs( fileName );
-	if (ifs.fail())
-	{
-		cerr << "False" << endl;
-		return EXIT_FAILURE;
-	}
-
-	//ヘッダ部分をとばすためのループ
-	for (int i = 0 ; i <= 11; i++){
-		getline(ifs, str);
-	}
-
-	while (getline(ifs, str))
-	{
-		//nanの列ならスルー
-		if ( str.find(searchLine) != string::npos ) continue;
-
-		//先頭から半角スペースまでの文字列に係数を掛けてint型で取得
-		x_pos = str.find(searchWord);
-		if (x_pos != string::npos){
-			x_str = str.substr(0, x_pos);
-			x_val = int(stof(x_str) * coefficient);
-		}
-
-		//xの値の後ろから半角スペースまでの文字列に係数を掛けてint型で取得
-		y_pos = str.find(searchWord, x_pos + 1);
-		if (y_pos != string::npos){
-			y_str = str.substr( x_pos + 1 , y_pos );
-			y_val = int(stof(y_str) * -coefficient);
-		}
-
-		//取得した[x,y]の画素値を増加させる
-		pcd_img.data[(pcd_img.rows / 2 + y_val) * pcd_img.cols + x_val + pcd_img.cols / 5] += imgval_increment;
-
-	}
-
-	cout << "complete" << endl;
-
-	//jpgで保存
-	imwrite(imgName, pcd_img);
-
-	return 0;
-}
-
-int save_floorimg(string src_imgName, string dst_imgName)
-{
-	string str;
-	string searchLine("nan");
-	string searchWord(" ");
-
-	Mat src_img = imread( src_imgName , 0 );
-	Mat dst_img = src_img.clone();
-
-	for (int y = 0; y < src_img.rows - 1; y++){
-		for (int x = 0; x < src_img.cols - 1; x++){
-			if (src_img.data[y * src_img.cols + x] > 0){
-				line(dst_img, Point(x, y), Point(dst_img.cols / 5, dst_img.rows / 2), 80);
-			}
-		}
-	}
-	for (int y = 0; y < src_img.rows - 1; y++){
-		for (int x = 0; x < src_img.cols - 1; x++){
-			if (src_img.data[y * src_img.cols + x] > 0){
-				dst_img.data[y * dst_img.cols + x] = src_img.data[y * src_img.cols + x];
-			}
-		}
-	}
-
-
-	cout << "complete" << endl;
-
-	//jpgで保存
-	imwrite(dst_imgName, dst_img);
-
-	return 0;
-}
-
 int PCIclasstest(){
 	
 	int img_width = 1000;
@@ -287,13 +183,24 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	int yi = int(pos_y * -coefficient);
 
 	//現在の画像のXY
-	int xy[2];
+	int XY[2];
 
-	pcimage[nowimage].getImageNumber(xy);		//中心画像のX,Y番号を取得
+	pcimage[nowimage].getImageNumber(XY);		//中心画像のX,Y番号を取得
+
+	if (xi < limitpix || pcimage[nowimage].cols - limitpix < xi || yi < limitpix || pcimage[nowimage].rows - limitpix < yi)
+		this->outsideProcess(xi, yi , XY);
+	else
+	{
+		for (int i = 0; i < imageNum; i++)
+		{
+			if (i == nowimage) continue;
+			if (!pcimage[i].empty()) pcimage[i].release();
+		}
+	}
 
 	//8近傍のリミットチェック
 	//画像端までlimitpix以下なら次の画像を用意し，離れたら近傍画像を保存する
-
+	/*
 	//（ずれてるというかXとY間違えてる）
 
 	//↑上方向のリミットチェック↑
@@ -377,7 +284,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	/************************************
 	*>>>>>>次の画像にシフトする処理<<<<<*
 	************************************/
-	//画像端までの距離がlimitpixの1/3以下になったらシフト
+	/*//画像端までの距離がlimitpixの1/3以下になったらシフト
 	//上方向のリミットチェック
 	if ( yi < limitpix/3)
 	{
@@ -399,9 +306,93 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		xshift = -1;
 	}
 	//xshiftもしくはyshiftが0以外なら画像シフトを実行
-	if (xshift || yshift ) shiftCenterImage(xshift, yshift);
+	if (xshift || yshift ) shiftCenterImage(xshift, yshift);*/
 
 	return 0;
+}
+
+void PCImage::outsideProcess(int pos_x, int pos_y , int XY[2] )
+{
+	int flag_x = 0;
+	int flag_y = 0;
+
+	//↑上方向のリミットチェック↑
+	if ( pos_y < limitpix)
+	{
+		// リミットを超えていた場合
+		flag_y = -1;
+	}
+	//↓下方向のリミットチェック↓
+	else if (pcimage[nowimage].rows - limitpix < pos_y)
+	{
+		//リミットを超えていた場合
+		flag_y = 1;
+	}
+
+	//→右方向のリミットチェック→
+	if ( pcimage[nowimage].cols - limitpix < pos_x )
+	{
+		// リミットを超えていた場合
+		flag_x = 1;
+	}	
+	//←左方向のリミットチェック←
+	else if (pos_x < limitpix)
+	{
+		// リミットを超えていた場合
+		flag_x = -1;
+	}
+
+	int flag = flag_x*flag_x + flag_y*flag_y;
+	// X,Y共にリミット外
+	if (flag_x && flag_y)
+	{
+		prepareImage(XY[0] + flag_x, XY[1] + flag_y);
+		prepareImage(XY[0] + flag_x, XY[1] );
+		prepareImage(XY[0] , XY[1] + flag_y );
+	}
+	// どっちかだけリミット
+	else
+	{
+		prepareImage(XY[0] + flag_x, XY[1] + flag_y);
+
+		for (int i = 0; i < imageNum; i++)
+		{
+			if (i == nowimage) continue;
+			if (!pcimage[i].empty() && !pcimage[i].isCoordinates(XY[0] + flag_x, XY[1] + flag_y)) pcimage[i].release();
+		}
+	}
+
+	// 画像外ならそっちの画像にシフトする(改良の余地大いにあり)
+
+	flag_x = 0;
+	flag_y = 0;
+	//↑上方向のリミットチェック↑
+	if (pos_y < 0)
+	{
+		// リミットを超えていた場合
+		flag_y = -1;
+	}
+	//↓下方向のリミットチェック↓
+	else if (pcimage[nowimage].rows  < pos_y)
+	{
+		//リミットを超えていた場合
+		flag_y = 1;
+	}
+
+	//→右方向のリミットチェック→
+	if (pcimage[nowimage].cols < pos_x)
+	{
+		// リミットを超えていた場合
+		flag_x = 1;
+	}
+	//←左方向のリミットチェック←
+	else if (pos_x < 0)
+	{
+		// リミットを超えていた場合
+		flag_x = -1;
+	}
+	//flag_xもしくはflag_yが0以外なら画像シフトを実行
+	if (flag_x || flag_y) shiftCenterImage(flag_x, flag_y);
 }
 
 int PCImage::readPoint(int x_val, int y_val)
@@ -453,6 +444,8 @@ int PCImage::loadPCImage(int emptyImageNum)
 */
 int PCImage::prepareImage(int x, int y)
 {
+	if (checkPrepare(x, y)) return 1;
+
 	int emptyImageNum;
 	int xy[2];
 
@@ -640,11 +633,11 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	}
 	if (y_val < 0)
 	{
-		y_coord = 1;
+		y_coord = -1;
 	}
 	else if (y_val >= rows)
 	{
-		y_coord = -1;
+		y_coord = 1;
 	}
 	if (x_coord*x_coord + y_coord*y_coord > 0)
 	{

@@ -44,6 +44,8 @@ private:
 	//©ŒÈˆÊ’u‚É‰‚¶‚Ä‰æ‘œ‚Ì—pˆÓ‚È‚Ç‚Ìˆ—‚ğ‚·‚é
 	int checkPosition(float pos_x, float pos_y);
 
+	void outsideProcess(int pos_x , int pos_y , int XY[2] );
+
 	//‰æ‘œ‚Ì—Ìˆæ”Ô†‚ğ–â‚¢‡‚í‚¹‚é‚Æ^‹U‚ğ•Ô‚·
 	bool checkPrepare(int x, int y);
 
