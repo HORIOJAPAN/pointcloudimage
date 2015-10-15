@@ -340,7 +340,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			showDirection(rad);
 		}
 
-
 	}
 
 	//Arduino‚Ìƒnƒ“ƒhƒ‹‚ð‰ð•ú
@@ -427,7 +426,6 @@ int urg_unko::disconnectURG(){
 urg_unko::~urg_unko()
 {
 	disconnectURG();
-	pcimage.savePCImage();
 }
 
 /*

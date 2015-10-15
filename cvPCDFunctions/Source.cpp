@@ -12,7 +12,7 @@ using namespace std;
 
 const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151014224236";
 
-PCImage pcimage(5000, 5000, 5);
+PCImage pcimage(1000, 1000, 5);
 
 void getAllFileName(vector<string>& fileNames)
 {
@@ -144,5 +144,5 @@ void main()
 		cout << sortFileNames[i] << endl;
 		makePCImageFromPCD(sortFileNames[i]);
 	}
-	pcimage.savePCImage();
+	//pcimage.savePCImage();
 }
