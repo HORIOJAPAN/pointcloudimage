@@ -161,8 +161,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	*/
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ğŒvZ
-	DL = receive_char1 * 24.87094184 * 1.01;
-	DR = receive_char2 * 24.87094184;
+	DL = receive_char1 * 23.855;
+	DR = receive_char2 * 23.7353;
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
 	DIS = (DL + DR) / 2;
