@@ -74,7 +74,7 @@ void PCImage::writePoint(float x_val, float y_val)
 {
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
-	y_val *= -coefficient;
+	y_val *= coefficient;
 
 	//取得した[x,y]の画素値を増加させる.オーバーフローしないように分岐.
 	if (pcimage.data[(pcimage.rows / 2 + (int)y_val) * pcimage.cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
@@ -88,13 +88,13 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 {
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
-	y_val *= -coefficient;
+	y_val *= coefficient;
 	x_val = (int)x_val + limitpix;
 	y_val = pcimage.rows / 2 + (int)y_val;
 
 
 	pos_x *= coefficient;
-	pos_y *= -coefficient;
+	pos_y *= coefficient;
 	pos_x = (int)pos_x + limitpix;
 	pos_y = pcimage.rows / 2 + (int)pos_y;
 
