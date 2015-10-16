@@ -85,16 +85,19 @@ PCImage::~PCImage()
 */
 void PCImage::writePoint(float x_val, float y_val)
 {
-	//x,yの値を指定した解像度に合わせる
-	x_val *= coefficient;
-	y_val *= coefficient;
-
-	//取得した[x,y]の画素値を増加させる.オーバーフローしないように分岐.
-	if (pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
-		pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] += imgval_increment;
-	}
+	pcimage[nowimage].writePoint(x_val, y_val);
 }
 	
+/*
+*　概要：指定座標(絶対座標)に点を書き込む
+*　引数:
+*	float x_val 書き込む点のx座標(m)
+*	float y_val 書き込む点のy座標(m)
+*	float pos_x	自己位置のx座標(m)
+*	float pos_y	自己位置のy座標(m)
+*　返り値:
+*	なし
+*/
 void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 {
 	int XY[2];
@@ -103,13 +106,13 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
 	y_val *= coefficient;
-	x_val = (int)x_val + limitpix;
-	y_val = pcimage[nowimage].rows / 2 + (int)y_val;
+	x_val = (int)x_val - XY[0] * img_width + limitpix;
+	y_val = (int)y_val - XY[1] * img_height + img_height / 2;
 
 	pos_x *= coefficient;
 	pos_y *= coefficient;
-	pos_x = (int)pos_x + limitpix;
-	pos_y = pcimage[nowimage].rows / 2 + (int)pos_y;
+	pos_x = (int)pos_x - XY[0] * img_width + limitpix;
+	pos_y = (int)pos_y - XY[1] * img_height + img_height / 2;
 
 	//取得した[x,y]と現在地を線で結ぶ
 	line(pcimage[nowimage], Point(x_val, y_val), Point(pos_x, pos_y), 100);
