@@ -87,12 +87,13 @@ void PCImage::writePoint(float x_val, float y_val)
 {
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
-	y_val *= -coefficient;
+	y_val *= coefficient;
 
 	//取得した[x,y]の画素値を増加させる.オーバーフローしないように分岐.
-	if (pcimage.data[(pcimage.rows / 2 + (int)y_val) * pcimage.cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
-		pcimage.data[(pcimage.rows / 2 + (int)y_val) * pcimage.cols + (int)x_val + limitpix] += imgval_increment;
+	if (pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] < (imgval_increment * (255 / imgval_increment))){
+		pcimage[nowimage].data[(pcimage[nowimage].rows / 2 + (int)y_val) * pcimage[nowimage].cols + (int)x_val + limitpix] += imgval_increment;
 	}
+}
 	
 void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 {
@@ -101,14 +102,14 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 
 	//x,yの値を指定した解像度に合わせる
 	x_val *= coefficient;
-	y_val *= -coefficient;
+	y_val *= coefficient;
 	x_val = (int)x_val + limitpix;
-	y_val = pcimage.rows / 2 + (int)y_val;
+	y_val = pcimage[nowimage].rows / 2 + (int)y_val;
 
 	pos_x *= coefficient;
-	pos_y *= -coefficient;
+	pos_y *= coefficient;
 	pos_x = (int)pos_x + limitpix;
-	pos_y = pcimage.rows / 2 + (int)pos_y;
+	pos_y = pcimage[nowimage].rows / 2 + (int)pos_y;
 
 	//取得した[x,y]と現在地を線で結ぶ
 	line(pcimage[nowimage], Point(x_val, y_val), Point(pos_x, pos_y), 100);
@@ -143,7 +144,7 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 	// 自己位置に応じた処理を行う
 	this->checkPosition(pos_x, pos_y);
 
-	imshow("show", pcimage[nowimage]);
+	imshow(dirname, pcimage[nowimage]);
 	waitKey(1);
 
 	selfPos_x = pos_x;
@@ -207,7 +208,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 {
 	//x,yの値を指定した解像度に合わせる
 	int xi = int(pos_x * coefficient);
-	int yi = int(pos_y * -coefficient);
+	int yi = int(pos_y * coefficient);
 
 	//現在の画像のXY
 	int XY[2];
@@ -500,7 +501,7 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 {
 	//x,yの値を指定した解像度に合わせる
 	x_val *= pciOut.coefficient;
-	y_val *= -pciOut.coefficient;
+	y_val *= pciOut.coefficient;
 
 	//x,yの値を画像の位置に合わせる
 	x_val = x_val - imageNumXY[0] * pciOut.img_width + pciOut.limitpix;

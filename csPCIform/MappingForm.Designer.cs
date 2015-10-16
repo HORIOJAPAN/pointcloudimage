@@ -64,9 +64,10 @@
             // 
             // startBtn
             // 
-            this.startBtn.Location = new System.Drawing.Point(331, 526);
+            this.startBtn.Location = new System.Drawing.Point(199, 351);
+            this.startBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.startBtn.Name = "startBtn";
-            this.startBtn.Size = new System.Drawing.Size(190, 60);
+            this.startBtn.Size = new System.Drawing.Size(114, 40);
             this.startBtn.TabIndex = 0;
             this.startBtn.Text = "Start";
             this.startBtn.UseVisualStyleBackColor = true;
@@ -75,188 +76,210 @@
             // dirListBox
             // 
             this.dirListBox.FormattingEnabled = true;
-            this.dirListBox.ItemHeight = 18;
-            this.dirListBox.Location = new System.Drawing.Point(574, 78);
+            this.dirListBox.ItemHeight = 12;
+            this.dirListBox.Location = new System.Drawing.Point(344, 52);
+            this.dirListBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dirListBox.Name = "dirListBox";
-            this.dirListBox.Size = new System.Drawing.Size(370, 508);
+            this.dirListBox.Size = new System.Drawing.Size(224, 340);
             this.dirListBox.TabIndex = 2;
             this.dirListBox.SelectedIndexChanged += new System.EventHandler(this.dirListBox_SelectedIndexChanged);
             // 
             // imgWidthTxtbox
             // 
-            this.imgWidthTxtbox.Location = new System.Drawing.Point(40, 469);
+            this.imgWidthTxtbox.Location = new System.Drawing.Point(24, 313);
+            this.imgWidthTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.imgWidthTxtbox.Name = "imgWidthTxtbox";
-            this.imgWidthTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.imgWidthTxtbox.Size = new System.Drawing.Size(62, 19);
             this.imgWidthTxtbox.TabIndex = 3;
-            this.imgWidthTxtbox.Text = "5000";
+            this.imgWidthTxtbox.Text = "1000";
             // 
             // imgHeightTxtbox
             // 
-            this.imgHeightTxtbox.Location = new System.Drawing.Point(172, 469);
+            this.imgHeightTxtbox.Location = new System.Drawing.Point(103, 313);
+            this.imgHeightTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.imgHeightTxtbox.Name = "imgHeightTxtbox";
-            this.imgHeightTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.imgHeightTxtbox.Size = new System.Drawing.Size(62, 19);
             this.imgHeightTxtbox.TabIndex = 4;
-            this.imgHeightTxtbox.Text = "5000";
+            this.imgHeightTxtbox.Text = "1000";
             // 
             // imgWidthLbl
             // 
             this.imgWidthLbl.AutoSize = true;
-            this.imgWidthLbl.Location = new System.Drawing.Point(37, 437);
+            this.imgWidthLbl.Location = new System.Drawing.Point(22, 291);
+            this.imgWidthLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.imgWidthLbl.Name = "imgWidthLbl";
-            this.imgWidthLbl.Size = new System.Drawing.Size(92, 18);
+            this.imgWidthLbl.Size = new System.Drawing.Size(63, 12);
             this.imgWidthLbl.TabIndex = 5;
             this.imgWidthLbl.Text = "ImageWidth";
             // 
             // imgHeightLbl
             // 
             this.imgHeightLbl.AutoSize = true;
-            this.imgHeightLbl.Location = new System.Drawing.Point(169, 437);
+            this.imgHeightLbl.Location = new System.Drawing.Point(101, 291);
+            this.imgHeightLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.imgHeightLbl.Name = "imgHeightLbl";
-            this.imgHeightLbl.Size = new System.Drawing.Size(99, 18);
+            this.imgHeightLbl.Size = new System.Drawing.Size(68, 12);
             this.imgHeightLbl.TabIndex = 6;
             this.imgHeightLbl.Text = "ImageHeight";
             // 
             // imgResolutionLbl
             // 
             this.imgResolutionLbl.AutoSize = true;
-            this.imgResolutionLbl.Location = new System.Drawing.Point(37, 512);
+            this.imgResolutionLbl.Location = new System.Drawing.Point(22, 341);
+            this.imgResolutionLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.imgResolutionLbl.Name = "imgResolutionLbl";
-            this.imgResolutionLbl.Size = new System.Drawing.Size(129, 18);
+            this.imgResolutionLbl.Size = new System.Drawing.Size(89, 12);
             this.imgResolutionLbl.TabIndex = 8;
             this.imgResolutionLbl.Text = "ImageResolution";
             // 
             // imgResolutionTxtbox
             // 
-            this.imgResolutionTxtbox.Location = new System.Drawing.Point(40, 544);
+            this.imgResolutionTxtbox.Location = new System.Drawing.Point(24, 363);
+            this.imgResolutionTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.imgResolutionTxtbox.Name = "imgResolutionTxtbox";
-            this.imgResolutionTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.imgResolutionTxtbox.Size = new System.Drawing.Size(62, 19);
             this.imgResolutionTxtbox.TabIndex = 7;
             this.imgResolutionTxtbox.Text = "5";
             // 
             // urg1comCbbox
             // 
             this.urg1comCbbox.FormattingEnabled = true;
-            this.urg1comCbbox.Location = new System.Drawing.Point(40, 96);
+            this.urg1comCbbox.Location = new System.Drawing.Point(24, 64);
+            this.urg1comCbbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg1comCbbox.Name = "urg1comCbbox";
-            this.urg1comCbbox.Size = new System.Drawing.Size(121, 26);
+            this.urg1comCbbox.Size = new System.Drawing.Size(74, 20);
             this.urg1comCbbox.TabIndex = 9;
             // 
             // urg1Lbl
             // 
             this.urg1Lbl.AutoSize = true;
-            this.urg1Lbl.Location = new System.Drawing.Point(37, 75);
+            this.urg1Lbl.Location = new System.Drawing.Point(22, 50);
+            this.urg1Lbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg1Lbl.Name = "urg1Lbl";
-            this.urg1Lbl.Size = new System.Drawing.Size(52, 18);
+            this.urg1Lbl.Size = new System.Drawing.Size(35, 12);
             this.urg1Lbl.TabIndex = 10;
             this.urg1Lbl.Text = "URG1";
             // 
             // urg2Lbl
             // 
             this.urg2Lbl.AutoSize = true;
-            this.urg2Lbl.Location = new System.Drawing.Point(223, 75);
+            this.urg2Lbl.Location = new System.Drawing.Point(134, 50);
+            this.urg2Lbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg2Lbl.Name = "urg2Lbl";
-            this.urg2Lbl.Size = new System.Drawing.Size(52, 18);
+            this.urg2Lbl.Size = new System.Drawing.Size(35, 12);
             this.urg2Lbl.TabIndex = 12;
             this.urg2Lbl.Text = "URG2";
             // 
             // urg2comCbbox
             // 
             this.urg2comCbbox.FormattingEnabled = true;
-            this.urg2comCbbox.Location = new System.Drawing.Point(226, 96);
+            this.urg2comCbbox.Location = new System.Drawing.Point(136, 64);
+            this.urg2comCbbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg2comCbbox.Name = "urg2comCbbox";
-            this.urg2comCbbox.Size = new System.Drawing.Size(121, 26);
+            this.urg2comCbbox.Size = new System.Drawing.Size(74, 20);
             this.urg2comCbbox.TabIndex = 11;
             // 
             // arduinocomLbl
             // 
             this.arduinocomLbl.AutoSize = true;
-            this.arduinocomLbl.Location = new System.Drawing.Point(397, 75);
+            this.arduinocomLbl.Location = new System.Drawing.Point(238, 50);
+            this.arduinocomLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.arduinocomLbl.Name = "arduinocomLbl";
-            this.arduinocomLbl.Size = new System.Drawing.Size(65, 18);
+            this.arduinocomLbl.Size = new System.Drawing.Size(44, 12);
             this.arduinocomLbl.TabIndex = 14;
             this.arduinocomLbl.Text = "Arduino";
             // 
             // arduinocomCbbox
             // 
             this.arduinocomCbbox.FormattingEnabled = true;
-            this.arduinocomCbbox.Location = new System.Drawing.Point(400, 96);
+            this.arduinocomCbbox.Location = new System.Drawing.Point(240, 64);
+            this.arduinocomCbbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.arduinocomCbbox.Name = "arduinocomCbbox";
-            this.arduinocomCbbox.Size = new System.Drawing.Size(121, 26);
+            this.arduinocomCbbox.Size = new System.Drawing.Size(74, 20);
             this.arduinocomCbbox.TabIndex = 13;
             // 
             // urg1heightTxtbox
             // 
-            this.urg1heightTxtbox.Location = new System.Drawing.Point(40, 170);
+            this.urg1heightTxtbox.Location = new System.Drawing.Point(24, 113);
+            this.urg1heightTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg1heightTxtbox.Name = "urg1heightTxtbox";
-            this.urg1heightTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.urg1heightTxtbox.Size = new System.Drawing.Size(62, 19);
             this.urg1heightTxtbox.TabIndex = 15;
             this.urg1heightTxtbox.Text = "1100.0";
             // 
             // urg1heightLbl
             // 
             this.urg1heightLbl.AutoSize = true;
-            this.urg1heightLbl.Location = new System.Drawing.Point(37, 149);
+            this.urg1heightLbl.Location = new System.Drawing.Point(22, 99);
+            this.urg1heightLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg1heightLbl.Name = "urg1heightLbl";
-            this.urg1heightLbl.Size = new System.Drawing.Size(116, 18);
+            this.urg1heightLbl.Size = new System.Drawing.Size(77, 12);
             this.urg1heightLbl.TabIndex = 16;
             this.urg1heightLbl.Text = "地面からの高さ";
             // 
             // urg1distanceLbl
             // 
             this.urg1distanceLbl.AutoSize = true;
-            this.urg1distanceLbl.Location = new System.Drawing.Point(37, 206);
+            this.urg1distanceLbl.Location = new System.Drawing.Point(22, 137);
+            this.urg1distanceLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg1distanceLbl.Name = "urg1distanceLbl";
-            this.urg1distanceLbl.Size = new System.Drawing.Size(158, 18);
+            this.urg1distanceLbl.Size = new System.Drawing.Size(105, 12);
             this.urg1distanceLbl.TabIndex = 18;
             this.urg1distanceLbl.Text = "基準位置からの距離";
             // 
             // urg1distanceTxtbox
             // 
-            this.urg1distanceTxtbox.Location = new System.Drawing.Point(40, 227);
+            this.urg1distanceTxtbox.Location = new System.Drawing.Point(24, 151);
+            this.urg1distanceTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg1distanceTxtbox.Name = "urg1distanceTxtbox";
-            this.urg1distanceTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.urg1distanceTxtbox.Size = new System.Drawing.Size(62, 19);
             this.urg1distanceTxtbox.TabIndex = 17;
             this.urg1distanceTxtbox.Text = "285.0";
             // 
             // urg2distanceTxtbox
             // 
-            this.urg2distanceTxtbox.Location = new System.Drawing.Point(226, 227);
+            this.urg2distanceTxtbox.Location = new System.Drawing.Point(136, 151);
+            this.urg2distanceTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg2distanceTxtbox.Name = "urg2distanceTxtbox";
-            this.urg2distanceTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.urg2distanceTxtbox.Size = new System.Drawing.Size(62, 19);
             this.urg2distanceTxtbox.TabIndex = 21;
             this.urg2distanceTxtbox.Text = "443.0";
             // 
             // urg2heightTxtbox
             // 
-            this.urg2heightTxtbox.Location = new System.Drawing.Point(226, 170);
+            this.urg2heightTxtbox.Location = new System.Drawing.Point(136, 113);
+            this.urg2heightTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.urg2heightTxtbox.Name = "urg2heightTxtbox";
-            this.urg2heightTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.urg2heightTxtbox.Size = new System.Drawing.Size(62, 19);
             this.urg2heightTxtbox.TabIndex = 19;
             this.urg2heightTxtbox.Text = "20.0";
             // 
             // urg2heightLbl
             // 
             this.urg2heightLbl.AutoSize = true;
-            this.urg2heightLbl.Location = new System.Drawing.Point(223, 149);
+            this.urg2heightLbl.Location = new System.Drawing.Point(134, 99);
+            this.urg2heightLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg2heightLbl.Name = "urg2heightLbl";
-            this.urg2heightLbl.Size = new System.Drawing.Size(116, 18);
+            this.urg2heightLbl.Size = new System.Drawing.Size(77, 12);
             this.urg2heightLbl.TabIndex = 22;
             this.urg2heightLbl.Text = "地面からの高さ";
             // 
             // urg2distanceLbl
             // 
             this.urg2distanceLbl.AutoSize = true;
-            this.urg2distanceLbl.Location = new System.Drawing.Point(223, 206);
+            this.urg2distanceLbl.Location = new System.Drawing.Point(134, 137);
+            this.urg2distanceLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.urg2distanceLbl.Name = "urg2distanceLbl";
-            this.urg2distanceLbl.Size = new System.Drawing.Size(158, 18);
+            this.urg2distanceLbl.Size = new System.Drawing.Size(105, 12);
             this.urg2distanceLbl.TabIndex = 23;
             this.urg2distanceLbl.Text = "基準位置からの距離";
             // 
             // reloadBtn
             // 
-            this.reloadBtn.Location = new System.Drawing.Point(409, 149);
+            this.reloadBtn.Location = new System.Drawing.Point(245, 99);
+            this.reloadBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.reloadBtn.Name = "reloadBtn";
-            this.reloadBtn.Size = new System.Drawing.Size(112, 40);
+            this.reloadBtn.Size = new System.Drawing.Size(67, 27);
             this.reloadBtn.TabIndex = 24;
             this.reloadBtn.Text = "Reload";
             this.reloadBtn.UseVisualStyleBackColor = true;
@@ -264,9 +287,10 @@
             // 
             // replaceBtn
             // 
-            this.replaceBtn.Location = new System.Drawing.Point(138, 258);
+            this.replaceBtn.Location = new System.Drawing.Point(83, 172);
+            this.replaceBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.replaceBtn.Name = "replaceBtn";
-            this.replaceBtn.Size = new System.Drawing.Size(93, 33);
+            this.replaceBtn.Size = new System.Drawing.Size(56, 22);
             this.replaceBtn.TabIndex = 25;
             this.replaceBtn.Text = "<=>";
             this.replaceBtn.UseVisualStyleBackColor = true;
@@ -275,9 +299,10 @@
             // alldirCheckbox
             // 
             this.alldirCheckbox.AutoSize = true;
-            this.alldirCheckbox.Location = new System.Drawing.Point(807, 50);
+            this.alldirCheckbox.Location = new System.Drawing.Point(484, 33);
+            this.alldirCheckbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.alldirCheckbox.Name = "alldirCheckbox";
-            this.alldirCheckbox.Size = new System.Drawing.Size(137, 22);
+            this.alldirCheckbox.Size = new System.Drawing.Size(96, 16);
             this.alldirCheckbox.TabIndex = 26;
             this.alldirCheckbox.Text = "All directories";
             this.alldirCheckbox.UseVisualStyleBackColor = true;
@@ -285,9 +310,10 @@
             // 
             // devmngerBtn
             // 
-            this.devmngerBtn.Location = new System.Drawing.Point(12, 12);
+            this.devmngerBtn.Location = new System.Drawing.Point(7, 8);
+            this.devmngerBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.devmngerBtn.Name = "devmngerBtn";
-            this.devmngerBtn.Size = new System.Drawing.Size(157, 34);
+            this.devmngerBtn.Size = new System.Drawing.Size(94, 23);
             this.devmngerBtn.TabIndex = 27;
             this.devmngerBtn.Text = "DeviceManager";
             this.devmngerBtn.UseVisualStyleBackColor = true;
@@ -296,17 +322,19 @@
             // savedirpathTxtbox
             // 
             this.savedirpathTxtbox.BackColor = System.Drawing.SystemColors.Control;
-            this.savedirpathTxtbox.Location = new System.Drawing.Point(574, 17);
+            this.savedirpathTxtbox.Location = new System.Drawing.Point(344, 11);
+            this.savedirpathTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.savedirpathTxtbox.Multiline = true;
             this.savedirpathTxtbox.Name = "savedirpathTxtbox";
-            this.savedirpathTxtbox.Size = new System.Drawing.Size(333, 27);
+            this.savedirpathTxtbox.Size = new System.Drawing.Size(201, 19);
             this.savedirpathTxtbox.TabIndex = 28;
             // 
             // savadirpathBtn
             // 
-            this.savadirpathBtn.Location = new System.Drawing.Point(913, 15);
+            this.savadirpathBtn.Location = new System.Drawing.Point(548, 10);
+            this.savadirpathBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.savadirpathBtn.Name = "savadirpathBtn";
-            this.savadirpathBtn.Size = new System.Drawing.Size(31, 29);
+            this.savadirpathBtn.Size = new System.Drawing.Size(19, 19);
             this.savadirpathBtn.TabIndex = 29;
             this.savadirpathBtn.Text = "...";
             this.savadirpathBtn.UseVisualStyleBackColor = true;
@@ -315,26 +343,28 @@
             // intervalLbl
             // 
             this.intervalLbl.AutoSize = true;
-            this.intervalLbl.Location = new System.Drawing.Point(37, 319);
+            this.intervalLbl.Location = new System.Drawing.Point(22, 213);
+            this.intervalLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.intervalLbl.Name = "intervalLbl";
-            this.intervalLbl.Size = new System.Drawing.Size(131, 18);
+            this.intervalLbl.Size = new System.Drawing.Size(90, 12);
             this.intervalLbl.TabIndex = 31;
             this.intervalLbl.Text = "Interval[millisec]";
             // 
             // intervalTxtbox
             // 
-            this.intervalTxtbox.Location = new System.Drawing.Point(40, 351);
+            this.intervalTxtbox.Location = new System.Drawing.Point(24, 234);
+            this.intervalTxtbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.intervalTxtbox.Name = "intervalTxtbox";
-            this.intervalTxtbox.Size = new System.Drawing.Size(100, 25);
+            this.intervalTxtbox.Size = new System.Drawing.Size(62, 19);
             this.intervalTxtbox.TabIndex = 30;
             this.intervalTxtbox.Text = "20";
             this.intervalTxtbox.TextChanged += new System.EventHandler(this.intervalTxtbox_TextChanged);
             // 
             // MappingForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(966, 602);
+            this.ClientSize = new System.Drawing.Size(580, 401);
             this.Controls.Add(this.intervalLbl);
             this.Controls.Add(this.intervalTxtbox);
             this.Controls.Add(this.savadirpathBtn);
@@ -366,6 +396,7 @@
             this.Controls.Add(this.dirListBox);
             this.Controls.Add(this.startBtn);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "MappingForm";
             this.Text = "MappingForm";
             this.Load += new System.EventHandler(this.MappingForm_Load);

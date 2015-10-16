@@ -161,12 +161,12 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	*/
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ğŒvZ
-	DL = receive_char1 * 24.87094184;
+	DL = receive_char1 * 24.87094184 * 1.01;
 	DR = receive_char2 * 24.87094184;
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
 	DIS = (DL + DR) / 2;
-	ANG = (DL - DR) / 530 / 6.52 * 6.28;	//‰E‰ñ“]‚ª³
+	ANG = -(DL - DR) / 530;	//‰E‰ñ“]‚ª³
 
 	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
