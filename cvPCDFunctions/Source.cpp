@@ -12,7 +12,7 @@ using namespace std;
 
 const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151014224236";
 
-PCImage pcimage(5000, 5000, 5);
+PCImage pcimage(1000, 1000, 5);
 
 void getAllFileName(vector<string>& fileNames)
 {
@@ -108,15 +108,41 @@ void makePCImageFromPCD(string filename )
 	//cout << "complete" << endl;
 }
 
+void sortfnames(vector<string>& allFileNames, vector<string>& sortFileNames)
+{
+	string str, data_str;
+	string searchWord1("_");
+	string searchWord2(".");
+	string::size_type begin, end;
+	int num = 0;
+
+	sortFileNames.resize(allFileNames.size());
+
+	for (int i = 0; i < allFileNames.size(); i++)
+	{
+		begin = allFileNames[i].find(searchWord1);
+		end = allFileNames[i].find(searchWord2);
+		if (begin != string::npos){
+			data_str = allFileNames[i].substr(begin + 1, end - begin + 1);
+			num = stoi(data_str);
+
+			sortFileNames[num] = allFileNames[i];
+		}
+	}
+}
+
 void main()
 {
 	vector<string> allFileNames;
-
+	vector<string> sortFileNames;
 	getAllFileName(allFileNames);
+	
+	sortfnames(allFileNames, sortFileNames);
 
-	for (auto& name : allFileNames)
+	for (int i = 0; i < sortFileNames.size(); i++)
 	{
-		makePCImageFromPCD(name);
+		cout << sortFileNames[i] << endl;
+		makePCImageFromPCD(sortFileNames[i]);
 	}
-	pcimage.savePCImage();
+	//pcimage.savePCImage();
 }

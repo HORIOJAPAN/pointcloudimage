@@ -161,7 +161,7 @@ int PCIclasstest(){
 	}
 
 	cout << "complete" << endl;
-	pcimage.savePCImage();
+	//pcimage.savePCImage();
 
 	return 0;
 }

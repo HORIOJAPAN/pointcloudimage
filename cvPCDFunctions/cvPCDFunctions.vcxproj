@@ -69,7 +69,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\cvPCDtest\pcimage.cpp" />
-    <ClCompile Include="..\cvPCDtest\pcimageFunctions.cpp" />
+    <ClCompile Include="..\cvPCDtest\pcimageFunctions.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
