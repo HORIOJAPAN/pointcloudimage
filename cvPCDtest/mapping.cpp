@@ -67,12 +67,12 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 }
 
 //‰ñ“]Šp‚ð–îˆó‚Å•\Ž¦
-void showDirection(float radian)
+void showDirection(float radian , string showName)
 {
 	affine_mat = getRotationMatrix2D(Point(arroypic.cols / 2, arroypic.rows / 2), -radian / PI * 180, 1);
 	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
 	putText(rotatepic, to_string((int)(-radian / (2 * PI))), cv::Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(100, 0, 230), 2, CV_AA);
-	imshow("direction", rotatepic);
+	imshow("direction" + showName, rotatepic);
 }
 
 int CommClose(HANDLE hComm)
@@ -145,20 +145,12 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//cout << "\n\n\ndata1:" << data1 << " ,  data2:" << data2 << endl << endl;
 
 	//charŒ^‚ð®”’l‚Æ‚µ‚Ä•\Ž¦
-	cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
-	//int data[] = { static_cast<int>(receive_char1), static_cast<int>(receive_char2) };
-	//meter(picture, data, 2);
+	//cout << "\n\n\ndata1:" << std::showbase << std::dec << static_cast<int>(receive_char1) << " ,  data2:" << std::showbase << std::dec << static_cast<int>(receive_char2) << endl << endl;
+
+	// ƒf[ƒ^‚ðÏŽZ
 	data_L += static_cast<int>(receive_char1);
 	data_R += static_cast<int>(receive_char2);
-	cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
-
-
-	//DL = receive_data[0] * 2.5;
-	//DR = receive_data[1] * 2.5;
-	/*
-	DL = (signed int)data1 * 24.78367538;
-	DR = (signed int)data2 * 24.78367538;
-	*/
+	//cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ðŒvŽZ
 	DL = receive_char1 * 23.8555 / 1.0019 ;
@@ -167,8 +159,6 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ðŒvŽZ
 	DIS = (DL + DR) / 2;
 	ANG = -(DL - DR) / 530;	//‰E‰ñ“]‚ª³
-
-	//printf("Distance = %d , Angle = %f \n", (int)DIS, ANG);
 
 	//ˆÚ“®—ÊC‰ñ“]—Ê‚ðÏŽZ—p•Ï”‚ÖÏŽZ
 	dist += DIS;
@@ -317,8 +307,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			delete[] unkoArray;
 
 			// •\Ž¦‚µ‚Ä‚¢‚é‰æ‘œ‚ð•Â‚¶‚é
-			destroyWindow("meter");
-			destroyWindow("direction");
+			destroyAllWindows();
 
 			break;
 		}
@@ -337,7 +326,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			meterData[8] = interval;
 
 			meter(picture, meterData, meterName, 9);
-			showDirection(rad);
+			showDirection( rad , ":Encoder" );
 		}
 
 	}
