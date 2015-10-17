@@ -218,12 +218,15 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 
 	pcimage[nowimage].getImageNumber(XY);		//中心画像のX,Y番号を取得
 
+	// 座標を画像内に合わせる
 	xi = xi - XY[0] * img_width + limitpix;
 	yi = yi - XY[1] * img_height + img_height / 2;
 
+	// 自己位置が指定範囲を超えていたら...
 	if (xi < limitpix || img_width - limitpix < xi || yi < limitpix || img_height - limitpix < yi){
 		this->outsideProcess(xi, yi, XY);
 	}
+	// 指定範囲を超えていないのに解放されていない画像があれば解放
 	else
 	{
 		for (int i = 0; i < imageNum; i++)
@@ -286,10 +289,7 @@ void PCImage::outsideProcess(int pos_x, int pos_y, int XY[2])
 		}
 	}
 
-	//cout << "flag:" << flag_x << ", " << flag_y << endl;
-
-	// 画像外ならそっちの画像にシフトする(改良の余地大いにあり)
-
+	// 画像外ならそっちの画像にシフトする(メソッドの分け方を変えるとスッキリすると思われるけど動いたからいいや)
 	flag_x = 0;
 	flag_y = 0;
 	//↑上方向のリミットチェック↑
@@ -331,7 +331,9 @@ void PCImage::outsideProcess(int pos_x, int pos_y, int XY[2])
 */
 int PCImage::loadPCImage(int emptyImageNum)
 {
+	// 画像を読み込む
 	pcimage[emptyImageNum] = imread(pcimage[emptyImageNum].getName());
+	// 画像が存在していなかった場合は新規作成
 	if (pcimage[emptyImageNum].empty())
 	{
 		pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
@@ -349,16 +351,16 @@ int PCImage::loadPCImage(int emptyImageNum)
 */
 int PCImage::prepareImage(int X, int Y)
 {
+	// 既に用意されていたら処理を返す
 	if (checkPrepare(X, Y)) return 1;
 
 	int emptyImageNum;
 	int xy[2];
 
-	pcimage[nowimage].getImageNumber(xy);		//中心画像のx,y番号を取得
+	pcimage[nowimage].getImageNumber(xy);		//中心画像のX,Y番号を取得
 
 	emptyImageNum = getEmptyImage();						//空いている画像の番号を取得
-	//pcimage[emptyImageNum].setPCI(xy[0] + X, xy[1] + Y);	//画像を用意
-	pcimage[emptyImageNum].setPCI(X, Y);	//画像を用意
+	pcimage[emptyImageNum].setPCI(X, Y);					//画像を用意
 	loadPCImage(emptyImageNum);								//既に作成されている場合は読み込む
 	return 0;
 
