@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
 	char z;
 	//URGのCOMポートを指定
-	int URG_COM[] = { 15, 16 };
+	int URG_COM[] = { 21, 22 };
 
 	//URGの位置を指定
 	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
 	int ARDUINO_COM = 10;
 
 	//pcimageの引数
-	imgWidth = 5000;
-	imgHeight = 5000;
+	imgWidth = 1000;
+	imgHeight = 1000;
 	imgResolution = 5;
 
 	

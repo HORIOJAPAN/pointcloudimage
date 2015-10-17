@@ -12,7 +12,7 @@ using namespace std;
 #define WRITELINE
 
 //const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151014224236";
-const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
+const string DIRPATH = "C:\\Users\\NCWC\\Source\\Repos\\pointcloudimage2\\csPCIform\\bin\\Debug\\20151017140721";
 
 PCImage pcimage(1000, 1000, 5);
 
@@ -100,7 +100,7 @@ void makePCImageFromPCD(string filename )
 
 		//取得した[x,y]の画素値を増加させる
 #ifdef WRITELINE
-		pcimage.writePoint(x_cood, y_cood,x_pos/1000,y_pos/1000);
+		pcimage.writePoint(x_cood, y_cood,x_pos,y_pos);
 #else
 		pcimage.writePoint(x_cood,y_cood);
 #endif
@@ -220,7 +220,7 @@ void uniteImage()
 
 void main()
 {
-	//makePcimage();
-
-	uniteImage();
+	makePcimage();
+	waitKey();
+	//uniteImage();
 }
