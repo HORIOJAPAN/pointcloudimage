@@ -332,7 +332,7 @@ void PCImage::outsideProcess(int pos_x, int pos_y, int XY[2])
 int PCImage::loadPCImage(int emptyImageNum)
 {
 	// ‰æ‘œ‚ğ“Ç‚İ‚Ş
-	pcimage[emptyImageNum] = imread(pcimage[emptyImageNum].getName());
+	pcimage[emptyImageNum] = imread(pcimage[emptyImageNum].getName(),0);
 	// ‰æ‘œ‚ª‘¶İ‚µ‚Ä‚¢‚È‚©‚Á‚½ê‡‚ÍV‹Kì¬
 	if (pcimage[emptyImageNum].empty())
 	{
