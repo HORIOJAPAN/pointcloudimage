@@ -14,8 +14,7 @@ using namespace std;
 
 /*
 *　コンストラクタ(引数有) 
-*引数:
-*	string name 保存時のファイル名
+*  引数:
 *	int width 　縦
 *	int height　横
 *	int resolution　1pix何cm四方にするか
@@ -29,6 +28,8 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum, *thi
 	imgval_increment = 80;
 	limit = 10;
 	limitpix = limit * coefficient;
+
+	prepareArrow();
 
 	//年月日時分秒で命名したディレクトリを作成
 	getNowTime(dirname);
@@ -72,7 +73,61 @@ PCImage::~PCImage()
 		if (!pcimage[i].empty())
 		{
 			pcimage[i].savePCImage();
+		}
 }
+
+void PCImage::prepareArrow()
+{
+	arrowpic = imread("arrow.jpg");
+	arrowpic = ~arrowpic;
+	resize(arrowpic, arrowpic, Size(arrowpic.cols / 2, arrowpic.rows / 2));
+
+	Mat mask = arrowpic.clone();
+	cvtColor(mask, mask, CV_BGR2GRAY);
+	threshold(arrowpic, arrowpic, 100, 255, THRESH_BINARY);
+
+	// 素材画像をチャンネル(RGB)ごとに分離してvectorに格納する
+	vector<Mat> mv;
+	split(arrowpic, mv);
+
+	// vectorの最後尾にマスク画像の注目領域を追加する
+	mv.push_back(mask);
+
+	// vectorを結合して加工後の画像とする
+	merge(mv, arrowpic);
+}
+
+void PCImage::showArrow()
+{
+	Mat pic(Size(pcimage[nowimage].cols, pcimage[nowimage].rows), CV_8UC3);
+	cvtColor(pcimage[nowimage], pic, CV_GRAY2BGR);
+	Mat roi(pcimage[nowimage], cv::Rect(0, 0, arrowpic.cols, arrowpic.rows));
+	arrowpic.copyTo(roi);
+	imshow(dirname, pic);
+	waitKey(1);
+}
+void PCImage::showNowPoint(float x_val, float y_val)
+{
+	Mat showpic(Size(pcimage[nowimage].cols, pcimage[nowimage].rows), CV_8UC3);
+	cvtColor(pcimage[nowimage], showpic, CV_GRAY2BGR);
+
+	//x,yの値を指定した解像度に合わせる
+	int xi = int(x_val * coefficient);
+	int yi = int(y_val * coefficient);
+
+	//現在の画像のXY
+	int XY[2];
+
+	pcimage[nowimage].getImageNumber(XY);		//中心画像のX,Y番号を取得
+
+	// 座標を画像内に合わせる
+	xi = xi - XY[0] * img_width + limitpix;
+	yi = yi - XY[1] * img_height + img_height / 2;
+
+	circle(showpic, cv::Point(xi, yi), 10, cv::Scalar(0, 0, 255), 3);
+
+	imshow(dirname, showpic);
+	waitKey(1);
 }
 
 /*
@@ -115,7 +170,7 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 	pos_y = (int)pos_y - XY[1] * img_height + img_height / 2;
 
 	//取得した[x,y]と現在地を線で結ぶ
-	line(pcimage[nowimage], Point(x_val, y_val), Point(pos_x, pos_y), 100);
+	pcimage[nowimage].line(Point(x_val, y_val), Point(pos_x, pos_y), 100);
 
 }
 
@@ -139,7 +194,7 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 	if (ret)
 	{
 		pcimage[ret - 1].writePoint(x_val, y_val);
-}
+	}
 
 	// 自己位置が変化していなければ処理を返す
 	if (selfPos_x == pos_x && selfPos_y == pos_y) return;
@@ -147,8 +202,7 @@ void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 	// 自己位置に応じた処理を行う
 	this->checkPosition(pos_x, pos_y);
 
-	imshow(dirname, pcimage[nowimage]);
-	waitKey(1);
+	showNowPoint(pos_x,pos_y);
 
 	selfPos_x = pos_x;
 	selfPos_y = pos_y;
@@ -232,7 +286,7 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 		for (int i = 0; i < imageNum; i++)
 		{
 			if (i == nowimage) continue;
-			if (!pcimage[i].isEmpty()) pcimage[i].release();
+			if (!pcimage[i].empty()) pcimage[i].release();
 		}
 	}
 
@@ -285,7 +339,7 @@ void PCImage::outsideProcess(int pos_x, int pos_y, int XY[2])
 		for (int i = 0; i < imageNum; i++)
 		{
 			if (i == nowimage) continue;
-			if (!pcimage[i].isEmpty() && !pcimage[i].isCoordinates(XY[0] + flag_x, XY[1] + flag_y)) pcimage[i].release();
+			if (!pcimage[i].empty() && !pcimage[i].isCoordinates(XY[0] + flag_x, XY[1] + flag_y)) pcimage[i].release();
 		}
 	}
 
@@ -377,8 +431,7 @@ int PCImage::prepareImage(int X, int Y)
 int PCImage::getEmptyImage()
 {
 	for (int i = 0; i < imageNum; i++){
-		cout << i << " isEmpty:" << pcimage[i].isEmpty() << endl;
-		if (pcimage[i].isEmpty()) return i;
+		if (pcimage[i].empty()) return i;
 	}
 	return -1;
 }
@@ -426,8 +479,6 @@ bool PCImage::checkPrepare(int X, int Y)
 	}
 	return false;
 }
-
-
 
 /*------------------------------
 *----↓--PCIクラスの定義--↓----
@@ -515,25 +566,9 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	//当画像領域内の点か確認して当画像領域外の場合は該当領域のIDを返す
 	int x_coord = 0;
 	int y_coord = 0;
-	if (x_val < 0)
-	{
-		x_coord = -1;
-	}
-	else if (x_val >= cols)
-	{
-		x_coord = 1;
-	}
-	if (y_val < 0)
-	{
-		y_coord = -1;
-	}
-	else if (y_val >= rows)
-	{
-		y_coord = 1;
-	}
-	//cout << x_coord << "," << y_coord << endl;
-	//cout << x_val << "," << y_val << endl;
-	//cout << imageNumXY[0] << "," << imageNumXY[1] << endl;
+
+	checkOverRange(x_val, y_val, x_coord, y_coord);
+
 	if (x_coord || y_coord)
 	{
 		for (int i = 0; i < imageNum; i++)
@@ -580,9 +615,70 @@ bool PCImage::PCI::isCoordinates(int xy[])
 	if (imageNumXY[0] == xy[0] && imageNumXY[1] == xy[1]) return true;
 	return false;
 }
-
-bool PCImage::PCI::isEmpty()
+void PCImage::PCI::line(cv::Point start, cv::Point end, int color)
 {
-	if (this->Mat::empty()) return true;
-	else return false;
+	int ret[2] = { 0 };
+	checkOverRange(start.x, start.y, ret[0], ret[1]);
+	if (ret[0] || ret[1]) return;
+	checkOverRange(end.x, end.y, ret[0], ret[1]);
+	if (ret[0] || ret[1]) return;
+
+	int x = start.x;
+	int y = start.y;
+	int dx = abs(end.x - start.x);
+	int dy = abs(end.y - start.y);
+	int sx = (end.x>start.x) ? 1 : -1;
+	int sy = (end.y>start.y) ? 1 : -1;
+
+	if (dx >= dy) {
+		int err = 2 * dy - dx;
+		int i = 0;
+		for (i = 0; i <= dx; ++i) {
+			if (!data[y * cols + x]){
+				data[y * cols + x] = 100;
+			}
+
+			x += sx;
+			err += 2 * dy;
+			if (err >= 0) {
+				y += sy;
+				err -= 2 * dx;
+			}
+		}
+	}
+	else{
+		int err = 2 * dx - dy;
+		int i = 0;
+		for (i = 0; i <= dy; ++i) {
+			if (!data[y * cols + x]){
+				data[y * cols + x] = 100;
+			}
+
+			y += sy;
+			err += 2 * dx;
+			if (err >= 0) {
+				x += sx;
+				err -= 2 * dy;
+			}
+		}
+	}
+}
+void PCImage::PCI::checkOverRange(int x_coord, int y_coord, int& ret_x, int& ret_y)
+{
+	if (x_coord < 0)
+	{
+		ret_x = -1;
+	}
+	else if (x_coord >= cols)
+	{
+		ret_x = 1;
+	}
+	if (y_coord < 0)
+	{
+		ret_y = -1;
+	}
+	else if (y_coord >= rows)
+	{
+		ret_y = 1;
+	}
 }

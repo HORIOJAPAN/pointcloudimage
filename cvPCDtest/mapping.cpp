@@ -38,7 +38,7 @@ float startpos_old[2] = {};	//直前の位置を保存する変数
 
 //数値表示用
 Mat picture;
-Mat arroypic;
+Mat arrowpic;
 Mat rotatepic;
 Mat affine_mat;
 
@@ -69,8 +69,8 @@ void meter(Mat pic, float data[] , string name[], int NumOfData)
 //回転角を矢印で表示
 void showDirection(float radian , string showName)
 {
-	affine_mat = getRotationMatrix2D(Point(arroypic.cols / 2, arroypic.rows / 2), -radian / PI * 180, 1);
-	warpAffine(arroypic, rotatepic, affine_mat, arroypic.size());
+	affine_mat = getRotationMatrix2D(Point(arrowpic.cols / 2, arrowpic.rows / 2), -radian / PI * 180, 1);
+	warpAffine(arrowpic, rotatepic, affine_mat, arrowpic.size());
 	putText(rotatepic, to_string((int)(-radian / (2 * PI))), cv::Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(100, 0, 230), 2, CV_AA);
 	imshow("direction" + showName, rotatepic);
 }
@@ -241,9 +241,9 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	shMemInt.setShMemData(0, 0);
 
 	// 姿勢表示用矢印の読み込み
-	arroypic = imread("arrow.jpg");
-	if (arroypic.empty()) cout << "No arrow image" << endl;
-	arroypic = ~arroypic;
+	arrowpic = imread("arrow.jpg");
+	if (arrowpic.empty()) cout << "No arrow image" << endl;
+	arrowpic = ~arrowpic;
 
 	//rcvDroid.getOrientationData(defaultOrientation);
 
@@ -326,7 +326,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 			meterData[8] = interval;
 
 			meter(picture, meterData, meterName, 9);
-			showDirection( rad , ":Encoder" );
+			showDirection( -rad , ":Encoder" );
 		}
 
 	}

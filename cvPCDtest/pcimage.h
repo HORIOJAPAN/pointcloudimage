@@ -26,12 +26,9 @@ public:
 	//画像位置を考慮した処理を行う
 	class PCI;
 	std::string dirname;					//作成するディレクトリ名
-private:
-	//cv::Mat pcimage;				//画像
-	std::vector<PCI> pcimage;				//画像領域の配列
 
-	//std::string dirname;			//ディレクトリ名
-	//std::string img_name;			//保存時の画像名
+private:
+	std::vector<PCI> pcimage;				//画像領域の配列
 
 	int img_width;					//用意する画像の幅
 	int img_height;					//用意する画像の高さ
@@ -44,9 +41,15 @@ private:
 
 	const int lineVal = 200;		// 線を描画するときの画素値
 
+	cv::Mat arrowpic;
+
+/***********************
+*	↓privateメソッド↓
+***********************/
 	//自己位置に応じて画像の用意などの処理をする
 	int checkPosition(float pos_x, float pos_y);
 
+	// 自己位置が特定の範囲外だった場合の処理
 	void outsideProcess(int pos_x, int pos_y, int XY[2]);
 
 	//画像の領域番号を問い合わせると真偽を返す
@@ -63,6 +66,13 @@ private:
 
 	//中心画像を指定方向にシフトする
 	int shiftCenterImage(int x, int y);
+
+	// 現在地表示用の矢印を準備
+	void prepareArrow();
+	// 現在地を矢印で表示(未完成)
+	void showArrow();
+
+	void showNowPoint(float x_val , float y_val);
 
 public:
 	//コンストラクタ
@@ -93,7 +103,7 @@ public:
 
 	//現在の時刻を文字列で取得する
 	static void getNowTime(std::string& nowstr);
-
+	
 };
 
 
@@ -133,7 +143,11 @@ public:
 	//画像を保存する
 	void savePCImage();
 
-	bool isEmpty();
+	// 直線を描画する．画素値が0でない画素は上書きしない
+	void line(cv::Point start, cv::Point end, int color);
+
+	// 画像内の点かどうかをチェック
+	void checkOverRange( int x_coord , int y_coord , int& ret_x , int& ret_y );
 };
 
 
