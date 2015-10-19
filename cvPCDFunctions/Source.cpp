@@ -11,8 +11,8 @@ using namespace std;
 
 #define WRITELINE
 
-//const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151014224236";
-const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
+const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
+//const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
 
 PCImage pcimage(1000, 1000, 5);
 
@@ -72,7 +72,7 @@ void makePCImageFromPCD(string filename )
 		//y
 		end = str.find(searchWord, begin + 1);
 		if (end != string::npos){
-			data_str = str.substr(begin + 1, end);
+			data_str = str.substr(begin + 1, end - begin + 1);
 			y_cood = stof(data_str);
 
 			//cout << y_cood << endl;
@@ -82,7 +82,7 @@ void makePCImageFromPCD(string filename )
 		begin = end;
 		end = str.find(searchWord, begin + 1);
 		if (end != string::npos){
-			data_str = str.substr(begin + 1, end);
+			data_str = str.substr(begin + 1, end - begin + 1);
 			x_pos = stof(data_str);
 
 			//cout << x_pos << endl;
@@ -92,7 +92,7 @@ void makePCImageFromPCD(string filename )
 		begin = end;
 		end = str.find(searchWord, begin + 1);
 		if (end != string::npos){
-			data_str = str.substr(begin + 1, end);
+			data_str = str.substr(begin + 1, end - begin + 1);
 			y_pos = stof(data_str);
 
 			//cout << y_pos << endl;
@@ -100,7 +100,7 @@ void makePCImageFromPCD(string filename )
 
 		//取得した[x,y]の画素値を増加させる
 #ifdef WRITELINE
-		pcimage.writePoint(x_cood, y_cood,x_pos/1000,y_pos/1000);
+		pcimage.writePoint(x_cood, y_cood,x_pos,y_pos);
 #else
 		pcimage.writePoint(x_cood,y_cood);
 #endif
@@ -208,8 +208,6 @@ void uniteImage()
 		}
 	}
 
-
-
 	waitKey();
 
 	for (int i = 0; i < size_X; i++) {
@@ -220,7 +218,7 @@ void uniteImage()
 
 void main()
 {
-	//makePcimage();
+	makePcimage();
 
-	uniteImage();
+	//uniteImage();
 }
