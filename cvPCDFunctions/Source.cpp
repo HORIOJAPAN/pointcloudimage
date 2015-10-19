@@ -219,6 +219,6 @@ void uniteImage()
 void main()
 {
 	makePcimage();
-
+	waitKey();
 	//uniteImage();
 }
