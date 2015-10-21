@@ -256,7 +256,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	// ついでに共有メモリに作成したディレクトリの名前を格納
 	for (int i = 0; i < NumOfURG; i++)
 	{
-		unkoArray[i].init(URG_COM[i], URGPOS[i],imgWidth, imgHeight, imgResolution);
+		unkoArray[i].init(URG_COM[i], URGPOS[i]);
 	}
 
 	//ループを抜けるためのキー入力を待つウィンドウを作成
@@ -353,7 +353,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 *		なし
 */
 // urg_unkoを配列で宣言したときに引数を渡せないのでpcimageの引数はとりあえずグローバル変数から受け取る
-urg_unko::urg_unko()
+urg_unko::urg_unko() :pcimage(::imgWidth,::imgHeight,::imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
@@ -368,7 +368,7 @@ urg_unko::urg_unko()
 *	返り値:
 *		なし
 */
-void urg_unko::init(int COM, float pos[],int imgWidth, int imgHeight, int imgResolution)
+void urg_unko::init(int COM, float pos[])
 {
 	// 引数のCOMをメンバのCOMportに格納
 	COMport = COM;
@@ -381,9 +381,6 @@ void urg_unko::init(int COM, float pos[],int imgWidth, int imgHeight, int imgRes
 	{
 		urgpos[i] = pos[i];
 	}
-
-	pcimage = &PCImage(imgWidth, imgHeight, imgResolution);
-
 }
 
 /*
@@ -547,11 +544,11 @@ void urg_unko::set_3D_surface( int data_n)
 				// 座標を保存
 #ifndef DEBUG_WRITELINE
 				// 点のみ書き込む
-				pcimage->writePoint(pointpos[0] / 1000, pointpos[1] / 1000);
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000);
 				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000);
 #else
 				// 点を書き込んで現在地からの直線を引く
-				pcimage->writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
 				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
 #endif
 
@@ -573,7 +570,7 @@ void urg_unko::set_3D_surface( int data_n)
 void urg_unko::pcdinit()
 {
 	//ファイル名を指定してファイルストリームを開く
-	ofs.open( "./" + pcimage->getDirname() + "/pointcloud_" + std::to_string(pcdnum) + ".pcd");
+	ofs.open( "./" + pcimage.getDirname() + "/pointcloud_" + std::to_string(pcdnum) + ".pcd");
 
 	//pcdファイル番号を進めてデータ数カウント用変数を初期化
 	pcdnum++;
@@ -648,10 +645,10 @@ void urg_unko::pcdSave()
 
 void urg_unko::setWriteLine(bool isLine)
 {
-	pcimage->isWriteLine = isLine;
+	pcimage.isWriteLine = isLine;
 }
 
 std::string	urg_unko::getDirName()
 {
-	return pcimage->getDirname();
+	return pcimage.getDirname();
 }

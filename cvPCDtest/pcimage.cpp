@@ -602,6 +602,10 @@ void PCImage::PCI::release()
 	imwrite(name, *this);
 	this->Mat::release();
 	name = "";
+	imageNumXY[0] = 10000;
+	imageNumXY[1] = 10000;
+
+
 }
 
 bool PCImage::PCI::isCoordinates(int x, int y)
