@@ -8,16 +8,6 @@
 
 const int imageNum = 4;		//事前に用意する画像領域の数
 
-
-//pcdファイル名を指定すると画像に変換して保存
-int save_pcdtoimg(std::string fileName, std::string imgName, int resolution = 1);
-
-//点群画像に床を入れる(未完成)
-int save_floorimg(std::string src_imgName, std::string dst_imgName);
-
-//PCImageクラスのテストをする関数
-int PCIclasstest();
-
 //点群画像を作成するクラス
 class PCImage
 {

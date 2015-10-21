@@ -525,7 +525,8 @@ void urg_unko::set_3D_surface( int data_n)
 
 				//ˆÙí’l‚È‚ç‚Æ‚Î‚·
 				if ((l <= min_distance) || (l >= max_distance)) {
-					continue;
+					//continue;
+					l = max_distance;
 				}
 
 				//“_‚Ü‚Å‚ÌŠp“x‚ğæ“¾‚µ‚Äxy‚É•ÏŠ·

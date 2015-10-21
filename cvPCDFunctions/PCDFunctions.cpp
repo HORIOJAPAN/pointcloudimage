@@ -11,8 +11,8 @@ using namespace std;
 
 #define WRITELINE
 
-const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
-//const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
+//const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
+const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
 
 PCImage pcimage(1000, 1000, 5);
 
@@ -25,12 +25,12 @@ void getAllFileName(vector<string>& fileNames, string extension)
 
 	for_each(sys::directory_iterator(p), sys::directory_iterator(),
 		[&](const sys::path& p) {
-		if (sys::is_regular_file(p)) { // ファイルなら...
+		if (sys::is_regular_file(p)) { // ファイルなら
 			cout << p.filename() << endl;
 			fname = p.filename();
 			if (fname.find("." + extension) != string::npos)	fileNames.push_back(p.filename());
 		}
-		else if (sys::is_directory(p)) { // ディレクトリなら...
+		else if (sys::is_directory(p)) { // ディレクトリなら
 			cout << "dir.: " << p.string() << endl;
 		}
 	});
@@ -179,6 +179,47 @@ void minmaxXY(vector<string> allFileNames, int& maxX, int& minX, int& maxY, int&
 	}
 }
 
+void trimming( Mat** srcArray , Mat& dst , Size arraySize , Point originImage , Size dstimgSize , Point trimCenter )
+{
+	int resolution = 5;
+	int coefficient = 100 / resolution;
+	int	limit = 10;
+	int limitpix = limit * coefficient;
+
+	int width = srcArray[0][0].cols;
+	int height = srcArray[0][0].rows;
+	Point origin(originImage.x * width + limitpix, originImage.y * height + height / 2);
+	
+	trimCenter.x += origin.x;
+	trimCenter.y += origin.y;
+
+	Point trimUpperLeftXY((trimCenter.x - dstimgSize.width / 2)/1000, (trimCenter.y - dstimgSize.height / 2)/1000);
+	Point trimLowerRightXY((trimCenter.x + dstimgSize.width / 2)/1000, (trimCenter.y + dstimgSize.height / 2)/1000);
+	int XY[2] = { 1 };
+
+	if (trimUpperLeftXY.x != trimLowerRightXY.x ) XY[0] += trimLowerRightXY.x  - trimUpperLeftXY.x ;
+	if (trimUpperLeftXY.y != trimLowerRightXY.y ) XY[1] += trimLowerRightXY.y  - trimUpperLeftXY.y ;
+	
+	Mat tmpimg(XY[1] * 1000, XY[0] * 1000, CV_8U);
+	Rect roiRect(0, 0, 1000, 1000);
+	for (int x = trimUpperLeftXY.x; x < trimUpperLeftXY.x + XY[0]; x++)
+	{
+		for (int y = trimUpperLeftXY.y; y < trimUpperLeftXY.y + XY[1]; y++)
+		{
+			Mat roi(tmpimg, roiRect);
+			srcArray[x][y].copyTo(roi);
+			roiRect.y += 1000;
+		}
+		roiRect.y = 0;
+		roiRect.x += 1000;
+	}
+
+	Point trimUpperLeft(trimCenter.x - dstimgSize.width / 2 - trimUpperLeftXY.x * 1000, trimCenter.y - dstimgSize.height / 2 - trimUpperLeftXY.y * 1000);
+
+	dst = Mat(tmpimg, Rect(trimUpperLeft,Point(trimUpperLeft.x + dstimgSize.width,trimUpperLeft.y + dstimgSize.height))).clone();
+	imwrite(DIRPATH + "\\" + "trimImg.jpg", dst);
+}
+
 void uniteImage()
 {
 	vector<string> allFileNames;
@@ -191,12 +232,16 @@ void uniteImage()
 	int size_X = maxX - minX + 1;
 	int size_Y = maxY - minY + 1;
 
+	Point originImg;
+
 	Mat** pcimageArray = new Mat*[size_X];
 	for (int i = 0; i < size_X; i++)
 	{
 		pcimageArray[i] = new Mat[size_Y];
 	}
 
+	Mat margeImg(size_X*1000,size_Y*1000,CV_8U);
+	Rect roiRect(0,0,1000,1000);
 	for (int x = 0; x < size_X; x++)
 	{
 		for (int y = 0; y < size_Y; y++)
@@ -204,10 +249,20 @@ void uniteImage()
 			pcimageArray[x][y] = imread(DIRPATH + "\\" + to_string(minX + x) + "_" + to_string(minY + y) + ".jpg" , 0);
 			if (pcimageArray[x][y].empty()) pcimageArray[x][y] = Mat(1000, 1000, CV_8U, Scalar::all(100));
 
-			// imshow(DIRPATH + "\\" + to_string(minX + x) + "_" + to_string(minY + y) + ".jpg", pcimageArray[x][y]);
-		}
-	}
+			//imshow(DIRPATH + "\\" + to_string(minX + x) + "_" + to_string(minY + y) + ".jpg", pcimageArray[x][y]);
+			if (minX + x == 0 && minY + y == 0) originImg = Point(x, y);
 
+			Mat roi(margeImg, roiRect);
+			pcimageArray[x][y].copyTo(roi);
+			roiRect.y += 1000;
+		}
+		roiRect.y = 0;
+		roiRect.x += 1000;
+	}
+	imwrite(DIRPATH + "\\" + "margeImage.jpg", margeImg);
+
+	Mat trimImg;
+	trimming(pcimageArray, trimImg, Size(size_X, size_Y), originImg, Size(1000, 1000), Point(-500, 0));
 	waitKey();
 
 	for (int i = 0; i < size_X; i++) {
@@ -218,7 +273,8 @@ void uniteImage()
 
 void main()
 {
-	makePcimage();
+	//makePcimage();
+	uniteImage();
+
 	waitKey();
-	//uniteImage();
 }
