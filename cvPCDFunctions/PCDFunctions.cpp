@@ -14,7 +14,6 @@ using namespace std;
 //const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
 const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
 
-PCImage pcimage(1000, 1000, 5);
 
 void getAllFileName(vector<string>& fileNames, string extension)
 {
@@ -38,6 +37,8 @@ void getAllFileName(vector<string>& fileNames, string extension)
 
 void makePCImageFromPCD(string filename )
 {
+	PCImage pcimage(1000, 1000, 5);
+
 	float	x_cood, y_cood;
 	float	x_pos, y_pos;
 
@@ -195,12 +196,12 @@ void trimming( Mat** srcArray , Mat& dst , Size arraySize , Point originImage , 
 
 	Point trimUpperLeftXY((trimCenter.x - dstimgSize.width / 2)/1000, (trimCenter.y - dstimgSize.height / 2)/1000);
 	Point trimLowerRightXY((trimCenter.x + dstimgSize.width / 2)/1000, (trimCenter.y + dstimgSize.height / 2)/1000);
-	int XY[2] = { 1 };
+	int XY[2] = {1,1};
 
 	if (trimUpperLeftXY.x != trimLowerRightXY.x ) XY[0] += trimLowerRightXY.x  - trimUpperLeftXY.x ;
 	if (trimUpperLeftXY.y != trimLowerRightXY.y ) XY[1] += trimLowerRightXY.y  - trimUpperLeftXY.y ;
 	
-	Mat tmpimg(XY[1] * 1000, XY[0] * 1000, CV_8U);
+	Mat tmpimg(XY[0] * 1000, XY[1] * 1000, CV_8U);
 	Rect roiRect(0, 0, 1000, 1000);
 	for (int x = trimUpperLeftXY.x; x < trimUpperLeftXY.x + XY[0]; x++)
 	{
@@ -216,7 +217,7 @@ void trimming( Mat** srcArray , Mat& dst , Size arraySize , Point originImage , 
 
 	Point trimUpperLeft(trimCenter.x - dstimgSize.width / 2 - trimUpperLeftXY.x * 1000, trimCenter.y - dstimgSize.height / 2 - trimUpperLeftXY.y * 1000);
 
-	dst = Mat(tmpimg, Rect(trimUpperLeft,Point(trimUpperLeft.x + dstimgSize.width,trimUpperLeft.y + dstimgSize.height))).clone();
+	dst = Mat(tmpimg, Rect(trimUpperLeft,Point(trimUpperLeft.x + dstimgSize.width,trimUpperLeft.y + dstimgSize.height)));
 	imwrite(DIRPATH + "\\" + "trimImg.jpg", dst);
 }
 
@@ -262,7 +263,7 @@ void uniteImage()
 	imwrite(DIRPATH + "\\" + "margeImage.jpg", margeImg);
 
 	Mat trimImg;
-	trimming(pcimageArray, trimImg, Size(size_X, size_Y), originImg, Size(1000, 1000), Point(-500, 0));
+	trimming(pcimageArray, trimImg, Size(size_X, size_Y), originImg, Size(2000,2000), Point(-1000, 0));
 	waitKey();
 
 	for (int i = 0; i < size_X; i++) {

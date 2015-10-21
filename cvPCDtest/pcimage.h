@@ -15,7 +15,10 @@ public:
 	//Matクラスを継承した点群画像クラス
 	//画像位置を考慮した処理を行う
 	class PCI;
+
 	std::string dirname;					//作成するディレクトリ名
+
+	bool isWriteLine = true;					// マップに自己位置から測定点までの線を描画するかどうか
 
 private:
 	std::vector<PCI> pcimage;				//画像領域の配列

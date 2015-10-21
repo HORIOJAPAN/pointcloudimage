@@ -144,7 +144,7 @@ void PCImage::writePoint(float x_val, float y_val)
 }
 	
 /*
-*　概要：指定座標(絶対座標)に点を書き込む
+*　概要：指定座標と自己位置の間に直線を描画
 *　引数:
 *	float x_val 書き込む点のx座標(m)
 *	float y_val 書き込む点のy座標(m)
@@ -186,8 +186,7 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 */
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
-	
-	//this->writeLine(x_val, y_val , pos_x ,pos_y );
+	if(isWriteLine)	writeLine(x_val, y_val , pos_x ,pos_y );
 
 	int ret;
 	ret = pcimage[nowimage].writePoint(x_val, y_val);
@@ -227,7 +226,7 @@ void PCImage::savePCImage(int x, int y)
 	for (int i = 0; i < imageNum; i++)
 	{
 		if (pcimage[i].isCoordinates(x, y)) pcimage[i].savePCImage();
-}
+	}
 }
 
 std::string PCImage::getDirname()
@@ -493,7 +492,7 @@ bool PCImage::checkPrepare(int X, int Y)
 */
 PCImage::PCI& PCImage::PCI::operator=(cv::Mat& mat)
 {
-	Mat::operator=(mat);
+	this->Mat::operator=(mat);
 	return *this;
 }
 

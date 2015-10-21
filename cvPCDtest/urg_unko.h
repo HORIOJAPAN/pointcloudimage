@@ -43,7 +43,7 @@ private:
 	long *data = NULL;	
 	long time_stamp;
 
-	PCImage pcimage;	//マップ画像作成用クラス
+	PCImage* pcimage = NULL;	//マップ画像作成用クラス
 
 	/*
 	*	privateなメソッド
@@ -72,15 +72,15 @@ public:
 
 	//コンストラクタ
 	urg_unko();
-	urg_unko(int imgWidth, int imgHeight, int imgResolution);
 	//デストラクタ
 	~urg_unko();
 
 	//自身の初期化処理を行う
-	void init(int COM , float pos[]);
+	void init(int COM, float pos[], int imgWidth, int imgHeight, int imgResolution);
 	//URGからデータを取得するメソッド
 	int getData4URG(float& dist, float& rad);
 
+	void setWriteLine(bool isLine);
 	std::string	getDirName();
 };
 

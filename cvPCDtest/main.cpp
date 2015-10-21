@@ -5,7 +5,6 @@ int imgWidth, imgHeight, imgResolution;
 
 int main(int argc, char* argv[])
 {
-	char z;
 	//URGのCOMポートを指定
 	int URG_COM[] = { 6, 23 };
 
