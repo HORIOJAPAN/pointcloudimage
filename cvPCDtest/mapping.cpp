@@ -525,7 +525,8 @@ void urg_unko::set_3D_surface( int data_n)
 
 				//ˆÙí’l‚È‚ç‚Æ‚Î‚·
 				if ((l <= min_distance) || (l >= max_distance)) {
-					//continue;
+					pcdWrite(0, 0, startpos[0] / 1000, startpos[1] / 1000);
+					continue;
 					l = max_distance;
 				}
 

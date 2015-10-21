@@ -129,7 +129,7 @@ void PCImage::showNowPoint(float x_val, float y_val)
 	imshow(dirname, showpic);
 	waitKey(1);
 }
-
+	
 /*
 *　概要：指定座標に点を書き込む
 *　引数:
@@ -187,7 +187,7 @@ void PCImage::writeLine(float x_val, float y_val, float pos_x, float pos_y)
 void PCImage::writePoint(float x_val, float y_val, float pos_x, float pos_y)
 {
 	
-	this->writeLine(x_val, y_val , pos_x ,pos_y );
+	//this->writeLine(x_val, y_val , pos_x ,pos_y );
 
 	int ret;
 	ret = pcimage[nowimage].writePoint(x_val, y_val);
