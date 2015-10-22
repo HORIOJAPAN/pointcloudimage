@@ -26,7 +26,7 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
-rcvAndroidSensors rcvDroid(14);
+rcvAndroidSensors rcvDroid(24);
 float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
@@ -603,7 +603,7 @@ void urg_unko::pcdWrite(float x, float y)
 void urg_unko::pcdWrite(float x, float y , float pos_x , float pos_y , float droidAngle[] , float droidGPS[])
 {
 	//データを書き込んでデータ数をカウント
-	ofs << x << ", " << y << ", " << pos_x << ", " << pos_y << ", " << droidAngle << ", " << endl;
+	ofs << x << ", " << y << ", " << pos_x << ", " << pos_y << ", " << droidAngle[0] << ", " << droidAngle[1] << ", " << droidAngle[2] << ", " << droidGPS[0] << ", " << droidGPS[1] << ", " << droidGPS[2] << ", " << endl;
 	pcdcount++;
 }
 

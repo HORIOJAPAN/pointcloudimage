@@ -314,7 +314,7 @@ void	rcvAndroidSensors::getOrientationData(float retArray[3])
 		retArray[1] = mPitch;
 		retArray[2] = mRoll;
 
-		printf("--orientation--\n %.2f , %.2f , %.2f \n", mAzimuth, mPitch, mRoll);
+		//printf("--orientation--\n %.2f , %.2f , %.2f \n", mAzimuth, mPitch, mRoll);
 
 		// Žw’èŠÔŠu‚Å•Û‘¶
 		if(isSaveOrientationCSV) timeCountOrientation += timerOrientation.getLapTime();
@@ -335,8 +335,13 @@ void	rcvAndroidSensors::getOrientationData(float retArray[3])
 		}
 
 	}
-	else cout << "Not Orientation data" << endl;
-	
+	else
+	{
+		cout << "Not Orientation data" << endl;
+		retArray[0] = 0;
+		retArray[1] = 0;
+		retArray[2] = 0;
+	}
 }
 
 void rcvAndroidSensors::getGPSData(float retArray[3])
@@ -378,7 +383,11 @@ void rcvAndroidSensors::getGPSData(float retArray[3])
 		mLongitude = mLongitude / 1000000;
 		mAccuracy = mAccuracy / 10;
 
-		printf("--GPS--\n %.6f , %.6f , %.1f \n\n", mLatitude, mLongitude, mAccuracy);
+		retArray[0] = mLatitude;
+		retArray[1] = mLongitude;
+		retArray[2] = mAccuracy;
+
+		//printf("--GPS--\n %.6f , %.6f , %.1f \n\n", mLatitude, mLongitude, mAccuracy);
 
 		// Žw’èŠÔŠu‚Å•Û‘¶
 		if (isSaveGPSCSV) timeCountGPS += timerGPS.getLapTime();
@@ -397,7 +406,13 @@ void rcvAndroidSensors::getGPSData(float retArray[3])
 		}
 
 	}
-	else cout << "Not GPS data" << endl;
+	else
+	{
+		cout << "Not GPS data" << endl;
+		retArray[0] = 0;
+		retArray[1] = 0;
+		retArray[2] = 0;
+	}
 
 }
 
