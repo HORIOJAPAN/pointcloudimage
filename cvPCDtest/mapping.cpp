@@ -26,7 +26,7 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
-//rcvAndroidSensors rcvDroid(14);
+rcvAndroidSensors rcvDroid(14);
 float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
@@ -106,29 +106,23 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 
 	// ハンドルチェック
 	if( !hComm )	return -1;
-
 	// バッファクリア
 	memset(sendbuf, 0x00, sizeof(sendbuf));
-
 	// パケット作成
-	sendbuf[0] = (unsigned char)1;				// ヘッダー1
-
+	sendbuf[0] = (unsigned char)1;
 	// 通信バッファクリア
 	PurgeComm(hComm, PURGE_RXCLEAR);
-
 	// 送信
 	ret = WriteFile(hComm, &sendbuf, 1, &len, NULL);
 
 	// バッファクリア
 	memset(receive_data, 0x00, sizeof(receive_data));
-
 	// 通信バッファクリア
 	PurgeComm(hComm, PURGE_RXCLEAR);
-
-
 	// Arduinoからデータを受信
 	ret = ReadFile(hComm, &receive_data, 2, &len, NULL);
 	//cout << static_cast<bitset<8>>(receive_data[0]) << "," << static_cast<bitset<8>>(receive_data[1] )<< endl;
+
 
 	//初期化されていなければ初期化(初めのデータを捨てる)
 	if (!isInitialized)
@@ -166,7 +160,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//rcvDroid.getOrientationData(droidOrientation);
 	//rad = droidOrientation[0] - defaultOrientation[0];
 
-	printf("Distance = %d , Angle = %f \n", (int)dist, rad);
+	//printf("Distance = %d , Angle = %f \n", (int)dist, rad);
 
 	return ret;
 }
@@ -222,7 +216,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	urg_unko *unkoArray = new urg_unko[NumOfURG];	//urg_unko型変数の配列
 
 	Timer	timer; //ループの間隔調整用タイマー
-	int		intervalTime = 10; // ループの間隔．millisecで指定
 	int		interval;
 	timer.Start();
 
@@ -238,7 +231,8 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	// csFormとの懸け橋
 	// ループ抜けるタイミングとかのやり取り用
 	SharedMemory<int> shMemInt("MappingFormInt");
-	shMemInt.setShMemData(0, 0);
+	enum {ISEND , INTERVALTIME};
+	shMemInt.setShMemData(false, ISEND);
 
 	// 姿勢表示用矢印の読み込み
 	arrowpic = imread("arrow.jpg");
@@ -253,26 +247,22 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	Encoder(handle_ARDUINO, dist, rad);
 
 	//接続したURGの数だけurg_unko型オブジェクトを初期化
-	// ついでに共有メモリに作成したディレクトリの名前を格納
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
 	}
-
-	//ループを抜けるためのキー入力を待つウィンドウを作成
-	//cv::namedWindow("q");
 
 	//マップ作成を行うループ
 	//'q'を入力するとループを抜ける
 	while (true){
 
 		// 処理の間隔を指定時間あける
-		if (timer.getLapTime(1, Timer::millisec, false) < shMemInt.getShMemData(1)) continue;
+		if (timer.getLapTime(1, Timer::millisec, false) < shMemInt.getShMemData(INTERVALTIME)) continue;
 		interval = timer.getLapTime();
 
 		//エンコーダから移動量，回転量を取得
 		Encoder(handle_ARDUINO, dist, rad);
-		cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
+		//cout << "\n\n dist = " << dist << ", rad = " << rad << endl << endl;
 
 		//積算した距離を格納
 		chairpos = dist;
@@ -293,14 +283,13 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		//		yの正：左
 		startpos[0] += cos(rad) * (chairpos - DIS_old);
 		startpos[1] -= sin(rad) * (chairpos - DIS_old);
-		printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
+		//printf("startpos[0] = %f , startpos[1] = %f\n", startpos[0], startpos[1]);
 
 		//現在の移動量を保存
 		DIS_old = chairpos;
 
 		//'q'が入力されたらループを抜ける
 		// もしくは共有メモリの0番地に0が入力さ(ry
-		cout << "shMem:" << shMemInt.getShMemData(0) << endl;
 		if (cv::waitKey(1) == 'q' || shMemInt.getShMemData(0))
 		{
 			//Newで確保した配列の解放
@@ -497,7 +486,7 @@ int urg_unko::getData4URG(float& dist, float& rad){
 */
 void urg_unko::set_3D_surface( int data_n)
 {
-	printf(" set_3D_surface data_n = %d \n", data_n);
+	//printf(" set_3D_surface data_n = %d \n", data_n);
 
 	(void)time_stamp;
 
@@ -515,6 +504,11 @@ void urg_unko::set_3D_surface( int data_n)
 			//pcdファイルの初期化
 			pcdinit();
 
+			float droidOrientation[3];
+			float droidGPS[3];
+			rcvDroid.getOrientationData(droidOrientation);
+			rcvDroid.getGPSData(droidGPS);
+
 			//データの数だけ実際の座標を計算してマップ，pcdファイルに書き込む
 			for (int i = 0; i < data_n; ++i) {
 				long l = data[i];	//取得した点までの距離
@@ -524,7 +518,7 @@ void urg_unko::set_3D_surface( int data_n)
 
 				//異常値ならとばす
 				if ((l <= min_distance) || (l >= max_distance)) {
-					pcdWrite(0, 0, startpos[0] / 1000, startpos[1] / 1000);
+					pcdWrite(0, 0, startpos[0] / 1000, startpos[1] / 1000, droidOrientation, droidGPS);
 					continue;
 					l = max_distance;
 				}
@@ -549,7 +543,7 @@ void urg_unko::set_3D_surface( int data_n)
 #else
 				// 点を書き込んで現在地からの直線を引く
 				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
-				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, startpos[0] / 1000, startpos[1] / 1000 ,droidOrientation , droidGPS);
 #endif
 
 			}
@@ -606,10 +600,10 @@ void urg_unko::pcdWrite(float x, float y)
 	pcdcount++;
 }
 
-void urg_unko::pcdWrite(float x, float y , float pos_x , float pos_y)
+void urg_unko::pcdWrite(float x, float y , float pos_x , float pos_y , float droidAngle[] , float droidGPS[])
 {
 	//データを書き込んでデータ数をカウント
-	ofs << x << ", " << y << ", " << pos_x << ", " << pos_y << ", " << endl;
+	ofs << x << ", " << y << ", " << pos_x << ", " << pos_y << ", " << droidAngle << ", " << endl;
 	pcdcount++;
 }
 

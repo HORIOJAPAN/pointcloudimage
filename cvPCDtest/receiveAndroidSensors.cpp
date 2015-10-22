@@ -339,3 +339,65 @@ void	rcvAndroidSensors::getOrientationData(float retArray[3])
 	
 }
 
+void rcvAndroidSensors::getGPSData(float retArray[3])
+{
+	unsigned char	sendbuf[1];
+	unsigned char	readbuf[20];
+	int				ret;
+	unsigned long	len, readlen;
+
+	// ハンドルチェック
+	if (!hComm){
+		cout << "No handle" << endl;
+		return;
+	}
+
+	// バッファクリア
+	memset(sendbuf, 0x01, sizeof(sendbuf));
+
+	// 通信バッファクリア
+	PurgeComm(hComm, PURGE_RXCLEAR);
+
+	// 送信
+	ret = WriteFile(hComm, &sendbuf, 1, &len, NULL);
+
+	// 読み込み
+	memset(readbuf, 0x00, sizeof(readbuf));
+	readlen = 11;
+	len = 0;
+
+	ret = ReadFile(hComm, readbuf, readlen, &len, NULL);
+
+	// GPSの初期値
+	if (readbuf[0] == 3){
+		mLatitude = (readbuf[1] << 24) + (readbuf[2] << 16) + (readbuf[3] << 8) + readbuf[4];
+		mLongitude = (readbuf[5] << 24) + (readbuf[6] << 16) + (readbuf[7] << 8) + readbuf[8];
+		mAccuracy = (readbuf[9] << 8) + readbuf[10];
+
+		mLatitude = mLatitude / 1000000;
+		mLongitude = mLongitude / 1000000;
+		mAccuracy = mAccuracy / 10;
+
+		printf("--GPS--\n %.6f , %.6f , %.1f \n\n", mLatitude, mLongitude, mAccuracy);
+
+		// 指定間隔で保存
+		if (isSaveGPSCSV) timeCountGPS += timerGPS.getLapTime();
+		if (timeCountGPS > minSaveInterval && isSaveGPSCSV)
+		{
+			ofsGPS << timerGPS.getNowTime() << ","
+				<< mLatitude << ","
+				<< mLongitude << ","
+				<< mAccuracy << "," << endl;
+		}
+		if (isSaveSharedMemory)
+		{
+			shMem.setShMemData(mLatitude, LATITUDE);
+			shMem.setShMemData(mLongitude, LONGITUDE);
+			shMem.setShMemData(mAccuracy, ACCURACY);
+		}
+
+	}
+	else cout << "Not GPS data" << endl;
+
+}
+
