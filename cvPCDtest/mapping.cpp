@@ -147,8 +147,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
 
 	//左右輪の回転量から移動量を計算
-	DL = receive_char1 * 23.8555 / 1.0019 ;
-	DR = receive_char2 * 23.7353;
+	DL = receive_char1 * 24.0086517664 / 1.005;
+	DR = receive_char2 * 23.751783167;
 
 	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
@@ -250,6 +250,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
+		unkoArray[i].setWriteLine(false);
 	}
 
 	//マップ作成を行うループ
