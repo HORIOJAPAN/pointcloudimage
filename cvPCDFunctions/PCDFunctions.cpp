@@ -11,9 +11,9 @@ using namespace std;
 
 #define WRITELINE
 
-//const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
+const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151023130844";
 //const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
-const string DIRPATH = "C:\\Users\\NCWC\\Source\\Repos\\pointcloudimage2\\csPCIform\\bin\\Debug\\20151023115020";
+//const string DIRPATH = "C:\\Users\\NCWC\\Source\\Repos\\pointcloudimage2\\csPCIform\\bin\\Debug\\20151023115020";
 
 
 void getAllFileName(vector<string>& fileNames, string extension)
@@ -36,9 +36,8 @@ void getAllFileName(vector<string>& fileNames, string extension)
 	});
 }
 
-void makePCImageFromPCD(string filename )
+void makePCImageFromPCD(string filename , PCImage& pcimage)
 {
-	PCImage pcimage(1000, 1000, 5);
 
 	float	x_cood, y_cood;
 	float	x_pos, y_pos;
@@ -99,7 +98,7 @@ void makePCImageFromPCD(string filename )
 
 			//cout << y_pos << endl;
 		}
-
+		if (x_cood == 0 && y_cood == 0) continue;
 		//取得した[x,y]の画素値を増加させる
 #ifdef WRITELINE
 		pcimage.writePoint(x_cood, y_cood,x_pos,y_pos);
@@ -135,18 +134,32 @@ void sortfnames(vector<string>& allFileNames, vector<string>& sortFileNames)
 	}
 }
 
-void makePcimage()
+void makePcimage( int start = 0 , int end = 0 )
 {
+	PCImage pcimage(1000, 1000, 5);
+	pcimage.isWriteLine = false;
+
 	vector<string> allFileNames;
 	vector<string> sortFileNames;
 	getAllFileName(allFileNames,"pcd");
 
 	sortfnames(allFileNames, sortFileNames);
 
-	for (int i = 0; i < sortFileNames.size(); i++)
+
+	if (start > sortFileNames.size())
+	{
+		cout << "Start value invalid " << endl;
+		int z = getchar();
+		return;
+	}
+	if (end == 0 || end > sortFileNames.size())
+	{
+		end = sortFileNames.size();
+	}
+	for (int i = start; i < sortFileNames.size(); i++)
 	{
 		cout << sortFileNames[i] << endl;
-		makePCImageFromPCD(sortFileNames[i]);
+		makePCImageFromPCD(sortFileNames[i],pcimage);
 	}
 }
 
@@ -202,7 +215,7 @@ void trimming( Mat** srcArray , Mat& dst , Size arraySize , Point originImage , 
 	if (trimUpperLeftXY.x != trimLowerRightXY.x ) XY[0] += trimLowerRightXY.x  - trimUpperLeftXY.x ;
 	if (trimUpperLeftXY.y != trimLowerRightXY.y ) XY[1] += trimLowerRightXY.y  - trimUpperLeftXY.y ;
 	
-	Mat tmpimg(XY[0] * 1000, XY[1] * 1000, CV_8U);
+	Mat tmpimg(XY[1] * 1000, XY[0] * 1000, CV_8U);
 	Rect roiRect(0, 0, 1000, 1000);
 	for (int x = trimUpperLeftXY.x; x < trimUpperLeftXY.x + XY[0]; x++)
 	{
@@ -242,7 +255,7 @@ void uniteImage()
 		pcimageArray[i] = new Mat[size_Y];
 	}
 
-	Mat margeImg(size_X*1000,size_Y*1000,CV_8U);
+	Mat margeImg(size_Y*1000,size_X*1000,CV_8U);
 	Rect roiRect(0,0,1000,1000);
 	for (int x = 0; x < size_X; x++)
 	{
@@ -264,7 +277,7 @@ void uniteImage()
 	imwrite(DIRPATH + "\\" + "margeImage.jpg", margeImg);
 
 	Mat trimImg;
-	trimming(pcimageArray, trimImg, Size(size_X, size_Y), originImg, Size(2000,2000), Point(-1000, 0));
+	trimming(pcimageArray, trimImg, Size(size_X, size_Y), originImg, Size(2000,1000), Point(500, 0));
 	waitKey();
 
 	for (int i = 0; i < size_X; i++) {
@@ -272,6 +285,8 @@ void uniteImage()
 	}
 	delete[] pcimageArray;
 }
+
+
 
 void main()
 {
