@@ -26,7 +26,7 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
-rcvAndroidSensors rcvDroid(1);
+rcvAndroidSensors rcvDroid(24);
 float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
@@ -250,6 +250,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	for (int i = 0; i < NumOfURG; i++)
 	{
 		unkoArray[i].init(URG_COM[i], URGPOS[i]);
+		unkoArray[i].setWriteLine(false);
 	}
 
 	//マップ作成を行うループ

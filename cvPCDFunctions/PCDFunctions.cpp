@@ -12,7 +12,8 @@ using namespace std;
 #define WRITELINE
 
 //const string DIRPATH = "C:\\Users\\user\\Documents\\なかむら\\つくばチャレンジ2015\\測定データ\\20151017141744";
-const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
+//const string DIRPATH = "C:\\Users\\user\\Documents\\Visual Studio 2013\\Projects\\cvPCDtest\\cvPCDFunctions\\20151016165345";
+const string DIRPATH = "C:\\Users\\NCWC\\Source\\Repos\\pointcloudimage2\\csPCIform\\bin\\Debug\\20151023115020";
 
 
 void getAllFileName(vector<string>& fileNames, string extension)
@@ -274,8 +275,8 @@ void uniteImage()
 
 void main()
 {
-	//makePcimage();
-	uniteImage();
+	makePcimage();
+	//uniteImage();
 
 	waitKey();
 }
