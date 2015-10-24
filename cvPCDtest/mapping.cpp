@@ -26,7 +26,7 @@ enum {
 	CAPTURE_TIMES = 1,
 };
 
-rcvAndroidSensors rcvDroid(24);
+rcvAndroidSensors rcvDroid(1);
 float defaultOrientation[3];
 
 float chairpos_old = 0.0;//車いすの車輪の直前の進行 
@@ -147,8 +147,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	//cout << "\n\n\ndata_L:" << data_L << " ,  data_R:" << data_R << endl << endl;
 
 	//左右輪の回転量から移動量を計算
-	DL = receive_char1 * 23.8555 / 1.0019 ;
-	DR = receive_char2 * 23.7353;
+	DL = receive_char1 * 24.0086517664 / 1.005 ;
+	DR = receive_char2 * 23.751783167;
 
 	//移動距離，回転量を計算
 	DIS = (DL + DR) / 2;
