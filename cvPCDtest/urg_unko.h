@@ -74,6 +74,7 @@ public:
 	urg_unko();
 	//デストラクタ
 	~urg_unko();
+	void save();
 
 	//自身の初期化処理を行う
 	void init(int COM, float pos[]);

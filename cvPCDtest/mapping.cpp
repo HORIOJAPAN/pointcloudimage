@@ -14,9 +14,9 @@
 
 #define PI 3.14159265359
 
-//#define DEBUG_WRITELINE
+#define DEBUG_WRITELINE
 
-#define KAISUU 10
+//#define KAISUU 10
 
 using namespace std;
 using namespace cv;
@@ -325,6 +325,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		}
 
 	}
+	for (int i = 0; i < NumOfURG; i++)
+	{
+		unkoArray[i].save();
+	}
 
 	//Arduino‚Ìƒnƒ“ƒhƒ‹‚ð‰ð•ú
 	CommClose(handle_ARDUINO);
@@ -408,6 +412,7 @@ int urg_unko::disconnectURG(){
 */
 urg_unko::~urg_unko()
 {
+	pcimage.savePCImage();
 	disconnectURG();
 }
 
@@ -651,4 +656,8 @@ void urg_unko::setWriteLine(bool isLine)
 std::string	urg_unko::getDirName()
 {
 	return pcimage.getDirname();
+}
+void urg_unko::save()
+{
+	pcimage.savePCImage();
 }

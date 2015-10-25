@@ -90,6 +90,7 @@ public:
 	//int savePCImage();
 	//画像を保存して領域を解放する
 	void savePCImage(int x, int y);
+	void savePCImage();
 
 	// 保存したディレクトリ名を取得
 	std::string getDirname();
