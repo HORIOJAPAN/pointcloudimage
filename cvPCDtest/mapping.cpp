@@ -14,7 +14,9 @@
 
 #define PI 3.14159265359
 
-#define DEBUG_WRITELINE
+//#define DEBUG_WRITELINE
+
+#define KAISUU 10
 
 using namespace std;
 using namespace cv;
@@ -255,8 +257,11 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 	//マップ作成を行うループ
 	//'q'を入力するとループを抜ける
+#ifndef KAISUU
 	while (true){
-
+#else
+	for (int i = 0; i < 10; i++){
+#endif
 		// 処理の間隔を指定時間あける
 		if (timer.getLapTime(1, Timer::millisec, false) < shMemInt.getShMemData(INTERVALTIME)) continue;
 		interval = timer.getLapTime();

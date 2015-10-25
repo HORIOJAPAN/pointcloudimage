@@ -25,7 +25,7 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum, *thi
 	img_width = width;
 	img_height = height;
 	coefficient = 100 / resolution;
-	imgval_increment = 80;
+	imgval_increment = 25;
 	limit = 10;
 	limitpix = limit * coefficient;
 
