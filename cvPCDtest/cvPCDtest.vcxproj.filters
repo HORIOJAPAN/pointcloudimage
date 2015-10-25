@@ -24,13 +24,13 @@
     <ClCompile Include="mapping.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SourceReference.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="receiveAndroidSensors.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="urg_unko.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

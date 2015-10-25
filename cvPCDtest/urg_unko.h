@@ -45,9 +45,19 @@ private:
 
 	PCImage pcimage;	//マップ画像作成用クラス
 
-	/*
-	*	privateなメソッド
-	*/
+	float scaninterval = 0.0;//計測を実施する最低間隔[mm]
+
+	enum {
+		CAPTURE_TIMES = 1,
+	};
+
+	float currentCoord_x, currentCoord_y;
+	float distance , distance_old;
+	float radian;
+
+	/***********************
+	 *	privateなメソッド  *
+	 ***********************/
 
 	//URGとの接続を切断
 	int disconnectURG();
@@ -79,10 +89,13 @@ public:
 	//自身の初期化処理を行う
 	void init(int COM, float pos[]);
 	//URGからデータを取得するメソッド
-	int getData4URG(float& dist, float& rad);
+	int getData4URG(float dist, float rad);
 
 	void setWriteLine(bool isLine);
 	std::string	getDirName();
+
+	void updateCurrentCoord(float coord_x, float coord_y);
+	void updateCurrentCoord(float coordXY[]);
 };
 
 
