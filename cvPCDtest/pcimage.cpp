@@ -69,7 +69,6 @@ PCImage::PCImage(int resolution )
 //‰ð•ú‚³‚ê‚Ä‚¢‚È‚¢‰æ‘œ—Ìˆæ‚ª‚ ‚ê‚Î”O‚Ì‚½‚ß•Û‘¶‚µ‚Ä‚¨‚­
 PCImage::~PCImage()
 {
-	pcimage[nowimage].release();
 	for (int i = 0; i < imageNum; i++)
 		if (!pcimage[i].empty())
 		{

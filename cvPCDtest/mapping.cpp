@@ -16,7 +16,7 @@
 
 #define DEBUG_WRITELINE
 
-//#define KAISUU 10
+#define KAISUU 10
 
 using namespace std;
 using namespace cv;
@@ -296,16 +296,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 		//'q'が入力されたらループを抜ける
 		// もしくは共有メモリの0番地に0が入力さ(ry
-		if (cv::waitKey(1) == 'q' || shMemInt.getShMemData(0))
-		{
-			//Newで確保した配列の解放
-			delete[] unkoArray;
-
-			// 表示している画像を閉じる
-			destroyAllWindows();
-
-			break;
-		}
+		if (cv::waitKey(1) == 'q' || shMemInt.getShMemData(0)) break;
 
 		// メーターの表示を設定
 		{
@@ -325,11 +316,12 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		}
 
 	}
-	for (int i = 0; i < NumOfURG; i++)
-	{
-		unkoArray[i].save();
-	}
 
+
+	//Newで確保した配列の解放
+	delete[] unkoArray;
+	// 表示している画像を閉じる
+	destroyAllWindows();
 	//Arduinoのハンドルを解放
 	CommClose(handle_ARDUINO);
 
