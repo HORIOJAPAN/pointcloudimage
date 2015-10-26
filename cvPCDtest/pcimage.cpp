@@ -8,6 +8,8 @@
 using namespace cv;
 using namespace std;
 
+bool PCImage::isColor = false;
+
 /*------------------------------
 *--↓--PCImageクラスの定義--↓--
 *-------------------------------*/
@@ -43,7 +45,7 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum, *thi
 	//pcimage[0]を準備する
 	nowimage = 0;
 	pcimage[nowimage].setPCI(0, 0);
-	pcimage[nowimage] = Mat(Size(width, height), CV_8U, Scalar::all(0));
+	pcimage[nowimage] = initImage(width, height);
 
 
 	cout << "Width:" << pcimage[nowimage].cols
@@ -66,7 +68,7 @@ PCImage::PCImage(int resolution )
 }
 
 //デストラクタ
-//解放されていない画像領域があれば念のため保存しておく
+//解放されていない画像領域があれば保存しておく
 PCImage::~PCImage()
 {
 	for (int i = 0; i < imageNum; i++)
@@ -256,7 +258,6 @@ void PCImage::getNowTime(string& nowstr){
 	nowstr = szTime;
 }
 
-
 /*
 *
 *  ⊂二二二（ ＾ω＾）二⊃     画像領域管理の中枢     ⊂二（＾ω＾ ）二二二⊃
@@ -398,7 +399,7 @@ int PCImage::loadPCImage(int emptyImageNum)
 	// 画像が存在していなかった場合は新規作成
 	if (pcimage[emptyImageNum].empty())
 	{
-		pcimage[emptyImageNum] = Mat(Size(img_width, img_height), CV_8U, Scalar::all(0));
+		pcimage[emptyImageNum] = initImage(img_width,img_height);
 	}
 	return 0;
 }
@@ -486,6 +487,24 @@ bool PCImage::checkPrepare(int X, int Y)
 		if (pcimage[i].isCoordinates(X, Y)) return true;
 	}
 	return false;
+}
+
+Mat PCImage::initImage(int width, int height)
+{
+	if (isColor)
+		return Mat(Size(width, height), CV_8UC3, Scalar::all(0));
+	else
+		return Mat(Size(width, height), CV_8U, Scalar::all(0));
+}
+
+void PCImage::setColor(BGR bgr)
+{
+	if (isColor)
+	{
+		if (bgr & B) color[0] = true;
+		if (bgr & G) color[1] = true;
+		if (bgr & R) color[2] = true;
+	}
 }
 
 /*------------------------------
@@ -587,10 +606,7 @@ int PCImage::PCI::writePoint(float x_val, float y_val)
 	}
 
 	//取得した[x,y]の画素値を増加させる
-	if (data[(int)y_val * cols + (int)x_val] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
-		data[(int)y_val * cols + (int)x_val] += pciOut.imgval_increment;
-	}
-	else data[(int)y_val * cols + (int)x_val] = 255;
+	write((int)x_val, (int)y_val);
 
 	return 0;
 }
@@ -692,5 +708,23 @@ void PCImage::PCI::checkOverRange(int x_coord, int y_coord, int& ret_x, int& ret
 	else if (y_coord >= rows)
 	{
 		ret_y = 1;
+	}
+}
+
+void PCImage::PCI::write(int x, int y)
+{
+	if (!pciOut.isColor){
+		if (data[y * cols + x] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
+			data[y * cols + x] += pciOut.imgval_increment;
+		}
+		else data[y * cols + x] = 255;
+	}
+	else
+	{
+		for (int c = 0; c < this->channels();c++)
+		if (data[y * cols + x + c] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
+			data[y * cols + x + c] += pciOut.imgval_increment;
+		}
+		else data[y * cols + x + c] = 255;
 	}
 }

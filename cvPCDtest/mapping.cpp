@@ -229,6 +229,9 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	//エンコーダの初期化
 	Encoder(handle_ARDUINO, dist, rad);
 
+	PCImage::isColor = true;
+	PCImage::BGR color[2] = { PCImage::B, PCImage::G };
+
 	urg_unko::initPCImage(PCImage(imgWidth, imgHeight, imgResolution));
 
 	//接続したURGの数だけurg_unko型オブジェクトを初期化
@@ -263,6 +266,7 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		for (int i = 0; i < NumOfURG; i++)
 		{
 			unkoArray[i].updateCurrentCoord(currentCoord);
+			unkoArray[i].setPCImageColor(color[i]);
 			unkoArray[i].getData4URG(dist,chairdist_old, rad);
 		}
 		

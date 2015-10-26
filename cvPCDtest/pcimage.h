@@ -19,6 +19,9 @@ public:
 	std::string dirname;					//作成するディレクトリ名
 
 	bool isWriteLine = true;					// マップに自己位置から測定点までの線を描画するかどうか
+	static bool isColor;
+
+	enum BGR{B = 1 , G = 2 , R = 4 , GRAY = 8};
 
 private:
 	std::vector<PCI> pcimage;				//画像領域の配列
@@ -35,6 +38,8 @@ private:
 	const int lineVal = 200;		// 線を描画するときの画素値
 
 	cv::Mat arrowpic;
+
+	bool color[3];
 
 /***********************
 *	↓privateメソッド↓
@@ -66,6 +71,8 @@ private:
 	void showArrow();
 
 	void showNowPoint(float x_val , float y_val);
+
+	static cv::Mat initImage(int width,int height);
 
 public:
 	//コンストラクタ
@@ -99,6 +106,8 @@ public:
 
 	//現在の時刻を文字列で取得する
 	static void getNowTime(std::string& nowstr);
+
+	void setColor(BGR bgr);
 	
 };
 
@@ -112,6 +121,9 @@ private:
 
 	std::string			name;					//保存時の名前
 	int					imageNumXY[2];			//画像の位置
+
+
+	void write(int x, int y);
 
 public:
 	PCI(PCImage& pcimage_outer);
