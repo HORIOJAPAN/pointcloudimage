@@ -8,7 +8,7 @@
 using namespace cv;
 using namespace std;
 
-bool PCImage::isColor = false;
+bool PCImage::isColor = true;
 
 /*------------------------------
 *--↓--PCImageクラスの定義--↓--
@@ -31,6 +31,7 @@ PCImage::PCImage(int width, int height, int resolution) : pcimage(imageNum, *thi
 	limit = 10;
 	limitpix = limit * coefficient;
 
+	for (int i = 0; i < sizeof(color); i++) color[i] = false;
 	prepareArrow();
 
 	//年月日時分秒で命名したディレクトリを作成
@@ -116,7 +117,8 @@ void PCImage::showArrow()
 void PCImage::showNowPoint(float x_val, float y_val)
 {
 	Mat showpic(Size(pcimage[nowimage].cols, pcimage[nowimage].rows), CV_8UC3);
-	cvtColor(pcimage[nowimage], showpic, CV_GRAY2BGR);
+	//cvtColor(pcimage[nowimage], showpic, CV_GRAY2BGR);
+	showpic = pcimage[nowimage].clone();
 
 	//x,yの値を指定した解像度に合わせる
 	int xi = int(x_val * coefficient);
@@ -284,6 +286,8 @@ int PCImage::checkPosition(float pos_x, float pos_y)
 	// 座標を画像内に合わせる
 	xi = xi - XY[0] * img_width + limitpix;
 	yi = yi - XY[1] * img_height + img_height / 2;
+
+	cout << "Position:" << xi << "," << yi << endl;
 
 	// 自己位置が指定範囲を超えていたら...
 	if (xi < limitpix || img_width - limitpix < xi || yi < limitpix || img_height - limitpix < yi){
@@ -502,8 +506,11 @@ void PCImage::setColor(BGR bgr)
 	if (isColor)
 	{
 		if (bgr & B) color[0] = true;
+		else color[0] = false;
 		if (bgr & G) color[1] = true;
+		else color[1] = false;
 		if (bgr & R) color[2] = true;
+		else color[2] = false;
 	}
 }
 
@@ -721,10 +728,11 @@ void PCImage::PCI::write(int x, int y)
 	}
 	else
 	{
-		for (int c = 0; c < this->channels();c++)
-		if (data[y * cols + x + c] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
-			data[y * cols + x + c] += pciOut.imgval_increment;
+		for (int c = 0; c < this->channels(); c++){
+			if (data[y * this->step[0] + x * this->elemSize() + c] < (pciOut.imgval_increment * (255 / pciOut.imgval_increment))){
+				data[y * this->step[0] + x * this->elemSize() + c] += pciOut.imgval_increment * pciOut.color[c];
+			}
+			else data[y * this->step + x * this->elemSize() + c] = 255 * pciOut.color[c];
 		}
-		else data[y * cols + x + c] = 255;
 	}
 }
