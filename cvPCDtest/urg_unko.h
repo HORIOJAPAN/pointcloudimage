@@ -5,6 +5,7 @@
 #include "urg_utils.h"
 #include "urg_open.h"
 #include "pcimage.h"
+//#include "open_urg_sensor.c"
 
 #include <Windows.h>
 #include <fstream>
@@ -59,9 +60,9 @@ private:
 		CAPTURE_TIMES = 1,
 	};
 
-	float currentCoord_x, currentCoord_y;
-	float distance , distance_old;
-	float radian;
+	float currentCoord_x = 0.0, currentCoord_y = 0.0;
+	float distance = 0.0, distance_old = 0.0;
+	float radian = 0.0;
 
 	/***********************
 	 *	privateなメソッド  *
@@ -97,7 +98,7 @@ public:
 	//自身の初期化処理を行う
 	void init(int COM, float pos[]);
 	//URGからデータを取得するメソッド
-	int getData4URG(float dist, float rad);
+	int getData4URG(float& dist, float& old, float& rad);
 
 	void setWriteLine(bool isLine);
 	std::string	getDirName();

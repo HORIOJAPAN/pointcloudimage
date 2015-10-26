@@ -1,6 +1,5 @@
 #include "urg_unko.h"
 #include "SharedMemory.h"
-#include "open_urg_sensor.c"
 #include "Timer.h"
 #include "receiveAndroidSensors.h"
 
@@ -12,7 +11,7 @@
 
 #define PI 3.14159265359
 
-#define KAISUU 10
+//#define KAISUU 10
 
 using namespace std;
 using namespace cv;
@@ -182,6 +181,10 @@ void getArduinoHandle(int arduinoCOM , HANDLE& hComm)
 */
 void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG)
 {
+	/**********************
+	 *　↓　変数の宣言　↓
+	 **********************/
+
 	HANDLE handle_ARDUINO;	//Arduino用ハンドル
 
 	urg_unko *unkoArray = new urg_unko[NumOfURG];	//urg_unko型変数の配列
@@ -210,6 +213,10 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	enum {ISEND , INTERVALTIME};
 	shMemInt.setShMemData(false, ISEND);
 
+	/****************************
+	*　↓　もろもろの初期化　↓
+	*****************************/
+
 	// 姿勢表示用矢印の読み込み
 	arrowpic = imread("arrow.jpg");
 	if (arrowpic.empty()) cout << "No arrow image" << endl;
@@ -229,12 +236,16 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		unkoArray[i].setWriteLine(false);
 	}
 
+	/*********************
+	*　↓　メイン処理　↓
+	**********************/
+
 	//マップ作成を行うループ
 	//'q'を入力するとループを抜ける
 #ifndef KAISUU
 	while (true){
 #else
-	for (int i = 0; i < 10; i++){
+	for (int i = 0; i < KAISUU; i++){
 #endif
 		// 処理の間隔を指定時間あける
 		if (timer.getLapTime(1, Timer::millisec, false) < shMemInt.getShMemData(INTERVALTIME)) continue;
@@ -245,20 +256,20 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 
 		//積算した距離を格納
 		chairdist = dist;
-
+		
+		//URGからデータを取得し，エンコーダの値を基にマップ，pcdファイルを作成
+		for (int i = 0; i < NumOfURG; i++)
+		{
+			unkoArray[i].updateCurrentCoord(currentCoord);
+			unkoArray[i].getData4URG(dist,chairdist_old, rad);
+		}
+		
 		//現在の位置を更新
 		//測定開始時点を基準に
 		//		xの正：前
 		//		yの正：左
 		currentCoord[0] += cos(rad) * (chairdist - chairdist_old);
 		currentCoord[1] -= sin(rad) * (chairdist - chairdist_old);
-
-		//URGからデータを取得し，エンコーダの値を基にマップ，pcdファイルを作成
-		for (int i = 0; i < NumOfURG; i++)
-		{
-			unkoArray[i].updateCurrentCoord(currentCoord);
-			unkoArray[i].getData4URG(dist, rad);
-		}
 
 		//現在の移動量を保存
 		chairdist_old = chairdist;
@@ -285,7 +296,6 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 		}
 
 	}
-
 
 	//Newで確保した配列の解放
 	delete[] unkoArray;
