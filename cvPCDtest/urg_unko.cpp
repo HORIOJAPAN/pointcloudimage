@@ -40,7 +40,7 @@ void urg_unko::init(int COM, float pos[])
 	connectURG();
 
 	//以下，メンバの初期化
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < sizeof(urgpos); i++)
 	{
 		urgpos[i] = pos[i];
 	}
@@ -206,8 +206,12 @@ void urg_unko::set_3D_surface(int data_n)
 			z = 120.0;
 
 			//2次元平面の座標変換
-			pointpos[0] = +cos(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + sin(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_x;
-			pointpos[1] = -sin(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + cos(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_y;
+			//pointpos[0] = +cos(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + sin(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_x;
+			//pointpos[1] = -sin(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + cos(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_y;
+
+			pointpos[0] = +cos(radian) * x + sin(radian) * y + cos(radian) * (distance - distance_old + urgpos[1]) + currentCoord_x;
+			pointpos[1] = -sin(radian) * x + cos(radian) * y - sin(radian) * (distance - distance_old + urgpos[1]) + currentCoord_y;
+
 			pointpos[2] = z;
 
 			// 座標を保存

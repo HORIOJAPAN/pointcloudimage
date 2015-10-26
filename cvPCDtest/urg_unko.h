@@ -11,6 +11,10 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
+
+#define DEBUG_WRITELINE
+
+
 //接続したURGの個数を自動で判断するようにしたマクロ
 #define getDataUNKO(aURGCOM , aURGPOS , ARDUINOCOM) getDataUNKOOrigin( (aURGCOM),(aURGPOS),(ARDUINOCOM),sizeof((aURGCOM))/sizeof(aURGCOM[0])) 
 
@@ -40,7 +44,7 @@ private:
 	//float urgpos[3];	
 	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
 
-	float urgpos[4] = { 0.0 , 0.0 , 0.0 , 0.0 };	
+	float urgpos[4];	
 	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からのx方向の距離，ｙ方向の距離，および水平面からの俯角
 	
 	urg_t urg;			//URGオブジェクト

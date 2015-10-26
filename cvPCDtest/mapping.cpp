@@ -12,7 +12,6 @@
 
 #define PI 3.14159265359
 
-#define DEBUG_WRITELINE
 #define KAISUU 10
 
 using namespace std;
