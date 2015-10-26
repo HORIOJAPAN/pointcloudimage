@@ -12,7 +12,6 @@
 
 #define PI 3.14159265359
 
-#define DEBUG_WRITELINE
 #define KAISUU 10
 
 using namespace std;
@@ -28,7 +27,7 @@ Mat rotatepic;
 Mat affine_mat;
 
 bool isInitialized = false;
-
+extern int imgWidth, imgHeight, imgResolution;
 
 //左右輪のエンコーダ生データ積算用
 int data_L = 0, data_R = 0;
@@ -222,6 +221,8 @@ void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int Nu
 	getArduinoHandle(ARDUINO_COM,handle_ARDUINO);
 	//エンコーダの初期化
 	Encoder(handle_ARDUINO, dist, rad);
+
+	urg_unko::initPCImage(PCImage(imgWidth, imgHeight, imgResolution));
 
 	//接続したURGの数だけurg_unko型オブジェクトを初期化
 	for (int i = 0; i < NumOfURG; i++)

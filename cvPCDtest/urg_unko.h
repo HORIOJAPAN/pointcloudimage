@@ -11,6 +11,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
+#define DEBUG_WRITELINE
+
 //接続したURGの個数を自動で判断するようにしたマクロ
 #define getDataUNKO(aURGCOM , aURGPOS , ARDUINOCOM) getDataUNKOOrigin( (aURGCOM),(aURGPOS),(ARDUINOCOM),sizeof((aURGCOM))/sizeof(aURGCOM[0])) 
 
@@ -47,7 +49,7 @@ private:
 	long *data = NULL;	
 	long time_stamp;
 
-	PCImage pcimage;	//マップ画像作成用クラス
+	static PCImage pcimage;	//マップ画像作成用クラス
 
 	float scaninterval = 0.0;//計測を実施する最低間隔[mm]
 
@@ -88,6 +90,7 @@ public:
 	urg_unko();
 	//デストラクタ
 	~urg_unko();
+
 	void save();
 
 	//自身の初期化処理を行う
@@ -100,6 +103,9 @@ public:
 
 	void updateCurrentCoord(float coord_x, float coord_y);
 	void updateCurrentCoord(float coordXY[]);
+
+	static void initPCImage( PCImage& pci );
+
 };
 
 

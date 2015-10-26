@@ -16,7 +16,7 @@ extern int imgWidth, imgHeight, imgResolution;
 *		なし
 */
 // urg_unkoを配列で宣言したときに引数を渡せないのでpcimageの引数はとりあえずグローバル変数から受け取る
-urg_unko::urg_unko() :pcimage(::imgWidth, ::imgHeight, ::imgResolution)
+urg_unko::urg_unko() //:pcimage(::imgWidth, ::imgHeight, ::imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
@@ -334,4 +334,9 @@ void urg_unko::updateCurrentCoord(float coordXY[])
 {
 	currentCoord_x = coordXY[0];
 	currentCoord_y = coordXY[1];
+}
+
+void urg_unko::initPCImage(PCImage& pci)
+{
+	pcimage = pci;
 }
