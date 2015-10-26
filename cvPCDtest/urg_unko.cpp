@@ -10,6 +10,8 @@ using namespace std;
 // main.cppでコマンドライン引数から受け取る
 extern int imgWidth, imgHeight, imgResolution;
 
+PCImage urg_unko::pcimage;
+
 /*
 *	概要:
 *		コンストラクタ
@@ -80,7 +82,6 @@ int urg_unko::disconnectURG(){
 */
 urg_unko::~urg_unko()
 {
-	pcimage.savePCImage();
 	disconnectURG();
 }
 
@@ -328,11 +329,6 @@ std::string	urg_unko::getDirName()
 {
 	return pcimage.getDirname();
 }
-void urg_unko::save()
-{
-	pcimage.savePCImage();
-}
-
 void urg_unko::updateCurrentCoord(float coord_x, float coord_y)
 {
 	currentCoord_x = coord_x;

@@ -76,6 +76,11 @@ PCImage::~PCImage()
 		}
 }
 
+PCImage& PCImage::operator = (PCImage& pci)
+{
+	return *this;
+}
+
 void PCImage::prepareArrow()
 {
 	arrowpic = imread("arrow.jpg");

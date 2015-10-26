@@ -75,6 +75,8 @@ public:
 	//デストラクタ
 	~PCImage();
 
+	PCImage& operator=(PCImage& pci);
+
 	// 画像に点を書き込む
 	void writePoint(float x_val, float y_val);
 	// 点を書き込んだ後に線を描画する
