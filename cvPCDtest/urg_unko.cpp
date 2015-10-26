@@ -1,4 +1,8 @@
+#define _USE_MATH_DEFINES
+
 #include "urg_unko.h"
+#include "open_urg_sensor.c"
+
 
 using namespace std;
 
@@ -40,7 +44,7 @@ void urg_unko::init(int COM, float pos[])
 	connectURG();
 
 	//以下，メンバの初期化
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		urgpos[i] = pos[i];
 	}
@@ -116,7 +120,7 @@ int urg_unko::connectURG(){
 *	返り値:
 *		0
 */
-int urg_unko::getData4URG(float dist, float rad){
+int urg_unko::getData4URG(float& dist,float& old, float& rad){
 	//データ取得
 #if 0
 	//データの取得範囲を変更する場合
@@ -141,7 +145,7 @@ int urg_unko::getData4URG(float dist, float rad){
 		}
 
 		//積算した距離,回転角を格納
-		distance_old = distance;
+		distance_old = old;
 		distance = dist;
 		radian = rad;
 
@@ -206,8 +210,12 @@ void urg_unko::set_3D_surface(int data_n)
 			z = 120.0;
 
 			//2次元平面の座標変換
-			pointpos[0] = +cos(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + sin(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_x;
-			pointpos[1] = -sin(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + cos(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_y;
+			//pointpos[0] = +cos(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + sin(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_x;
+			//pointpos[1] = -sin(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + cos(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_y;
+
+			pointpos[0] = +cos(this->radian) * x + sin(this->radian) * y + cos(this->radian) * (distance - distance_old + urgpos[1]) + currentCoord_x;
+			pointpos[1] = -sin(this->radian) * x + cos(this->radian) * y - sin(this->radian) * (distance - distance_old + urgpos[1]) + currentCoord_y;
+
 			pointpos[2] = z;
 
 			// 座標を保存

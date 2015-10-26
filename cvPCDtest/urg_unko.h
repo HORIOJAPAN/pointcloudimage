@@ -11,7 +11,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
+
 #define DEBUG_WRITELINE
+
 
 //接続したURGの個数を自動で判断するようにしたマクロ
 #define getDataUNKO(aURGCOM , aURGPOS , ARDUINOCOM) getDataUNKOOrigin( (aURGCOM),(aURGPOS),(ARDUINOCOM),sizeof((aURGCOM))/sizeof(aURGCOM[0])) 
@@ -42,7 +44,7 @@ private:
 	//float urgpos[3];	
 	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からの距離，および水平面からの俯角
 
-	float urgpos[4] = { 0.0 , 0.0 , 0.0 , 0.0 };	
+	float urgpos[4];	
 	//NCWCの回転中心から見たURGの位置．センサの地面からの高さ，センサの基準位置からのx方向の距離，ｙ方向の距離，および水平面からの俯角
 	
 	urg_t urg;			//URGオブジェクト
@@ -57,9 +59,9 @@ private:
 		CAPTURE_TIMES = 1,
 	};
 
-	float currentCoord_x, currentCoord_y;
-	float distance , distance_old;
-	float radian;
+	float currentCoord_x = 0.0, currentCoord_y = 0.0;
+	float distance = 0.0, distance_old = 0.0;
+	float radian = 0.0;
 
 	/***********************
 	 *	privateなメソッド  *
@@ -96,7 +98,7 @@ public:
 	//自身の初期化処理を行う
 	void init(int COM, float pos[]);
 	//URGからデータを取得するメソッド
-	int getData4URG(float dist, float rad);
+	int getData4URG(float& dist, float& old, float& rad);
 
 	void setWriteLine(bool isLine);
 	std::string	getDirName();
