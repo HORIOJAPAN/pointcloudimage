@@ -29,6 +29,8 @@ public:
 	//デストラクタ
 	~SharedMemory();
 
+	SharedMemory& operator=(SharedMemory& shmem);
+
 	//共有メモリにデータを書き込む
 	void setShMemData( T setData , int offset = 0 );
 	//データを取得
@@ -134,6 +136,7 @@ bool SharedMemory<T>::isCreated()
 {
 	return mIsCreated;
 }
+
 
 
 #endif

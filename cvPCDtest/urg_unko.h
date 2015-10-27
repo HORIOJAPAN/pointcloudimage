@@ -5,6 +5,7 @@
 #include "urg_utils.h"
 #include "urg_open.h"
 #include "pcimage.h"
+#include "SharedMemory.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -62,6 +63,9 @@ private:
 	float currentCoord_x = 0.0, currentCoord_y = 0.0;
 	float distance = 0.0, distance_old = 0.0;
 	float radian = 0.0;
+
+	SharedMemory<int> shMem;
+	enum {EMARGENCY};
 
 	/***********************
 	 *	private‚Èƒƒ\ƒbƒh  *

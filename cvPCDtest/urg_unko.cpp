@@ -23,6 +23,7 @@ PCImage urg_unko::pcimage;
 */
 // urg_unkoを配列で宣言したときに引数を渡せないのでpcimageの引数はとりあえずグローバル変数から受け取る
 urg_unko::urg_unko() //:pcimage(::imgWidth, ::imgHeight, ::imgResolution)
+	:shMem(SharedMemory<int>("unko"))
 {
 	COMport = 0;
 	pcdnum = 0;
@@ -212,7 +213,7 @@ void urg_unko::set_3D_surface(int data_n)
 
 			if (x < 1000 && abs(y) < 1000)
 			{
-				int i;
+				shMem.setShMemData(true, EMARGENCY);
 			}
 
 			//2次元平面の座標変換

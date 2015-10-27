@@ -86,6 +86,7 @@
     <ClInclude Include="..\..\Timer\Timer\Timer.h" />
     <ClInclude Include="pcimage.h" />
     <ClInclude Include="receiveAndroidSensors.h" />
+    <ClInclude Include="SharedMemory.h" />
     <ClInclude Include="urg_open.h" />
     <ClInclude Include="urg_unko.h" />
   </ItemGroup>
