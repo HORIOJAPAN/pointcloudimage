@@ -123,7 +123,7 @@ int urg_unko::connectURG(){
 */
 int urg_unko::getData4URG(float& dist,float& old, float& rad){
 	//データ取得
-#if 0
+#if 1
 	//データの取得範囲を変更する場合
 	urg_set_scanning_parameter(&urg,
 		urg_deg2step(&urg, -90),
@@ -210,6 +210,11 @@ void urg_unko::set_3D_surface(int data_n)
 			y = (float)(l * sin(radian));
 			z = 120.0;
 
+			if (x < 1000 && abs(y) < 1000)
+			{
+				int i;
+			}
+
 			//2次元平面の座標変換
 			//pointpos[0] = +cos(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + sin(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_x;
 			//pointpos[1] = -sin(radian + urgpos[3]) * (x + distance - distance_old + urgpos[1]) + cos(radian + urgpos[3]) * (y + urgpos[2]) + currentCoord_y;
@@ -218,6 +223,8 @@ void urg_unko::set_3D_surface(int data_n)
 			pointpos[1] = -sin(this->radian) * x + cos(this->radian) * y - sin(this->radian) * (distance - distance_old + urgpos[1]) + currentCoord_y;
 
 			pointpos[2] = z;
+
+			
 
 			// 座標を保存
 #ifndef DEBUG_WRITELINE
