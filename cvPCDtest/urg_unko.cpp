@@ -212,7 +212,7 @@ void urg_unko::set_3D_surface(int data_n)
 
 			if (x < 1000 && abs(y) < 1000)
 			{
-				int i;
+				cout << "unko" << endl;
 			}
 
 			//2ŽŸŒ³•½–Ê‚ÌÀ•W•ÏŠ·
