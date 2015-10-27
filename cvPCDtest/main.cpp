@@ -6,7 +6,7 @@ int imgWidth, imgHeight, imgResolution;
 int main(int argc, char* argv[])
 {
 	//URGのCOMポートを指定
-	int URG_COM[] = { 6, 23 };
+	int URG_COM[] = { 19, 20 };
 
 	//URGの位置を指定
 	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
