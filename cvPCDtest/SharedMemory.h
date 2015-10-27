@@ -39,6 +39,8 @@ public:
 	////オブジェクトを新規作成したかどうか取得
 	bool isCreated();
 
+	void reset();
+
 };
 
 //↓↓↓↓ 以下実装部分 ↓↓↓↓
@@ -137,6 +139,11 @@ bool SharedMemory<T>::isCreated()
 	return mIsCreated;
 }
 
+template < typename T >
+void SharedMemory<T>::reset()
+{
+	SharedMemory::getShMem();
+}
 
 
 #endif

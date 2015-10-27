@@ -27,6 +27,8 @@ urg_unko::urg_unko() //:pcimage(::imgWidth, ::imgHeight, ::imgResolution)
 {
 	COMport = 0;
 	pcdnum = 0;
+
+	shMem.reset();
 }
 
 /*
