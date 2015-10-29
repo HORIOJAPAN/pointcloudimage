@@ -6,11 +6,11 @@ int imgWidth, imgHeight, imgResolution;
 int main(int argc, char* argv[])
 {
 	//URGのCOMポートを指定
-	int URG_COM[] = { 19, 20 };
+	int URG_COM[] = { 6, 27 };
 
 	//URGの位置を指定
-	float urgPOS[][3] = { 1100.0, 285.0, 0.0,
-		20.0, 443.0, 0.0 };
+	float urgPOS[][4] = { 20.0, 350.0, 280.0, 0.5236,
+		20.0, 350.0, -280.0, -0.5236 };
 
 	//ArduinoのCOMポートを指定
 	int ARDUINO_COM = 10;

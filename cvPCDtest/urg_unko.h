@@ -24,7 +24,7 @@ int CommClose(HANDLE hComm);
 //Arduinoのハンドルを取得
 void getArduinoHandle(int arduinoCOM, HANDLE& hComm);
 //urg_unkoのmainループ
-void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG);
+void getDataUNKOOrigin(int URG_COM[], float URGPOS[][4], int ARDUINO_COM, int NumOfURG);
 
 /*
 *

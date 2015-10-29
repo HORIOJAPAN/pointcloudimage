@@ -179,7 +179,7 @@ void getArduinoHandle(int arduinoCOM , HANDLE& hComm)
 *	返り値:
 *		なし
 */
-void getDataUNKOOrigin(int URG_COM[], float URGPOS[][3], int ARDUINO_COM, int NumOfURG)
+void getDataUNKOOrigin(int URG_COM[], float URGPOS[][4], int ARDUINO_COM, int NumOfURG)
 {
 	/**********************
 	 *　↓　変数の宣言　↓
