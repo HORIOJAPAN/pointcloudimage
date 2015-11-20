@@ -218,7 +218,6 @@ void urg_unko::set_3D_surface(int data_n)
 			// ƒZƒ“ƒT‹óŠÔ‚Ìæ“¾À•W
 			x = (float)(l * cos(radian) + urgpos[3]);
 			y = -(float)(l * sin(radian) + urgpos[3]);
-			z = 0.0;
 
 			if (x < 1000 && abs(y) < 1000)
 			{
@@ -230,8 +229,8 @@ void urg_unko::set_3D_surface(int data_n)
 			pointpos[1] = -sin(this->radian + urgpos[3]) * x + cos(this->radian + urgpos[3]) * y - sin(this->radian) * (distance - distance_old + urgpos[1]) + cos(this->radian) * urgpos[2] + currentCoord_y;
 			pointpos[2] = z;*/
 
-			pointpos[0] = - sin(this->radian) * y + cos(this->radian) * z - sin(this->radian) * (distance - distance_old + urgpos[1]) + sin(this->radian) * urgpos[2] + currentCoord_x;
-			pointpos[1] = + cos(this->radian) * y + sin(this->radian) * z + cos(this->radian) * (distance - distance_old + urgpos[1]) + cos(this->radian) * urgpos[2] + currentCoord_y;
+			pointpos[0] = -sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) - sin(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_x;
+			pointpos[1] = +cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_y;
 			pointpos[2] = x + urgpos[0];
 			
 
