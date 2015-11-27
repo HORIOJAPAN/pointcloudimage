@@ -6,6 +6,8 @@
 
 using namespace std;
 
+int m = 0;
+
 // pcimageの引数．画像のサイズと解像度
 // main.cppでコマンドライン引数から受け取る
 extern int imgWidth, imgHeight, imgResolution;
@@ -126,7 +128,7 @@ int urg_unko::connectURG(){
 */
 int urg_unko::getData4URG(float& dist,float& old, float& rad){
 	//データ取得
-#if 1
+#if 0
 	//データの取得範囲を変更する場合
 	urg_set_scanning_parameter(&urg,
 		urg_deg2step(&urg, -90),
@@ -201,7 +203,8 @@ void urg_unko::set_3D_surface(int data_n)
 
 			//異常値ならとばす
 			if ((l <= min_distance) || (l >= max_distance)) {
-				pcdWrite(0, 0, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
+				//pcdWrite(0, 0, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
+				pcdWrite(0, 0, 0);
 				continue;
 				l = max_distance;
 			}
@@ -216,8 +219,8 @@ void urg_unko::set_3D_surface(int data_n)
 			z = 120.0;*/
 
 			// センサ空間時の取得座標
-			x = (float)(l * cos(radian) + urgpos[3]);
-			y = -(float)(l * sin(radian) + urgpos[3]);
+			x = (float)(l * cos(radian + urgpos[3]));
+			y = (float)(l * sin(radian + urgpos[3]));
 
 			if (x < 1000 && abs(y) < 1000)
 			{
@@ -229,9 +232,9 @@ void urg_unko::set_3D_surface(int data_n)
 			pointpos[1] = -sin(this->radian + urgpos[3]) * x + cos(this->radian + urgpos[3]) * y - sin(this->radian) * (distance - distance_old + urgpos[1]) + cos(this->radian) * urgpos[2] + currentCoord_y;
 			pointpos[2] = z;*/
 
-			pointpos[0] = -sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) - sin(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_x;
-			pointpos[1] = +cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_y;
-			pointpos[2] = x + urgpos[0];
+			pointpos[0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_x;
+			pointpos[1] = x + urgpos[0];
+			pointpos[2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_y;
 			
 
 			// 座標を保存
@@ -265,8 +268,18 @@ void urg_unko::pcdinit()
 	ofs.open("./" + pcimage.getDirname() + "/pointcloud_" + std::to_string(pcdnum) + ".pcd");
 
 	//pcdファイル番号を進めてデータ数カウント用変数を初期化
-	pcdnum++;
+	//pcdnum++;
 	pcdcount = 0;
+
+	if (urgpos[3] < 0)
+	{
+		pcdnum = m;
+	}
+	else if (urgpos[3] > 0)
+	{
+		pcdnum = m;
+	}
+	m++;
 
 	//ヘッダを記入
 	ofs << "# .PCD v.7 - Point Cloud Data file format\n"

@@ -9,8 +9,8 @@ int main(int argc, char* argv[])
 	int URG_COM[] = { 6, 27 };
 
 	//URGの位置を指定
-	float urgPOS[][4] = { 20.0, 350.0, -280.0, 0.5236,
-		20.0, 350.0, 280.0, -0.5236 };
+	float urgPOS[][4] = { 685.0, -325.0, 110.0, -1.5708,
+		685.0, 325.0, 110.0, 1.5708 };
 
 	//ArduinoのCOMポートを指定
 	int ARDUINO_COM = 10;

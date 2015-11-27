@@ -119,8 +119,8 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	data_R += static_cast<int>(receive_char2);
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ğŒvZ
-	DL = receive_char1 * 24.0086517664 / 1.005 ;
-	DR = receive_char2 * 23.751783167;
+	DL = receive_char1 * 25.7436;
+	DR = receive_char2 * 25.7436;
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
 	DIS = (DL + DR) / 2;
