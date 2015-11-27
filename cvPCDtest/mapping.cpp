@@ -78,6 +78,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	unsigned char	receive_data[2];
 	int				ret;
 	float			DL, DR, DIS, ANG;
+	float			DL_old = 0.0, DR_old = 0.0;
 	unsigned long	len;
 
 	float			droidOrientation[3];
@@ -119,12 +120,24 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	data_R += static_cast<int>(receive_char2);
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ğŒvZ
-	DL = receive_char1 * 25.7436;
-	DR = receive_char2 * 25.7436;
+	DL = receive_char1 * 25.22;
+	DR = receive_char2 * 25.22;
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
 	DIS = (DL + DR) / 2;
-	ANG = -(DL - DR) / 530;	//‰E‰ñ“]‚ª³
+	ANG = -((DL - DR) / 530);    //‰E‰ñ“]‚ª³
+
+	/*ANG = abs((DL - DR) / 530);	//‰E‰ñ“]‚ª³
+
+	if (DL < DL_old && DR_old < DR)
+	{
+		ANG = -ANG;
+	}
+	else if (DR <= DR_old && DL_old <= DL)
+	{
+		ANG = ANG;
+	}*/
+
 
 	//ˆÚ“®—ÊC‰ñ“]—Ê‚ğÏZ—p•Ï”‚ÖÏZ
 	dist += DIS;
