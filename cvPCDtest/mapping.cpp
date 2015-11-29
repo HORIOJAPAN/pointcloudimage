@@ -120,7 +120,7 @@ int Encoder(HANDLE hComm, float& dist, float& rad)
 	data_R += static_cast<int>(receive_char2);
 
 	//¶‰E—Ö‚Ì‰ñ“]—Ê‚©‚çˆÚ“®—Ê‚ğŒvZ
-	DL = receive_char1 * 25.22;
+	DL = receive_char1 * 25.22 * 0.995;
 	DR = receive_char2 * 25.22;
 
 	//ˆÚ“®‹——£C‰ñ“]—Ê‚ğŒvZ
