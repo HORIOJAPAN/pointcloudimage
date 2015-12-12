@@ -180,7 +180,7 @@ void urg_unko::set_3D_surface(int data_n)
 	long min_distance;
 	long max_distance;
 
-	if (abs(distance - distance_old) >= scaninterval){//位置が設定値以上動いたとき
+	if (abs(distance - distance_old) >= scaninterval){ //位置が設定値以上動いたとき
 
 		// 全てのデータの X-Y の位置を取得
 		//正常に取得されるデータの最大値，最小値を取得
@@ -227,20 +227,27 @@ void urg_unko::set_3D_surface(int data_n)
 				shMem.setShMemData(true, EMARGENCY);
 			}
 
-			//2次元平面の座標変換
-			/*pointpos[0] = +cos(this->radian + urgpos[3]) * x + sin(this->radian + urgpos[3]) * y + cos(this->radian) * (distance - distance_old + urgpos[1]) + sin(this->radian) * urgpos[2] + currentCoord_x;
-			pointpos[1] = -sin(this->radian + urgpos[3]) * x + cos(this->radian + urgpos[3]) * y - sin(this->radian) * (distance - distance_old + urgpos[1]) + cos(this->radian) * urgpos[2] + currentCoord_y;
-			pointpos[2] = z;*/
+			if (urgpos[3] == 0.0)
+			{
+				//2次元平面の座標変換
+				pointpos[0] = cos(this->radian) * x + sin(this->radian) * y + cos(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) + sin(this->radian) * urgpos[1] + currentCoord_x;
+				pointpos[1] = urgpos[0];
+				pointpos[2] = sin(this->radian) * x - cos(this->radian) * y + sin(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) - cos(this->radian) * urgpos[1] + currentCoord_y;
+			}
 
-			pointpos[0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_x;
-			pointpos[1] = x + urgpos[0];
-			pointpos[2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_y;
+			else
+			{
+				//3次元空間の座標変換
+				pointpos[0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_x;
+				pointpos[1] = x + urgpos[0];
+				pointpos[2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_y;
+			}
 			
 
 			// 座標を保存
 #ifndef DEBUG_WRITE
 			// 点のみ書き込む
-			pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000);
+			pcimage.writePoint(pointpos[0] / 1000, pointpos[2] / 1000);
 			pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, pointpos[2] / 1000);
 #else
 			// 点を書き込んで現在地からの直線を引く
@@ -276,6 +283,10 @@ void urg_unko::pcdinit()
 		pcdnum = m;
 	}
 	else if (urgpos[3] > 0)
+	{
+		pcdnum = m;
+	}
+	else
 	{
 		pcdnum = m;
 	}
