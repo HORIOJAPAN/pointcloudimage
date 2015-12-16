@@ -189,75 +189,102 @@ void urg_unko::set_3D_surface(int data_n)
 		//pcdファイルの初期化
 		pcdinit();
 
+		float pointpos[3];
+		//float pointpos[10000][3];
 		float droidOrientation[3] = {};
 		float droidGPS[3] = {};
 		//rcvDroid.getOrientationData(droidOrientation);
 		//rcvDroid.getGPSData(droidGPS);
 
-		//データの数だけ実際の座標を計算してマップ，pcdファイルに書き込む
-		for (int i = 0; i < data_n; ++i) {
-			long l = data[i];	//取得した点までの距離
-			double radian;
-			float x, y, z;
-			float pointpos[3];
+		//for (int j = 0; j < 10; j += 1){
 
-			//異常値ならとばす
-			if ((l <= min_distance) || (l >= max_distance)) {
-				//pcdWrite(0, 0, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
-				pcdWrite(0, 0, 0);
-				continue;
-				l = max_distance;
-			}
+			//データの数だけ実際の座標を計算してマップ，pcdファイルに書き込む
+			for (int i = 0; i < data_n; ++i) {
+				long l = data[i];	//取得した点までの距離
+				double radian;
+				float x, y, z;
+				//float pointpos[100][3];
 
-			//点までの角度を取得してxyに変換
-			//(極座標で取得されるデータをデカルト座標に変換)
-			radian = urg_index2rad(&urg, i);
+				//異常値ならとばす
+				if ((l <= min_distance) || (l >= max_distance)) {
+					//pcdWrite(0, 0, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
+					pcdWrite(0, 0, 0);
+					continue;
+					l = max_distance;
+				}
 
-			// センサ平面時の取得座標
-			/*x = (float)(l * cos(radian));
-			y = (float)(l * sin(radian));
-			z = 120.0;*/
+				//点までの角度を取得してxyに変換
+				//(極座標で取得されるデータをデカルト座標に変換)
+				radian = urg_index2rad(&urg, i);
 
-			// センサ空間時の取得座標
-			x = (float)(l * cos(radian + urgpos[3]));
-			y = (float)(l * sin(radian + urgpos[3]));
+				// センサ平面時の取得座標
+				/*x = (float)(l * cos(radian));
+				y = (float)(l * sin(radian));
+				z = 120.0;*/
 
-			if (x < 1000 && abs(y) < 1000)
-			{
-				shMem.setShMemData(true, EMARGENCY);
-			}
+				// センサ空間時の取得座標
+				x = (float)(l * cos(radian + urgpos[3]));
+				y = (float)(l * sin(radian + urgpos[3]));
 
-			if (urgpos[3] == 0.0)
-			{
-				//2次元平面の座標変換
-				pointpos[0] = cos(this->radian) * x - sin(this->radian) * y + cos(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) - sin(this->radian) * urgpos[1] + currentCoord_x;
-				pointpos[1] = urgpos[0];
-				pointpos[2] = -sin(this->radian) * x - cos(this->radian) * y - sin(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) - cos(this->radian) * urgpos[1] + currentCoord_y;
-			}
+				if (x < 1000 && abs(y) < 1000)
+				{
+					shMem.setShMemData(true, EMARGENCY);
+				}
 
-			else
-			{
-				//3次元空間の座標変換
-				pointpos[0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_x;
-				pointpos[1] = x + urgpos[0];
-				pointpos[2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_y;
-			}
-			
+				if (urgpos[3] == 0.0)
+				{
+					//2次元平面の座標変換
+					pointpos[0] = cos(this->radian) * x - sin(this->radian) * y + cos(this->radian) * (distance - distance_old + urgpos[2]) - sin(this->radian) * urgpos[1] + currentCoord_x;
+					pointpos[1] = urgpos[0];
+					pointpos[2] = -sin(this->radian) * x - cos(this->radian) * y - sin(this->radian) * (distance - distance_old + urgpos[2]) - cos(this->radian) * urgpos[1] + currentCoord_y;
 
-			// 座標を保存
+					//pointpos[j * data_n + i][0] = cos(this->radian) * x - sin(this->radian) * y + cos(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) - sin(this->radian) * urgpos[1] + currentCoord_x;
+					//pointpos[j * data_n + i][1] = urgpos[0];
+					//pointpos[j * data_n + i][2] = -sin(this->radian) * x - cos(this->radian) * y - sin(this->radian) * (((distance - distance_old) * i / data_n) + urgpos[2]) - cos(this->radian) * urgpos[1] + currentCoord_y;
+				}
+
+				else
+				{
+					//3次元空間の座標変換
+					pointpos[0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_x;
+					pointpos[1] = x + urgpos[0];
+					pointpos[2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_y;
+					
+					//pointpos[j * data_n + i][0] = sin(this->radian) * y + cos(this->radian) * ((distance - distance_old) * i / data_n) + sin(this->radian) * urgpos[1] + cos(this->radian) * urgpos[2] + currentCoord_x;
+					//pointpos[j * data_n + i][1] = x + urgpos[0];
+					//pointpos[j * data_n + i][2] = cos(this->radian) * y + sin(this->radian) * ((distance - distance_old) * i / data_n) + cos(this->radian) * urgpos[1] + sin(this->radian) * urgpos[2] + currentCoord_y;
+				}
+
+
+				// 座標を保存
 #ifndef DEBUG_WRITE
-			// 点のみ書き込む
-			pcimage.writePoint(pointpos[0] / 1000, pointpos[2] / 1000);
-			pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, pointpos[2] / 1000);
-#else
-			// 点を書き込んで現在地からの直線を引く
-			pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, currentCoord_x / 1000, currentCoord_y / 1000);
-			pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
-#endif
+				// 点のみ書き込む
+				//pcimage.writePoint(pointpos[j * data_n + i][0] / 1000, pointpos[j * data_n + i][2] / 1000);
 
-		}
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[2] / 1000);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, pointpos[2] / 1000);
+#else
+				// 点を書き込んで現在地からの直線を引く
+				pcimage.writePoint(pointpos[0] / 1000, pointpos[1] / 1000, currentCoord_x / 1000, currentCoord_y / 1000);
+				pcdWrite(pointpos[0] / 1000, pointpos[1] / 1000, currentCoord_x / 1000, currentCoord_y / 1000, droidOrientation, droidGPS);
+#endif
+				//printf("%d   %f,%f,%f\n", j * data_n + i, pointpos[j * data_n + i][0], pointpos[j * data_n + i][1], pointpos[j * data_n + i][2]);
+
+			}
+
+		//}
+
 		//１スキャン分のpcdファイルを保存
 		pcdSave();
+
+		/*for (int m = 0; m < 10000; m++){
+
+			pcdWrite(pointpos[m][0] / 1000, pointpos[m][1] / 1000, pointpos[m][2] / 1000);
+			//１スキャン分のpcdファイルを保存
+			pcdSave();
+			
+		}*/
+
 	}
 }
 
