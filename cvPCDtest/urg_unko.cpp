@@ -127,7 +127,7 @@ int urg_unko::connectURG(){
 *		0
 */
 int urg_unko::getData4URG(float& dist,float& old, float& rad){
-	//データ取得
+	//デ-タ取得
 #if 0
 	//データの取得範囲を変更する場合
 	urg_set_scanning_parameter(&urg,
